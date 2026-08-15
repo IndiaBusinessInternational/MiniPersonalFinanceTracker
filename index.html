@@ -80,7 +80,7 @@ body[data-theme="light"]{color-scheme:light}
 .topbar-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px;gap:10px}
 .topbar-left{display:flex;align-items:center;gap:10px;min-width:0}
 .mono-logo{width:38px;height:38px;border-radius:8px;background:var(--black);border:1.5px solid var(--cyan);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.mono-logo span{font-family:var(--font);font-weight:700;font-size:12px;color:var(--cyan);letter-spacing:0.5px}
+.mono-logo span{font-family:var(--font);font-weight:700;font-size:12px;color:var(--cyan);letter-spacing:0.2px}
 .app-name{color:var(--cyan);font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ver-badge{font-size:10px;font-weight:700;background:var(--cyan);color:#000;padding:2px 7px;border-radius:20px;letter-spacing:0.04em;flex-shrink:0}
 .topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
@@ -441,6 +441,18 @@ tr.row-editing td{background:var(--info-bg) !important}
 .pf-avatar.has-photo span{display:none}
 .pf-photo-btns{display:flex;flex-wrap:wrap;gap:8px}
 
+/* Top bar at phone widths. The title sat in a plain div with no `min-width:0`,
+   so the flex item refused to shrink below its content and the version badge
+   rode out over the theme switch. The title truncates; the badge never does,
+   because it is how a release is identified on a device you cannot inspect. */
+.topbar-title{min-width:0;flex:1 1 auto}
+.app-name{display:flex;align-items:center;gap:7px;min-width:0}
+.app-name-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+@media(max-width:600px){
+  /* The switch already says what it does — the word beside it only costs room. */
+  .toggle-label{display:none}
+}
+
 /* Install dialog. Every browser gets an answer here, including the ones that
    never fire beforeinstallprompt — which is all of iOS. */
 .ins-hero{display:flex;align-items:center;gap:14px;padding:2px 0 16px}
@@ -482,9 +494,9 @@ tr.row-editing td{background:var(--info-bg) !important}
 <div class="topbar">
   <div class="topbar-inner">
     <div class="topbar-left">
-      <div class="mono-logo"><span class="js-mono">NSS</span></div>
-      <div>
-        <div class="app-name">Mini Personal Finance Tracker <span class="ver-badge">v1.1</span></div>
+      <div class="mono-logo"><span class="js-mono">Mini</span></div>
+      <div class="topbar-title">
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v1.2</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -515,7 +527,7 @@ tr.row-editing td{background:var(--info-bg) !important}
 <div class="hero">
   <div class="hero-inner">
     <button class="hero-avatar" id="heroAvatar" type="button" onclick="openProfile()" aria-label="Change profile photo and name">
-      <span class="js-mono">NSS</span>
+      <span class="js-mono">Mini</span>
     </button>
     <div class="hero-info">
       <button class="hero-name-btn" type="button" onclick="openProfile()" title="Edit name, subtitle and photo">
@@ -680,7 +692,7 @@ tr.row-editing td{background:var(--info-bg) !important}
     </div>
   </div>
 
-  <div class="footer">Mini Personal Finance Tracker v1.1 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v1.2 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -706,7 +718,7 @@ tr.row-editing td{background:var(--info-bg) !important}
   <button class="drawer-item" onclick="closeDrawer();changeBackend()"><i class="ti ti-plug-connected"></i> Backend Connection</button>
   <button class="drawer-item" onclick="signOut()"><i class="ti ti-logout"></i> Sign Out</button>
   <div class="drawer-section-label">About</div>
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px"><i class="ti ti-info-circle"></i> Version 1.1 — August 2026</div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px"><i class="ti ti-info-circle"></i> Version 1.2 — August 2026</div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -768,10 +780,10 @@ tr.row-editing td{background:var(--info-bg) !important}
 <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
   <div class="gate-card">
     <div class="gate-brand">
-      <div class="mono-logo"><span class="js-mono">NSS</span></div>
+      <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger &middot; v1.1</div>
+        <div class="gate-sub">Private ledger &middot; v1.2</div>
       </div>
     </div>
 
@@ -853,7 +865,7 @@ tr.row-editing td{background:var(--info-bg) !important}
   </div>
   <div class="sheet-body">
     <div class="pf-preview">
-      <div class="pf-avatar" id="pfAvatar"><span id="pfMono">NSS</span></div>
+      <div class="pf-avatar" id="pfAvatar"><span id="pfMono">Mini</span></div>
       <div class="pf-photo-btns">
         <button class="s-btn" type="button" onclick="document.getElementById('pfFile').click()"><i class="ti ti-camera"></i> Choose photo</button>
         <button class="s-btn" type="button" onclick="clearPhoto()"><i class="ti ti-trash"></i> Remove</button>
@@ -1024,10 +1036,15 @@ tickClock(); setInterval(tickClock, 1000);
    option gated on that event is invisible on exactly the device she will use
    most. The option is therefore always present, and this code decides whether
    it can install for her or has to show her where the button is. */
+/* Whether the page is being viewed FROM an installed copy — which is not the
+   same question as "is it installed", and cannot be.
+   `display-mode: fullscreen` was in here and had to go: every browser reports
+   it while merely in F11 fullscreen, so a maximised window read as installed.
+   `minimal-ui` went for the same reason. Even `standalone` only says how THIS
+   page is being displayed — uninstalling never notifies an open page — so this
+   is a hint for choosing wording, never a gate on what she is allowed to do. */
 function isInstalled(){
   return window.matchMedia('(display-mode: standalone)').matches
-      || window.matchMedia('(display-mode: fullscreen)').matches
-      || window.matchMedia('(display-mode: minimal-ui)').matches
       || navigator.standalone === true;             // iOS Safari's own flag
 }
 
@@ -1114,26 +1131,45 @@ const INSTALL_STEPS = {
     note:'If it is not there, open this page in Chrome, Edge or Safari.' }
 };
 
+function installStepsHTML(spec){
+  return '<div class="ins-steps"><div class="ins-steps-h"><i class="ti ti-list-numbers"></i> '
+    + esc(spec.device) + '</div><ol>' + spec.steps.map(s => '<li>' + s + '</li>').join('') + '</ol></div>'
+    + (spec.note ? '<div class="ins-note">' + spec.note + '</div>' : '');
+}
+
+/* Show the steps regardless of what the detection thinks — the way out of a
+   stale "already installed". */
+function installAnyway(){
+  const spec = INSTALL_STEPS[installEnv()] || INSTALL_STEPS.unknown;
+  document.getElementById('insBody').innerHTML = installStepsHTML(spec);
+}
+
 function openInstall(){
   const box = document.getElementById('insBody');
-  const env = installEnv();
-  const spec = INSTALL_STEPS[env] || INSTALL_STEPS.unknown;
+  const spec = INSTALL_STEPS[installEnv()] || INSTALL_STEPS.unknown;
   document.getElementById('insDevice').textContent = spec.device;
 
-  if(isInstalled()){
-    box.innerHTML = '<div class="ins-done"><i class="ti ti-circle-check"></i>'
-      + '<div><b>Already installed.</b> You are using the installed app right now &mdash; '
-      + 'look for the <b>NSS</b> icon on your home screen or app list.</div></div>';
-  } else if(deferredPrompt){
-    // Chromium has handed us a real prompt: one tap, no instructions needed.
+  if(deferredPrompt){
+    // Checked first, and it outranks isInstalled(): a browser does not offer to
+    // install something it already has, so a live prompt is proof it is gone.
     box.innerHTML = '<button class="btn-save" type="button" style="width:100%;justify-content:center" onclick="triggerInstall()">'
       + '<i class="ti ti-download"></i> Install now</button>'
       + '<div class="ins-note">Your browser will ask you to confirm. Nothing is downloaded from an app store '
       + '&mdash; the app is this page, saved to your device.</div>';
+  } else if(isInstalled()){
+    // A hint, not a verdict. Deleting the app never tells this page, and on
+    // Android removing the home-screen icon can leave the app installed, so
+    // this must never be the last word — the steps are one tap away.
+    box.innerHTML = '<div class="ins-done"><i class="ti ti-circle-check"></i>'
+      + '<div><b>This looks like the installed app.</b> Look for the <b>Mini</b> icon '
+      + 'on your home screen or app list.</div></div>'
+      + '<button class="s-btn" type="button" style="width:100%;justify-content:center;margin-top:12px" onclick="installAnyway()">'
+      + '<i class="ti ti-refresh"></i> Deleted it? Install it again</button>'
+      + '<div class="ins-note">If you removed the app, your browser may need a moment &mdash; or a reload of this '
+      + 'page &mdash; before it offers to install it again. The button above shows the manual steps, '
+      + 'which always work.</div>';
   } else {
-    box.innerHTML = '<div class="ins-steps"><div class="ins-steps-h"><i class="ti ti-list-numbers"></i> '
-      + esc(spec.device) + '</div><ol>' + spec.steps.map(s => '<li>' + s + '</li>').join('') + '</ol></div>'
-      + (spec.note ? '<div class="ins-note">' + spec.note + '</div>' : '');
+    box.innerHTML = installStepsHTML(spec);
   }
   document.getElementById('installOverlay').classList.add('open');
   document.getElementById('installModal').classList.add('open');
@@ -1160,12 +1196,13 @@ window.addEventListener('appinstalled', () => {
   document.getElementById('installBanner').classList.remove('show');
   document.getElementById('installBtn').style.display = 'none';
   closeInstall();
-  showToast('Installed — look for the NSS icon on your home screen');
+  showToast('Installed — look for the Mini icon on your home screen');
 });
 
 function triggerInstall(){
-  if(isInstalled()){ showToast('Already installed on this device'); return; }
-  if(!deferredPrompt){ openInstall(); return; }   // no native prompt — show the steps
+  // Never dead-end on a detection that cannot be trusted: with no live prompt,
+  // open the dialog so she can read the steps and install it again herself.
+  if(!deferredPrompt){ openInstall(); return; }
   deferredPrompt.prompt();
   deferredPrompt.userChoice.then(c => {
     if(c.outcome === 'accepted') showToast('Installing…');
@@ -2647,7 +2684,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v1.1</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v1.2</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -2969,25 +3006,22 @@ function setOffline(on){
 
 /* ── Profile ────────────────────────────────────────────────────────
    Name, subtitle and photo belong to whoever is holding the phone, so they are
-   set in the app rather than baked into the page — which is also what lets the
-   monogram follow the name instead of being a second thing to keep in step. */
+   set in the app rather than baked into the page.
+   The monogram is the APP's mark, not the person's initials — it stays "Mini"
+   whatever the display name says, the way an app icon does. It is the fallback
+   for the avatar until she sets a photo, and it must match the launcher icons,
+   so changing it here means regenerating icon-*.png too. */
+const MONO = 'Mini';
 const PROFILE_DEFAULT = { name:'N. Sowdhamini Sasimurugan', sub:'Personal Income & Expense Ledger', photo:'' };
 let PROFILE = Object.assign({}, PROFILE_DEFAULT);
 let pfPhotoDraft = '';
-
-function initials(name){
-  const parts = String(name || '').replace(/[^A-Za-z.\s]/g, ' ').split(/[\s.]+/).filter(Boolean);
-  if(!parts.length) return 'NSS';
-  return parts.slice(0, 3).map(w => w[0].toUpperCase()).join('');
-}
 function loadProfile(){
   try{ PROFILE = Object.assign({}, PROFILE_DEFAULT, JSON.parse(localStorage.getItem(LS.profile) || '{}') || {}); }
   catch(e){ PROFILE = Object.assign({}, PROFILE_DEFAULT); }
   paintProfile();
 }
 function paintProfile(){
-  const mono = initials(PROFILE.name);
-  document.querySelectorAll('.js-mono').forEach(el => el.textContent = mono);
+  document.querySelectorAll('.js-mono').forEach(el => el.textContent = MONO);
   document.getElementById('heroName').textContent = PROFILE.name;
   document.getElementById('heroSub').textContent  = PROFILE.sub;
   const foot = document.getElementById('footName');
@@ -3010,7 +3044,7 @@ function closeProfile(){
 }
 function paintProfilePreview(){
   const av = document.getElementById('pfAvatar');
-  document.getElementById('pfMono').textContent = initials(document.getElementById('pfName').value);
+  document.getElementById('pfMono').textContent = MONO;
   av.classList.toggle('has-photo', !!pfPhotoDraft);
   av.style.backgroundImage = pfPhotoDraft ? 'url("' + pfPhotoDraft + '")' : '';
 }

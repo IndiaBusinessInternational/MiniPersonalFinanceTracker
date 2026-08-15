@@ -133,8 +133,12 @@ hide the install path on exactly the device she uses most. So:
   Internet, Android Firefox, macOS Safari's *Add to Dock*, and the in-app
   webviews (Instagram, Facebook, WhatsApp) where installing is impossible and
   the only fix is *Open in browser*.
-- **Already installed** — it says so, rather than offering a button that does
-  nothing.
+- **Already installed** — it says so, but never dead-ends there. Deleting an app
+  does not notify an open page, and on Android removing the home-screen icon can
+  leave the app installed, so the detection is a hint for wording only. A
+  **Deleted it? Install it again** button always reveals the manual steps.
+  A live `beforeinstallprompt` outranks the hint entirely: a browser does not
+  offer to install something it already has.
 - **iOS Safari** also gets a permanent top-bar Install button and a one-off
   banner a week apart, because iOS gives no other hint that this is possible.
 
@@ -143,6 +147,12 @@ middle 80% for Android's adaptive shapes, and an `apple-touch-icon` — without
 that last one iOS uses a **screenshot of the page** as the home-screen tile.
 
 ## Version
+
+**v1.2** — August 2026. The mark reads **Mini** everywhere (app monogram, not
+the user's initials — it no longer follows the display name), icons regenerated
+to match. Install detection no longer treats F11 fullscreen as "installed" and
+can always be overridden. Top bar no longer collides its version badge with the
+theme switch at phone widths.
 
 **v1.1** — August 2026. Install-as-an-app flow for every browser, real PNG icon
 set, `apple-touch-icon`.
