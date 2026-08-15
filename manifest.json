@@ -1,0 +1,42 @@
+{
+  "name": "Mini Personal Finance Tracker",
+  "short_name": "Mini Finance",
+  "description": "A private income, expense and credit ledger with a full financial analysis pack. Works offline.",
+  "id": "/MiniPersonalFinanceTracker/",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "categories": ["finance", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='24' fill='%23000'/><text x='96' y='130' font-family='Roboto,Segoe UI,sans-serif' font-size='62' font-weight='700' fill='%2300c5ff' text-anchor='middle'>NSS</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='64' fill='%23000'/><text x='256' y='348' font-family='Roboto,Segoe UI,sans-serif' font-size='166' font-weight='700' fill='%2300c5ff' text-anchor='middle'>NSS</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23000'/><text x='256' y='320' font-family='Roboto,Segoe UI,sans-serif' font-size='128' font-weight='700' fill='%2300c5ff' text-anchor='middle'>NSS</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Financial Analysis",
+      "short_name": "Analysis",
+      "url": "./index.html?open=report"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+# Nothing secret belongs in this repo. The Apps Script URL and the password
+# live in her own Google account and on her own devices, never here.
+*.tmp
+*.bak
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
