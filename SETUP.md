@@ -101,19 +101,34 @@ That is it. She stays signed in for **30 days** per device before it asks again.
 
 ---
 
-## Step 6 — Install it on the phone
+## Step 6 — Install it as an app
 
-**Android (Chrome)** — an *Install this app* banner appears at the top; tap
-**Install App**. Or ⋮ menu → *Add to Home screen*.
+Open the **☰ menu → Install on this Device**. The app works out which browser
+she is using and either installs itself or shows her the exact steps for it.
 
-**iPhone (Safari)** — the Share button → **Add to Home Screen**. iOS only offers
-this in Safari, not in Chrome.
+If you would rather do it by hand:
+
+**Android (Chrome)** — tap **Install App** on the banner, or ⋮ menu →
+*Add to Home screen*.
+
+**iPhone / iPad** — this must be done in **Safari**: the Share button
+<kbd>⌴</kbd> at the bottom → **Add to Home Screen** → **Add**. Chrome, Edge and
+Firefox on iOS cannot do it; they only make a bookmark that reopens the browser.
+There is no one-tap install button on iOS — Apple does not provide one, so this
+is how every app-like site is added on an iPhone.
 
 **Laptop (Chrome/Edge)** — the install icon in the address bar, or the
 **Install** button in the app's top bar.
 
-Once installed it opens like a normal app, full screen, with no browser bar, and
-it opens straight to her last-saved ledger even with no signal.
+**Mac (Safari)** — File menu → **Add to Dock** (macOS Sonoma or newer).
+
+> If she opens the link from inside WhatsApp or Instagram, the page runs in that
+> app's own mini-browser, which cannot install anything. Use its menu →
+> **Open in browser** first.
+
+Once installed it opens like a normal app — full screen, its own **NSS** icon,
+no browser bar — and it opens straight to her last-saved ledger even with no
+signal.
 
 ---
 

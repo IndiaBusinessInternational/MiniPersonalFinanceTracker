@@ -32,8 +32,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 
-<!-- Inline SVG favicon — NSS monogram -->
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='10' fill='%23000'/><text x='32' y='46' font-family='Roboto,sans-serif' font-size='26' font-weight='700' fill='%2300c5ff' text-anchor='middle'>NSS</text></svg>">
+<!-- Icons. iOS ignores the manifest and reads apple-touch-icon; without it the
+     home-screen tile is a screenshot of the page instead of the app's mark. -->
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -438,6 +441,26 @@ tr.row-editing td{background:var(--info-bg) !important}
 .pf-avatar.has-photo span{display:none}
 .pf-photo-btns{display:flex;flex-wrap:wrap;gap:8px}
 
+/* Install dialog. Every browser gets an answer here, including the ones that
+   never fire beforeinstallprompt — which is all of iOS. */
+.ins-hero{display:flex;align-items:center;gap:14px;padding:2px 0 16px}
+.ins-icon{width:60px;height:60px;border-radius:14px;flex-shrink:0;border:1.5px solid var(--cyan);box-shadow:0 0 20px rgba(0,197,255,.25)}
+.ins-hero-name{font-size:14.5px;font-weight:700;color:var(--text)}
+.ins-hero-sub{font-size:11.5px;color:var(--text3);margin-top:3px;line-height:1.5}
+.ins-why{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.ins-why div{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--text2);line-height:1.5}
+.ins-why i{color:var(--cyan);font-size:15px;flex-shrink:0;margin-top:1px}
+.ins-steps{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px 15px 14px 16px;margin-bottom:14px}
+.ins-steps-h{font-size:12px;font-weight:600;color:var(--cyan);margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.ins-steps ol{margin:0 0 0 16px;padding:0}
+.ins-steps li{font-size:12.5px;color:var(--text2);line-height:1.65;margin-bottom:6px}
+.ins-steps li:last-child{margin-bottom:0}
+.ins-steps b{color:var(--text)}
+.ins-key{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--border2);border-radius:5px;padding:1px 6px;font-size:11.5px;color:var(--text);white-space:nowrap}
+.ins-note{font-size:11.5px;color:var(--text3);line-height:1.6;margin-top:12px;border-top:1px solid var(--border);padding-top:12px}
+.ins-done{background:var(--success-bg);border:1px solid var(--success-border);color:var(--success-text);border-radius:var(--radius);padding:13px 14px;font-size:12.5px;line-height:1.6;display:flex;gap:9px;align-items:flex-start}
+.ins-done i{font-size:16px;flex-shrink:0}
+
 /* Shown when the ledger on screen is the saved copy rather than a live read. */
 .offline-note{display:none;margin:0 0 12px;padding:9px 12px;border-radius:var(--radius);background:var(--warning-bg);border:1px solid var(--warning-border);color:var(--warning-text);font-size:12px;line-height:1.5}
 .offline-note.show{display:block}
@@ -461,7 +484,7 @@ tr.row-editing td{background:var(--info-bg) !important}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">NSS</span></div>
       <div>
-        <div class="app-name">Mini Personal Finance Tracker <span class="ver-badge">v1.0</span></div>
+        <div class="app-name">Mini Personal Finance Tracker <span class="ver-badge">v1.1</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -657,7 +680,7 @@ tr.row-editing td{background:var(--info-bg) !important}
     </div>
   </div>
 
-  <div class="footer">Mini Personal Finance Tracker v1.0 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v1.1 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -674,14 +697,16 @@ tr.row-editing td{background:var(--info-bg) !important}
   <a class="drawer-item" id="sheetLinkDrawer" href="#" target="_blank" rel="noopener" style="display:none" onclick="closeDrawer()"><i class="ti ti-external-link"></i> Open Google Sheet</a>
   <div class="drawer-section-label">Settings</div>
   <button class="drawer-item" onclick="toggleTheme();closeDrawer()"><i class="ti ti-sun"></i> Toggle Dark / Light Mode</button>
-  <button class="drawer-item" id="drawerInstallBtn" style="display:none" onclick="triggerInstall();closeDrawer()"><i class="ti ti-device-mobile-down"></i> Install as App (PWA)</button>
+  <!-- Always shown. beforeinstallprompt never fires on iOS, so gating this on
+       it left the whole iPhone install path invisible. -->
+  <button class="drawer-item" id="drawerInstallBtn" onclick="closeDrawer();openInstall()"><i class="ti ti-device-mobile-down"></i> Install on this Device</button>
   <button class="drawer-item" onclick="closeDrawer();openProfile()"><i class="ti ti-user-circle"></i> Profile &amp; Photo</button>
   <div class="drawer-section-label">Account</div>
   <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px"><i class="ti ti-user"></i> Signed in as <b id="drawerUser" style="color:var(--cyan);font-weight:600">—</b></div>
   <button class="drawer-item" onclick="closeDrawer();changeBackend()"><i class="ti ti-plug-connected"></i> Backend Connection</button>
   <button class="drawer-item" onclick="signOut()"><i class="ti ti-logout"></i> Sign Out</button>
   <div class="drawer-section-label">About</div>
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px"><i class="ti ti-info-circle"></i> Version 1.0 — August 2026</div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px"><i class="ti ti-info-circle"></i> Version 1.1 — August 2026</div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -746,7 +771,7 @@ tr.row-editing td{background:var(--info-bg) !important}
       <div class="mono-logo"><span class="js-mono">NSS</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger &middot; v1.0</div>
+        <div class="gate-sub">Private ledger &middot; v1.1</div>
       </div>
     </div>
 
@@ -792,6 +817,30 @@ tr.row-editing td{background:var(--info-bg) !important}
       <div class="gate-msg" id="signInMsg" role="status" aria-live="polite"></div>
       <button class="gate-link" type="button" onclick="gateStep('connect')">Use a different backend link</button>
     </div>
+  </div>
+</div>
+
+<!-- INSTALL DIALOG -->
+<div class="sheet-overlay" id="installOverlay" onclick="closeInstall()"></div>
+<div class="sheet-modal" id="installModal" role="dialog" aria-modal="true" aria-labelledby="installTitle">
+  <div class="sheet-hdr">
+    <span class="sheet-hdr-title" id="installTitle"><i class="ti ti-device-mobile-down"></i> Install as an App</span>
+    <button class="drawer-close" type="button" onclick="closeInstall()" aria-label="Close"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="sheet-body">
+    <div class="ins-hero">
+      <img class="ins-icon" src="icon-192.png" alt="" width="60" height="60">
+      <div>
+        <div class="ins-hero-name">Mini Personal Finance Tracker</div>
+        <div class="ins-hero-sub" id="insDevice">On this device</div>
+      </div>
+    </div>
+    <div class="ins-why">
+      <div><i class="ti ti-app-window"></i> Opens full screen with its own icon, like any other app &mdash; no browser bar.</div>
+      <div><i class="ti ti-wifi-off"></i> Opens straight to your ledger even with no signal.</div>
+      <div><i class="ti ti-bolt"></i> Starts instantly, and takes almost no space on the phone.</div>
+    </div>
+    <div id="insBody"></div>
   </div>
 </div>
 
@@ -969,36 +1018,185 @@ function tickClock(){
 }
 tickClock(); setInterval(tickClock, 1000);
 
-// ── PWA ──
+/* ── PWA INSTALL ────────────────────────────────────────────────────────────
+   Only Chromium fires `beforeinstallprompt`. iOS never does — Safari installs
+   through Share → Add to Home Screen and offers no API at all — so an install
+   option gated on that event is invisible on exactly the device she will use
+   most. The option is therefore always present, and this code decides whether
+   it can install for her or has to show her where the button is. */
+function isInstalled(){
+  return window.matchMedia('(display-mode: standalone)').matches
+      || window.matchMedia('(display-mode: fullscreen)').matches
+      || window.matchMedia('(display-mode: minimal-ui)').matches
+      || navigator.standalone === true;             // iOS Safari's own flag
+}
+
+/* Which set of instructions applies. Browser sniffing is the wrong tool for
+   deciding what a browser can DO — but this is deciding which menu to point
+   at, and that genuinely differs per browser. */
+function installEnv(){
+  const ua = navigator.userAgent;
+  const iOS = /iPad|iPhone|iPod/.test(ua)
+           || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPadOS lies
+  const android = /Android/.test(ua);
+  // Webviews inside Instagram, Facebook, WhatsApp and friends cannot install
+  // anything at all; the only cure is reopening the link in a real browser.
+  if(/FBAN|FBAV|FB_IAB|Instagram|LinkedInApp|Line\//.test(ua))         return 'inapp';
+  if(iOS) return /CriOS|FxiOS|EdgiOS|OPiOS/.test(ua) ? 'ios-other' : 'ios-safari';
+  if(android){
+    if(/SamsungBrowser/.test(ua)) return 'android-samsung';
+    if(/Firefox/.test(ua))        return 'android-firefox';
+    return 'android-chrome';
+  }
+  if(/Firefox/.test(ua))                        return 'desktop-firefox';
+  if(/Edg\//.test(ua))                          return 'desktop-edge';
+  if(/Chrome|Chromium/.test(ua))                return 'desktop-chrome';
+  if(/Safari/.test(ua))                         return 'desktop-safari';
+  return 'unknown';
+}
+
+const INSTALL_STEPS = {
+  'ios-safari': { device:'iPhone or iPad · Safari', can:true, steps:[
+      'Tap the <b>Share</b> button <span class="ins-key"><i class="ti ti-share-2"></i></span> at the bottom of Safari.',
+      'Scroll down the list and tap <b>Add to Home Screen</b>.',
+      'Tap <b>Add</b> at the top right.'],
+    note:'iOS has no one-tap install button — this is how every app-like site is added on an iPhone.' },
+
+  'ios-other': { device:'iPhone or iPad', can:false, steps:[
+      'Tap the <b>&hellip;</b> menu and choose <b>Open in Safari</b>.',
+      'In Safari, tap <b>Share</b> <span class="ins-key"><i class="ti ti-share-2"></i></span> &rarr; <b>Add to Home Screen</b>.'],
+    note:'On iPhone only Safari can install an app to the home screen. Chrome, Edge and Firefox on iOS can add a bookmark, but it opens back inside the browser.' },
+
+  'android-chrome': { device:'Android · Chrome', can:true, steps:[
+      'Tap the <b>&#8942;</b> menu at the top right.',
+      'Tap <b>Add to Home screen</b> (it may say <b>Install app</b>).',
+      'Confirm with <b>Install</b>.'],
+    note:'' },
+
+  'android-samsung': { device:'Android · Samsung Internet', can:true, steps:[
+      'Tap the <b>&#8801;</b> menu at the bottom right.',
+      'Tap <b>Add page to</b> &rarr; <b>Home screen</b>.',
+      'Confirm with <b>Add</b>.'],
+    note:'' },
+
+  'android-firefox': { device:'Android · Firefox', can:true, steps:[
+      'Tap the <b>&#8942;</b> menu at the top right.',
+      'Tap <b>Install</b>, or <b>Add to Home screen</b>.'],
+    note:'' },
+
+  'desktop-chrome': { device:'Computer · Chrome', can:true, steps:[
+      'Click the install icon <span class="ins-key"><i class="ti ti-download"></i></span> at the right of the address bar.',
+      'Or open the <b>&#8942;</b> menu &rarr; <b>Cast, save and share</b> &rarr; <b>Install page as app</b>.'],
+    note:'' },
+
+  'desktop-edge': { device:'Computer · Edge', can:true, steps:[
+      'Click the install icon <span class="ins-key"><i class="ti ti-download"></i></span> at the right of the address bar.',
+      'Or open the <b>&hellip;</b> menu &rarr; <b>Apps</b> &rarr; <b>Install this site as an app</b>.'],
+    note:'' },
+
+  'desktop-safari': { device:'Mac · Safari', can:true, steps:[
+      'Open the <b>File</b> menu.',
+      'Choose <b>Add to Dock</b>.'],
+    note:'Needs macOS Sonoma or newer. On older versions, use Chrome or Edge.' },
+
+  'desktop-firefox': { device:'Computer · Firefox', can:false, steps:[
+      'Open this page in <b>Chrome</b> or <b>Edge</b>, then use the install icon in the address bar.'],
+    note:'Firefox on the desktop does not install web apps. It still works perfectly as a normal tab, and you can bookmark it.' },
+
+  'inapp': { device:'In-app browser', can:false, steps:[
+      'Tap the <b>&#8942;</b> or <b>&hellip;</b> menu in this window.',
+      'Choose <b>Open in browser</b> (Chrome on Android, Safari on iPhone).',
+      'Then open this menu again and tap <b>Install on this Device</b>.'],
+    note:'A browser opened inside another app cannot install anything.' },
+
+  'unknown': { device:'This browser', can:false, steps:[
+      'Look for <b>Install</b> or <b>Add to Home screen</b> in the browser menu.'],
+    note:'If it is not there, open this page in Chrome, Edge or Safari.' }
+};
+
+function openInstall(){
+  const box = document.getElementById('insBody');
+  const env = installEnv();
+  const spec = INSTALL_STEPS[env] || INSTALL_STEPS.unknown;
+  document.getElementById('insDevice').textContent = spec.device;
+
+  if(isInstalled()){
+    box.innerHTML = '<div class="ins-done"><i class="ti ti-circle-check"></i>'
+      + '<div><b>Already installed.</b> You are using the installed app right now &mdash; '
+      + 'look for the <b>NSS</b> icon on your home screen or app list.</div></div>';
+  } else if(deferredPrompt){
+    // Chromium has handed us a real prompt: one tap, no instructions needed.
+    box.innerHTML = '<button class="btn-save" type="button" style="width:100%;justify-content:center" onclick="triggerInstall()">'
+      + '<i class="ti ti-download"></i> Install now</button>'
+      + '<div class="ins-note">Your browser will ask you to confirm. Nothing is downloaded from an app store '
+      + '&mdash; the app is this page, saved to your device.</div>';
+  } else {
+    box.innerHTML = '<div class="ins-steps"><div class="ins-steps-h"><i class="ti ti-list-numbers"></i> '
+      + esc(spec.device) + '</div><ol>' + spec.steps.map(s => '<li>' + s + '</li>').join('') + '</ol></div>'
+      + (spec.note ? '<div class="ins-note">' + spec.note + '</div>' : '');
+  }
+  document.getElementById('installOverlay').classList.add('open');
+  document.getElementById('installModal').classList.add('open');
+}
+function closeInstall(){
+  document.getElementById('installOverlay').classList.remove('open');
+  document.getElementById('installModal').classList.remove('open');
+}
+
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
   const dismissed = parseInt(localStorage.getItem(LS.banner) || '0');
-  const now = Date.now();
-  if(now - dismissed > 24*60*60*1000){ // re-show after 24h
+  if(Date.now() - dismissed > 24*60*60*1000){ // re-show after 24h
     document.getElementById('installBanner').classList.add('show');
   }
   document.getElementById('installBtn').style.display = 'flex';
-  document.getElementById('drawerInstallBtn').style.display = 'flex';
+  // If the dialog is already open showing manual steps, swap in the real button.
+  if(document.getElementById('installModal').classList.contains('open')) openInstall();
 });
+
 window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
   document.getElementById('installBanner').classList.remove('show');
   document.getElementById('installBtn').style.display = 'none';
-  document.getElementById('drawerInstallBtn').style.display = 'none';
-  showToast('App installed successfully!');
+  closeInstall();
+  showToast('Installed — look for the NSS icon on your home screen');
 });
+
 function triggerInstall(){
-  if(!deferredPrompt){ showToast('Open in Chrome/Safari to install','error'); return; }
+  if(isInstalled()){ showToast('Already installed on this device'); return; }
+  if(!deferredPrompt){ openInstall(); return; }   // no native prompt — show the steps
   deferredPrompt.prompt();
   deferredPrompt.userChoice.then(c => {
-    if(c.outcome === 'accepted') showToast('Installing app...');
+    if(c.outcome === 'accepted') showToast('Installing…');
+    else showToast('Install cancelled — you can do it later from the menu');
     deferredPrompt = null;
     document.getElementById('installBanner').classList.remove('show');
-  });
+    document.getElementById('installBtn').style.display = 'none';
+    closeInstall();
+  }).catch(()=>{});
 }
+
 function dismissBanner(){
   localStorage.setItem(LS.banner, Date.now().toString());
   document.getElementById('installBanner').classList.remove('show');
+}
+
+/* Safari on iOS is the one place where a nudge earns its keep: there is no
+   install button anywhere, so someone who is never told will never find it.
+   Shown once, a week apart, and only after she has actually used the app. */
+function maybeNudgeIOS(){
+  if(isInstalled() || installEnv() !== 'ios-safari') return;
+  // The top-bar button is the permanent affordance; the banner is the one-off
+  // prod, because on iOS nothing else in the interface hints that this exists.
+  document.getElementById('installBtn').style.display = 'flex';
+  const last = parseInt(localStorage.getItem(LS.banner) || '0');
+  if(Date.now() - last < 7*24*60*60*1000) return;
+  const b = document.getElementById('installBanner');
+  b.querySelector('.install-banner-left').innerHTML =
+    '<i class="ti ti-device-mobile" style="font-size:18px"></i> Add this to your Home Screen to use it like an app';
+  b.querySelector('.ib-install').innerHTML = '<i class="ti ti-share-2"></i> Show me how';
+  b.classList.add('show');
 }
 
 // ── DRAWER ──
@@ -2449,7 +2647,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v1.0</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v1.1</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -2852,7 +3050,8 @@ function saveProfile(){
 // Escape closes the topmost thing that is open.
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;
-  if(document.getElementById('profileModal').classList.contains('open')) closeProfile();
+  if(document.getElementById('installModal').classList.contains('open')) closeInstall();
+  else if(document.getElementById('profileModal').classList.contains('open')) closeProfile();
   else if(document.getElementById('reportModal').classList.contains('open')) closeReport();
   else if(document.getElementById('drawer').classList.contains('open')) closeDrawer();
 });
@@ -2865,6 +3064,7 @@ function boot(){
   loadProfile();
   applySheetUrl('');
   paintUser();
+  maybeNudgeIOS();
   const exp = +(localStorage.getItem(LS.expires) || 0);
   if(!GAS_URL){ openGate('connect'); return; }
   if(!AUTH_TOKEN || (exp && exp < Date.now())){

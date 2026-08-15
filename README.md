@@ -40,12 +40,16 @@ Her Apps Script — private to her account — does the comparison and returns a
 ## Files
 
 ```
-index.html      the whole app — markup, styles and logic in one file
-sw.js           service worker: offline shell + update notice
-manifest.json   PWA manifest (installable, standalone, NSS icons)
-GAS.gs          the Apps Script backend — paste into HER Apps Script editor
-og-banner.png   1200×630 social preview
-SETUP.md        step-by-step first-time setup
+index.html               the whole app — markup, styles and logic in one file
+sw.js                    service worker: offline shell + update notice
+manifest.json            PWA manifest (installable, standalone, NSS icons)
+GAS.gs                   the Apps Script backend — paste into HER Apps Script editor
+icon-192/512.png         launcher icons
+icon-maskable-512.png    Android adaptive icon (content inside the middle 80%)
+apple-touch-icon.png     iOS home-screen tile — iOS ignores the manifest
+favicon.ico, favicon-32  browser tab
+og-banner.png            1200×630 social preview
+SETUP.md                 step-by-step first-time setup
 ```
 
 `GAS.gs` is **not** executed by this repo. It is a copy of the code that has to
@@ -112,7 +116,39 @@ which is what stops a tenant named "Provision Shop" being read as groceries.
 
 ---
 
+## Installing it as an app
+
+**Menu → Install on this Device.** That option is always present, on every
+browser — which is the point of it.
+
+Only Chromium browsers fire `beforeinstallprompt`, so an install button gated on
+that event is invisible on iOS, where Safari installs through
+Share → Add to Home Screen and offers no API at all. Gating it that way would
+hide the install path on exactly the device she uses most. So:
+
+- **Chromium (Android Chrome, desktop Chrome/Edge)** — the dialog shows a real
+  **Install now** button wired to the captured prompt.
+- **Everything else** — the dialog names the browser and gives its actual steps:
+  iOS Safari, iOS Chrome/Firefox (which must be sent to Safari), Samsung
+  Internet, Android Firefox, macOS Safari's *Add to Dock*, and the in-app
+  webviews (Instagram, Facebook, WhatsApp) where installing is impossible and
+  the only fix is *Open in browser*.
+- **Already installed** — it says so, rather than offering a button that does
+  nothing.
+- **iOS Safari** also gets a permanent top-bar Install button and a one-off
+  banner a week apart, because iOS gives no other hint that this is possible.
+
+Icons are real PNGs, including a `maskable` variant with its content inside the
+middle 80% for Android's adaptive shapes, and an `apple-touch-icon` — without
+that last one iOS uses a **screenshot of the page** as the home-screen tile.
+
 ## Version
 
-**v1.0** — August 2026. The badge next to the app name in the top bar, the
-drawer's About line and `CACHE` in `sw.js` must all move together on a release.
+**v1.1** — August 2026. Install-as-an-app flow for every browser, real PNG icon
+set, `apple-touch-icon`.
+
+**v1.0** — August 2026. First release.
+
+The badge next to the app name in the top bar, the drawer's About line, the
+footer, the gate subtitle and `CACHE` in `sw.js` must all move together on a
+release.
