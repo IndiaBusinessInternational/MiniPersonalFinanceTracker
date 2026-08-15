@@ -25,9 +25,17 @@
    ═════════════════════════════════════════════════════════════════════════ */
 
 const APP_NAME    = 'MPFT';                 // identifies this backend to the app
-const APP_VERSION = '1.0';
+const APP_VERSION = '1.2';
+const FEATURES    = ['profile'];            // lets an older app detect what this backend can do
 const SHEET_NAME  = 'Transactions';
 const HEADERS     = ['ID', 'Date', 'Type', 'Description', 'Party', 'Amount', 'Note', 'CreatedAt'];
+
+/* Profile (display name, subtitle, photo) lives in the Sheet, not on the
+   device — otherwise a photo set on the laptop never reaches the phone.
+   A Sheet cell holds 50,000 characters, which is why the photo is capped
+   below that rather than being stored in Script Properties (9 KB a value). */
+const SETTINGS_SHEET = 'Settings';
+const MAX_SETTING    = 45000;
 
 const TOKEN_TTL_MS   = 30 * 24 * 60 * 60 * 1000;  // stay signed in for 30 days
 const MAX_SESSIONS   = 25;                        // her phone + laptop + a few re-logins
@@ -70,12 +78,14 @@ function route(p) {
     if (!auth.ok) return { status: 'auth', message: auth.message };
 
     switch (action) {
-      case 'getAll': return getAllTransactions();
-      case 'add':    return addTransaction(p);
-      case 'update': return updateTransaction(p);
-      case 'delete': return deleteTransaction(p.id);
-      case 'logout': return logout(p.token);
-      default:       return { status: 'error', message: 'Unknown action: ' + action };
+      case 'getAll':      return getAllTransactions();
+      case 'add':         return addTransaction(p);
+      case 'update':      return updateTransaction(p);
+      case 'delete':      return deleteTransaction(p.id);
+      case 'getProfile':  return getProfile();
+      case 'saveProfile': return saveProfile(p);
+      case 'logout':      return logout(p.token);
+      default:            return { status: 'error', message: 'Unknown action: ' + action };
     }
   } catch (err) {
     return { status: 'error', message: String(err && err.message ? err.message : err) };
@@ -91,6 +101,7 @@ function ping() {
     status: 'ok',
     app: APP_NAME,
     version: APP_VERSION,
+    features: FEATURES,
     configured: !!scriptPassword(),
     user: scriptUser(),
     message: 'Mini Personal Finance Tracker backend v' + APP_VERSION + ' is live.'
@@ -169,6 +180,10 @@ function login(p) {
     try { lock.releaseLock(); } catch (e) {}
   }
 
+  // The profile rides along with the login so a brand-new device paints her
+  // name and photo on its very first screen, with no extra round trip.
+  const prof = getProfile();
+
   return {
     status: 'ok',
     token: token,
@@ -176,7 +191,10 @@ function login(p) {
     user: wantUser,
     sheetUrl: sheetUrl(),
     app: APP_NAME,
-    version: APP_VERSION
+    version: APP_VERSION,
+    features: FEATURES,
+    profile: prof.profile,
+    profileAt: prof.profileAt
   };
 }
 
@@ -242,6 +260,92 @@ function sheetUrl() {
   try { return SpreadsheetApp.getActiveSpreadsheet().getUrl(); } catch (e) { return ''; }
 }
 
+/* ── SETTINGS (key/value) ───────────────────────────────────────────────────
+   A second, hidden sheet. It is hidden rather than deleted-and-recreated so
+   she can still find it if she ever needs to clear a bad value by hand. */
+function getSettingsSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(SETTINGS_SHEET);
+  if (!sh) {
+    sh = ss.insertSheet(SETTINGS_SHEET);
+    sh.appendRow(['Key', 'Value', 'UpdatedAt']);
+    sh.setFrozenRows(1);
+    sh.getRange(1, 1, 1, 3).setFontWeight('bold').setBackground('#000000').setFontColor('#00c5ff');
+    sh.setColumnWidth(1, 140);
+    sh.setColumnWidth(2, 420);
+    sh.setColumnWidth(3, 170);
+    sh.hideSheet();
+  }
+  return sh;
+}
+
+function readSetting(key) {
+  const sh = getSettingsSheet();
+  const rows = sh.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]) === key) return String(rows[i][1] == null ? '' : rows[i][1]);
+  }
+  return '';
+}
+
+function writeSetting(key, value) {
+  const sh = getSettingsSheet();
+  const rows = sh.getDataRange().getValues();
+  const now = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'dd-MMM-yyyy HH:mm:ss');
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]) === key) {
+      sh.getRange(i + 1, 2, 1, 2).setValues([[value, now]]);
+      return;
+    }
+  }
+  sh.appendRow([key, value, now]);
+}
+
+/* ── PROFILE ────────────────────────────────────────────────────────────────
+   Display name, subtitle and photo, shared by every device she signs in on.
+   `profileAt` is the version stamp: the app sends it back on each sync and
+   only downloads the (comparatively heavy) photo when it has actually moved. */
+function getProfile() {
+  const raw = readSetting('profile');
+  let profile = null;
+  if (raw) { try { profile = JSON.parse(raw); } catch (e) { profile = null; } }
+  return { status: 'ok', profile: profile, profileAt: Number(readSetting('profileAt') || 0) };
+}
+
+function saveProfile(p) {
+  const raw = String(p.profile == null ? '' : p.profile);
+  if (!raw) return { status: 'error', message: 'No profile supplied.' };
+  if (raw.length > MAX_SETTING) {
+    return { status: 'error',
+             message: 'That photo is too large to sync. Please choose a smaller picture.' };
+  }
+  let obj;
+  try { obj = JSON.parse(raw); } catch (e) {
+    return { status: 'error', message: 'Profile was not valid JSON.' };
+  }
+  // Store only the three fields we own, so a future app version cannot be
+  // tricked into round-tripping something unexpected through the Sheet.
+  const clean = JSON.stringify({
+    name:  String(obj.name  || '').slice(0, 120),
+    sub:   String(obj.sub   || '').slice(0, 160),
+    photo: String(obj.photo || '')
+  });
+
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(20000); } catch (e) {
+    return { status: 'error', message: 'Busy — please try again in a moment.' };
+  }
+  try {
+    const at = Date.now();
+    writeSetting('profile', clean);
+    writeSetting('profileAt', String(at));
+    SpreadsheetApp.flush();
+    return { status: 'ok', profileAt: at, message: 'Profile saved.' };
+  } finally {
+    try { lock.releaseLock(); } catch (e) {}
+  }
+}
+
 /* A date cell can come back as a Date object (Sheets parsed it) or as the
    plain 'yyyy-MM-dd' text we wrote. Formatting a Date in a timezone that is
    not the Sheet's own shifts it by a day, so always format in the Sheet's
@@ -259,8 +363,13 @@ function toISODate(v, tz) {
 function getAllTransactions() {
   const sh = getSheet();
   const tz = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone() || 'Asia/Kolkata';
+  // Sent on every sync so the app can notice a profile edited on another
+  // device. It is a number, not the photo — the photo is fetched only when
+  // this has moved.
+  const profileAt = Number(readSetting('profileAt') || 0);
+
   const data = sh.getDataRange().getValues();
-  if (data.length <= 1) return { status: 'ok', transactions: [] };
+  if (data.length <= 1) return { status: 'ok', transactions: [], profileAt: profileAt };
 
   const rows = data.slice(1)
     .filter(function (r) { return String(r[0] || '').trim() !== ''; })   // ignore blank rows
@@ -277,7 +386,7 @@ function getAllTransactions() {
       };
     });
 
-  return { status: 'ok', transactions: rows };
+  return { status: 'ok', transactions: rows, profileAt: profileAt };
 }
 
 function addTransaction(p) {

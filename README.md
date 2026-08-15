@@ -146,7 +146,35 @@ Icons are real PNGs, including a `maskable` variant with its content inside the
 middle 80% for Android's adaptive shapes, and an `apple-touch-icon` — without
 that last one iOS uses a **screenshot of the page** as the home-screen tile.
 
+## Profile sync
+
+Display name, subtitle and photo live in the Sheet, not on the device — a photo
+set on the laptop has to reach the phone, and `localStorage` is per-browser.
+
+They are kept in a hidden **Settings** sheet as key/value rows. A Sheet cell
+holds 50,000 characters, which is why the photo goes there rather than into
+Script Properties (9 KB a value). The picture is centre-cropped square and
+re-encoded down the ladder `320@0.85 → 288 → 256 → 224 → 192@0.55` until the
+data URL is under 40,000 characters; even pure noise, the worst case for JPEG,
+lands around 36,000.
+
+Traffic is kept honest with a version stamp:
+
+- **`login`** returns the whole profile, so a new device paints her name and
+  photo on its first screen with no extra round trip.
+- **`getAll`** returns only `profileAt`, a number. The app fetches the profile —
+  and therefore the photo — only when that stamp has moved.
+- **Saving** writes the device copy first, so the screen never waits on the
+  network, then pushes.
+
+If her Apps Script predates this (`Unknown action: saveProfile`), the save still
+lands locally and the app says the backend needs updating, because that is a
+paste-and-redeploy she has to do — see [SETUP.md](SETUP.md).
+
 ## Version
+
+**v1.3** — August 2026. Profile (name, subtitle, photo) syncs across her devices
+through the Sheet. **Requires re-pasting `GAS.gs` and redeploying.**
 
 **v1.2** — August 2026. The mark reads **Mini** everywhere (app monogram, not
 the user's initials — it no longer follows the display name), icons regenerated

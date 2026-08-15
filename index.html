@@ -496,7 +496,7 @@ tr.row-editing td{background:var(--info-bg) !important}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v1.2</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v1.3</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -692,7 +692,7 @@ tr.row-editing td{background:var(--info-bg) !important}
     </div>
   </div>
 
-  <div class="footer">Mini Personal Finance Tracker v1.2 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v1.3 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -718,7 +718,7 @@ tr.row-editing td{background:var(--info-bg) !important}
   <button class="drawer-item" onclick="closeDrawer();changeBackend()"><i class="ti ti-plug-connected"></i> Backend Connection</button>
   <button class="drawer-item" onclick="signOut()"><i class="ti ti-logout"></i> Sign Out</button>
   <div class="drawer-section-label">About</div>
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px"><i class="ti ti-info-circle"></i> Version 1.2 — August 2026</div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px"><i class="ti ti-info-circle"></i> Version 1.3 — August 2026</div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -783,7 +783,7 @@ tr.row-editing td{background:var(--info-bg) !important}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger &middot; v1.2</div>
+        <div class="gate-sub">Private ledger &middot; v1.3</div>
       </div>
     </div>
 
@@ -893,6 +893,7 @@ tr.row-editing td{background:var(--info-bg) !important}
    device. The password itself never lives here — see the gate, further down. */
 const LS = { url:'mpft_backend_url', token:'mpft_token', expires:'mpft_expires',
              user:'mpft_user', sheet:'mpft_sheet_url', profile:'mpft_profile',
+             profileAt:'mpft_profile_at',
              cache:'mpft_cache', theme:'mpft_theme', banner:'mpft_banner_dismissed' };
 let GAS_URL    = localStorage.getItem(LS.url)   || '';
 let AUTH_TOKEN = localStorage.getItem(LS.token) || '';
@@ -1360,6 +1361,7 @@ async function loadAll(){
       cacheEntries();                                   // next cold open paints instantly
       setOffline(false);
       setStatus(true,'Connected — Google Drive'); render();
+      syncProfileIfStale(data.profileAt);                // picks up a photo set elsewhere
     }
     else{ setStatus(false,'Error: '+data.message); showToast('Load failed','error'); }
   }catch(e){
@@ -2684,7 +2686,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v1.2</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v1.3</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -2927,6 +2929,9 @@ async function gateSignIn(ev){
     if(data.sheetUrl) localStorage.setItem(LS.sheet, data.sheetUrl);
     applySheetUrl(data.sheetUrl || '');
     paintUser();
+    // A device signing in for the first time gets her name and photo straight
+    // away, rather than showing the defaults until the first sync.
+    if(data.profile) applyRemoteProfile(data.profile, data.profileAt);
     document.getElementById('gPass').value = '';   // never leave it sitting in the DOM
     closeGate();
     showToast('Signed in');
@@ -3048,8 +3053,25 @@ function paintProfilePreview(){
   av.classList.toggle('has-photo', !!pfPhotoDraft);
   av.style.backgroundImage = pfPhotoDraft ? 'url("' + pfPhotoDraft + '")' : '';
 }
-/* Phone cameras hand over 3–5 MB JPEGs and localStorage stops near 5 MB, so the
-   picture is centre-cropped square and shrunk to 320px before it is ever kept. */
+/* Phone cameras hand over 3–5 MB JPEGs. The picture is centre-cropped square
+   and shrunk before it is stored — and because the profile now travels to her
+   other devices through a Sheet cell, which holds 50,000 characters, it is
+   re-encoded smaller until the data URL fits with room to spare. */
+const PHOTO_TRIES = [[320, 0.85], [288, 0.78], [256, 0.72], [224, 0.64], [192, 0.55]];
+const PHOTO_MAX   = 40000;   // characters, against the 45,000 the backend accepts
+
+function squashPhoto(img){
+  const side = Math.min(img.width, img.height);
+  let out = '';
+  for(const [S, q] of PHOTO_TRIES){
+    const c = document.createElement('canvas'); c.width = c.height = S;
+    c.getContext('2d').drawImage(img, (img.width-side)/2, (img.height-side)/2, side, side, 0, 0, S, S);
+    out = c.toDataURL('image/jpeg', q);
+    if(out.length <= PHOTO_MAX) return out;
+  }
+  return out;   // smallest attempt; saveProfile still checks before sending
+}
+
 function pickPhoto(input){
   const f = input.files && input.files[0];
   input.value = '';                       // so re-picking the same file still fires
@@ -3058,10 +3080,7 @@ function pickPhoto(input){
   rd.onload = () => {
     const img = new Image();
     img.onload = () => {
-      const S = 320, side = Math.min(img.width, img.height);
-      const c = document.createElement('canvas'); c.width = c.height = S;
-      c.getContext('2d').drawImage(img, (img.width-side)/2, (img.height-side)/2, side, side, 0, 0, S, S);
-      pfPhotoDraft = c.toDataURL('image/jpeg', 0.85);
+      pfPhotoDraft = squashPhoto(img);
       paintProfilePreview();
     };
     img.onerror = () => showToast('That file is not an image', 'error');
@@ -3071,14 +3090,70 @@ function pickPhoto(input){
   rd.readAsDataURL(f);
 }
 function clearPhoto(){ pfPhotoDraft = ''; paintProfilePreview(); }
-function saveProfile(){
+
+/* Saving writes the device copy first so the screen never waits on the
+   network, then pushes to the Sheet so her other devices pick it up. */
+async function saveProfile(){
   const name = document.getElementById('pfName').value.trim() || PROFILE_DEFAULT.name;
   const sub  = document.getElementById('pfSub').value.trim()  || PROFILE_DEFAULT.sub;
   const next = { name:name, sub:sub, photo:pfPhotoDraft || '' };
-  try{ localStorage.setItem(LS.profile, JSON.stringify(next)); }
+  const json = JSON.stringify(next);
+
+  try{ localStorage.setItem(LS.profile, json); }
   catch(e){ showToast('That photo is too large to store on this device', 'error'); return; }
   PROFILE = next;
-  paintProfile(); closeProfile(); showToast('Profile saved');
+  paintProfile(); closeProfile();
+
+  if(!AUTH_TOKEN || AUTH_LOST){
+    showToast('Profile saved on this device');
+    return;
+  }
+  showToast('Profile saved — syncing…');
+  try{
+    const res = await gasCall({action:'saveProfile', profile:json}, 2, 25000);
+    if(res && res.status === 'ok'){
+      localStorage.setItem(LS.profileAt, String(res.profileAt || Date.now()));
+      showToast('Profile saved on all your devices');
+    } else if(res && /Unknown action/i.test(res.message || '')){
+      // Her Apps Script predates profile sync. Say exactly that, because the
+      // fix is a paste-and-redeploy she has to do, not something to wait for.
+      showToast('Saved here only — update GAS.gs in your Apps Script to sync it', 'error');
+    } else {
+      showToast((res && res.message) || 'Saved here, but syncing failed', 'error');
+    }
+  }catch(e){
+    if(!AUTH_LOST) showToast('Saved here — will not reach your other devices until you sync', 'error');
+  }
+}
+
+/* Pull a profile the backend reports as newer than this device's copy. Called
+   after login (which returns it outright) and after every ledger sync (which
+   returns only the stamp, so the photo travels only when it has changed). */
+function applyRemoteProfile(profile, at){
+  if(!profile || typeof profile !== 'object') return false;
+  const next = {
+    name:  String(profile.name  || PROFILE_DEFAULT.name),
+    sub:   String(profile.sub   || PROFILE_DEFAULT.sub),
+    photo: String(profile.photo || '')
+  };
+  PROFILE = next;
+  try{ localStorage.setItem(LS.profile, JSON.stringify(next)); }catch(e){}
+  localStorage.setItem(LS.profileAt, String(at || Date.now()));
+  paintProfile();
+  return true;
+}
+
+async function syncProfileIfStale(remoteAt){
+  const at = Number(remoteAt || 0);
+  if(!at) return;                                   // backend has none, or is older than v1.2
+  if(at <= Number(localStorage.getItem(LS.profileAt) || 0)) return;
+  try{
+    const res = await gasCall({action:'getProfile'}, 1, 20000);
+    if(res && res.status === 'ok' && res.profile){
+      applyRemoteProfile(res.profile, res.profileAt);
+      showToast('Profile updated from your other device');
+    }
+  }catch(e){ /* next sync will try again */ }
 }
 
 // Escape closes the topmost thing that is open.

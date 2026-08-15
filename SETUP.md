@@ -132,6 +132,29 @@ signal.
 
 ---
 
+## Updating the backend (needed for v1.3 — profile sync)
+
+The app on GitHub updates itself. The Apps Script does **not** — it is a copy
+living in her account, so a new feature that needs backend support has to be
+pasted in again.
+
+**Profile sync (name, subtitle, photo shared across her devices) needs this.**
+Without it the app still works; a photo set on the laptop just stays on the
+laptop, and saving says so.
+
+1. Open her Sheet → **Extensions → Apps Script**.
+2. Select everything in the editor and paste in the current **`GAS.gs`**.
+3. 💾 **Save**.
+4. **Deploy → Manage deployments** → pencil ✏ on the existing deployment →
+   **Version: New version** → **Deploy**.
+
+> Use **Manage deployments → New version**, not *New deployment*. A new
+> deployment gets a **different URL**, and every device would have to be
+> reconnected. Editing the existing one keeps the URL she already has.
+
+The script adds a hidden **Settings** sheet on first use to hold the profile.
+Leave it alone; to see it, right-click any sheet tab → *Show sheets*.
+
 ## Day-to-day notes
 
 - **Changing the password**: edit `APP_PASSWORD` in Script Properties. Devices
