@@ -672,6 +672,18 @@ tr.row-editing td{background:var(--info-bg) !important}
   .sheet-foot{flex-direction:column-reverse}
   .sheet-foot .btn-save,.sheet-foot .mini-btn{width:100%;justify-content:center}
 }
+
+/* ── DASHBOARD PERIOD ───────────────────────────────────────────────────────
+   The four headline tiles used to total everything ever recorded — a figure
+   that only goes up and says nothing about how this month is going. They now
+   answer for a chosen window, and the window is remembered. */
+.dash-period{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:11px}
+.dash-period .dp-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);font-weight:700;display:flex;align-items:center;gap:5px;flex-shrink:0}
+.dash-period .chip-row{flex:1 1 auto;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;padding-bottom:2px}
+.dash-period .chip-row::-webkit-scrollbar{display:none}
+.dash-period .chip{flex-shrink:0}
+.dp-range{font-size:10.5px;color:var(--text3);width:100%;line-height:1.4;margin-top:-3px}
+@media(max-width:600px){ .dash-period{padding:0 10px} }
 </style>
 </head>
 <body>
@@ -682,7 +694,7 @@ tr.row-editing td{background:var(--info-bg) !important}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v2.0</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v2.1</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -757,6 +769,12 @@ tr.row-editing td{background:var(--info-bg) !important}
 <div class="view on" id="viewLedger">
 
   <!-- SUMMARY -->
+  <!-- Which window the four tiles below answer for. -->
+  <div class="dash-period">
+    <span class="dp-label"><i class="ti ti-calendar-stats"></i> Showing</span>
+    <div class="chip-row" id="dashChips"></div>
+    <div class="dp-range" id="dashRangeTxt"></div>
+  </div>
   <div class="summary-grid">
     <div class="metric m-income">
       <div class="metric-label"><i class="ti ti-arrow-down-circle"></i> Income</div>
@@ -966,7 +984,7 @@ tr.row-editing td{background:var(--info-bg) !important}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v2.0 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v2.1 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -992,7 +1010,7 @@ tr.row-editing td{background:var(--info-bg) !important}
   <button class="drawer-item" onclick="closeDrawer();changeBackend()"><i class="ti ti-plug-connected"></i> Backend Connection</button>
   <button class="drawer-item" onclick="signOut()"><i class="ti ti-logout"></i> Sign Out</button>
   <div class="drawer-section-label">About</div>
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px"><i class="ti ti-info-circle"></i> Version 2.0 — August 2026</div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px"><i class="ti ti-info-circle"></i> Version 2.1 — August 2026</div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1057,7 +1075,7 @@ tr.row-editing td{background:var(--info-bg) !important}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v2.0</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v2.1</div>
       </div>
     </div>
 
@@ -2080,19 +2098,126 @@ function filtered(){
   return list;
 }
 
+/* ── DASHBOARD PERIOD ───────────────────────────────────────────────────────
+   All-time totals are the wrong default for a screen you open every day: the
+   number only grows, and it cannot tell you whether this month is going well.
+   The headline now answers for one window, starting on the current month, and
+   the choice sticks — picking "Last Month" once means the app opens there
+   tomorrow.
+
+   Scope is deliberately the four tiles only. The table below keeps its own
+   filters and still lists everything, because a period that silently hid rows
+   would read as lost data — which is exactly the confusion this release is
+   elsewhere trying to remove. The active chip sits directly above the tiles so
+   the two are never read apart.                                             */
+const DASH_KEY = 'mpft_dash';
+/* The standard set for a finance dashboard, in the order they are actually
+   reached for: where the current month stands, then the month just closed,
+   then the rolling windows, then quarter and year to date, then history.
+   Identical to the Report modal's presets, so a figure on the dashboard and a
+   figure in the report can always be compared like for like. */
+const DASH_PERIODS = [
+  { k:'thisMonth',   label:'This Month',    hint:'month to date' },
+  { k:'lastMonth',   label:'Last Month',    hint:'the month just closed' },
+  { k:'last30',      label:'Last 30 Days',  hint:'rolling window' },
+  { k:'last90',      label:'Last 90 Days',  hint:'rolling window' },
+  { k:'thisQuarter', label:'This Quarter',  hint:'quarter to date' },
+  { k:'thisFY',      label:'This FY',       hint:'year to date' },
+  { k:'lastFY',      label:'Last FY',       hint:'the year before' },
+  { k:'all',         label:'All Time',      hint:'everything on record' }
+];
+let dashPeriod = localStorage.getItem(DASH_KEY) || 'thisMonth';
+if(dashPeriod === 'fy') dashPeriod = 'thisFY';   // interim key from an earlier build
+if(!DASH_PERIODS.some(p => p.k === dashPeriod)) dashPeriod = 'thisMonth';
+
+/* Self-contained date maths — the three apps spell their shared helpers
+   differently and some of them are `const`s declared further down the file. */
+function _dpIso(d){
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+/* The window, or null for all time. The Indian financial year runs
+   1 April → 31 March, so FY 2026-27 is 01-Apr-2026 to 31-Mar-2027 — a date in
+   January belongs to the year that began the previous April — and the quarters
+   follow it, so Q1 is Apr–Jun, not Jan–Mar. Getting that wrong would put a
+   January figure in the wrong year on every screen that shows it. */
+function dashRange(){
+  const now = new Date(), y = now.getFullYear(), m = now.getMonth();
+  const lastDay = (yy, mm) => new Date(yy, mm+1, 0).getDate();
+  const fyStart = m >= 3 ? y : y - 1;             // April is month 3
+  const fyWindow = f => ({ from:_dpIso(new Date(f,3,1)), to:_dpIso(new Date(f+1,2,31)),
+                           label:'FY ' + f + '-' + String((f+1) % 100).padStart(2,'0') });
+  switch(dashPeriod){
+    case 'thisMonth':
+      return { from:_dpIso(new Date(y,m,1)), to:_dpIso(new Date(y,m,lastDay(y,m))),
+               label: DASH_MONTHS[m] + ' ' + y };
+    case 'lastMonth': {
+      const d = new Date(y, m-1, 1);
+      return { from:_dpIso(d), to:_dpIso(new Date(d.getFullYear(), d.getMonth(), lastDay(d.getFullYear(), d.getMonth()))),
+               label: DASH_MONTHS[d.getMonth()] + ' ' + d.getFullYear() };
+    }
+    case 'last30': {
+      const f = new Date(y, m, now.getDate()-29);   // inclusive of today
+      return { from:_dpIso(f), to:_dpIso(now), label:'the last 30 days' };
+    }
+    case 'last90': {
+      const f = new Date(y, m, now.getDate()-89);
+      return { from:_dpIso(f), to:_dpIso(now), label:'the last 90 days' };
+    }
+    case 'thisQuarter': {
+      const qi = Math.floor(((m - 3 + 12) % 12) / 3);   // 0 = Apr–Jun
+      const sm = 3 + qi * 3;                            // start month index from April
+      const sy = fyStart + (sm > 11 ? 1 : 0), s = sm % 12;
+      const em = s + 2, ey = sy + (em > 11 ? 1 : 0), e2 = em % 12;
+      return { from:_dpIso(new Date(sy,s,1)), to:_dpIso(new Date(ey,e2,lastDay(ey,e2))),
+               label:'Q' + (qi+1) + ' ' + DASH_MONTHS[s].slice(0,3) + '–' + DASH_MONTHS[e2].slice(0,3) };
+    }
+    case 'thisFY': return fyWindow(fyStart);
+    case 'lastFY': return fyWindow(fyStart - 1);
+    default: return null;                          // all time
+  }
+}
+const DASH_MONTHS = ['January','February','March','April','May','June',
+                     'July','August','September','October','November','December'];
+
+function dashRows(){
+  const r = dashRange();
+  if(!r) return entries;
+  return entries.filter(e => { const d = e.date || ''; return d >= r.from && d <= r.to; });
+}
+
+function setDashPeriod(k){
+  dashPeriod = k;
+  try{ localStorage.setItem(DASH_KEY, k); }catch(e){}
+  render();
+}
+
+function paintDashChips(){
+  const box = document.getElementById('dashChips');
+  if(!box) return;
+  box.innerHTML = DASH_PERIODS.map(o =>
+    `<button class="chip${dashPeriod === o.k ? ' on' : ''}" title="${o.hint}" onclick="setDashPeriod('${o.k}')">${o.label}</button>`).join('');
+  const r = dashRange(), txt = document.getElementById('dashRangeTxt');
+  if(txt) txt.textContent = r
+    ? `${fmtDate(r.from)} → ${fmtDate(r.to)} — the table below still lists everything`
+    : 'Everything on record';
+}
+
 function render(){
   const list=filtered(), body=document.getElementById('txBody'), empty=document.getElementById('emptyState');
-  const income=entries.filter(isIncomeT).reduce((s,e)=>s+e.amount,0);
+  paintDashChips();
+  const dashSet=dashRows();
+  const income=dashSet.filter(isIncomeT).reduce((s,e)=>s+e.amount,0);
   // Expense = cash expenses + credit purchases (+ any unrecognised type, which
   // is money out too). Settlements are deliberately excluded: they pay off
   // credit that was already counted here.
-  const expense=entries.filter(repIsOut).reduce((s,e)=>s+e.amount,0);
+  const expense=dashSet.filter(repIsOut).reduce((s,e)=>s+e.amount,0);
   const net=income-expense;
   document.getElementById('sumIncome').textContent=fmt(income);
   document.getElementById('sumExpense').textContent=fmt(expense);
   const netEl=document.getElementById('sumNet');
   netEl.textContent=fmt(net); netEl.className='metric-value '+(net>=0?'positive':'negative');
-  document.getElementById('sumCount').textContent=entries.length;
+  document.getElementById('sumCount').textContent=dashSet.length;
   document.getElementById('countBadge').textContent=list.length;
   // summary of the filtered rows — shown whenever a search term or type filter is active
   const fq=document.getElementById('filterSearch').value.trim(), fType=document.getElementById('filterType').value;
@@ -4509,7 +4634,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v2.0</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v2.1</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
