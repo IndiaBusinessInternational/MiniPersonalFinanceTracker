@@ -138,9 +138,17 @@ The app on GitHub updates itself. The Apps Script does **not** — it is a copy
 living in her account, so a new feature that needs backend support has to be
 pasted in again.
 
-**Profile sync (name, subtitle, photo shared across her devices) needs this.**
-Without it the app still works; a photo set on the laptop just stays on the
-laptop, and saving says so.
+**Required for v2.0.** The **Plan** and **Commitments** sections save into two
+new sheets, and **Paid by / Mode** into two new columns on `Transactions`. All
+of them are created automatically the first time the new script runs, and
+nothing already in the Sheet is moved or renumbered.
+
+Until this is done the app says so at the top of those two sections and offers
+an *I have done it — check again* button. The Ledger and the reports keep
+working throughout; only the new sections wait.
+
+Profile sync (name, subtitle and photo shared across her devices) needs this
+too — without it a photo set on the laptop stays on the laptop.
 
 1. Open her Sheet → **Extensions → Apps Script**.
 2. Select everything in the editor and paste in the current **`GAS.gs`**.
@@ -152,8 +160,22 @@ laptop, and saving says so.
 > deployment gets a **different URL**, and every device would have to be
 > reconnected. Editing the existing one keeps the URL she already has.
 
-The script adds a hidden **Settings** sheet on first use to hold the profile.
-Leave it alone; to see it, right-click any sheet tab → *Show sheets*.
+The script adds these sheets on first use:
+
+| Sheet | What is in it |
+|---|---|
+| `Transactions` | the ledger — gains a **PaidBy** and a **Mode** column in v2.0 |
+| `Commitments` | the standing list: savings, schemes, loans, fees, bills |
+| `Plans` | one row per item per month — proposed, actual, due, paid |
+| `Settings` | hidden; holds the profile. To see it, right-click any sheet tab → *Show sheets*. |
+
+They are hers to read and to correct by hand. Keep the `ID` column of each
+intact — it is how the app finds a row.
+
+One figure is worth knowing about: a loan's **Outstanding** is an *opening*
+balance. The app shows it less every instalment ticked off here. If the bank's
+number moves for another reason — interest, a part-payment made elsewhere —
+type the bank's current figure into the loan and it re-bases from there.
 
 ## Day-to-day notes
 

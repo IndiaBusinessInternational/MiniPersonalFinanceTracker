@@ -1,6 +1,6 @@
-/* Mini Personal Finance Tracker — service worker v1.3.0
+/* Mini Personal Finance Tracker — service worker v2.0.0
    Bump CACHE on every release, in step with the version badge in index.html. */
-const CACHE  = 'mpft-v1.3.0';
+const CACHE  = 'mpft-v2.0.0';
 // The icons are precached too: an installed app that opens offline still has to
 // draw its own mark in the install dialog and the task switcher.
 const ASSETS = ['./', './index.html', './manifest.json',

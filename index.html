@@ -486,6 +486,192 @@ tr.row-editing td{background:var(--info-bg) !important}
   .hero-avatar span{font-size:19px}
   .gate-card{margin-top:0;padding:22px 17px}
 }
+
+/* ══ v2.0 — SECTIONS, MONTHLY PLAN, COMMITMENTS ═════════════════════════════
+
+   The app stopped being one list. A ledger, a month's plan and a standing list
+   of savings, loans and bills are three different jobs, and stacking all three
+   down one page would mean scrolling past two of them to reach the third. So
+   they are sections, reached the way every phone app reaches a section: a tab
+   bar pinned to the bottom of the screen, where the thumb already is.
+   On a wide screen a bottom bar would be marooned at the foot of a 1600px
+   window, so the same markup sits under the hero as a normal tab strip.    */
+.viewnav{position:sticky;top:56px;z-index:190;background:var(--black);border-bottom:1px solid var(--border)}
+.viewnav-inner{max-width:960px;margin:0 auto;display:flex;gap:2px;padding:0 16px;overflow-x:auto;scrollbar-width:none}
+.viewnav-inner::-webkit-scrollbar{display:none}
+.vn-btn{flex:1 1 0;min-width:88px;background:none;border:none;border-bottom:2.5px solid transparent;color:var(--text2);font-family:var(--font);font-size:12.5px;font-weight:600;padding:11px 8px 9px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;white-space:nowrap;transition:color .15s}
+.vn-btn i{font-size:19px;line-height:1}
+.vn-btn:hover{color:var(--text)}
+.vn-btn.on{color:var(--cyan);border-bottom-color:var(--cyan)}
+.vn-dot{position:absolute;top:7px;right:calc(50% - 20px);width:7px;height:7px;border-radius:50%;background:var(--warning-text);display:none}
+.vn-btn{position:relative}
+.vn-btn.has-due .vn-dot{display:block}
+
+.view{display:none}
+.view.on{display:block}
+
+/* ── shared building blocks ── */
+.pane-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px}
+.pane-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.pane-h{font-size:13px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:7px}
+.pane-sub{font-size:11.5px;color:var(--text3);line-height:1.55;margin-top:-4px;margin-bottom:12px}
+.mini-btn{font-size:12px;padding:7px 13px;border:1px solid var(--border2);border-radius:8px;background:transparent;color:var(--text2);cursor:pointer;font-family:var(--font);font-weight:600;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.mini-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.mini-btn.primary{background:var(--cyan);border-color:var(--cyan);color:#000}
+.mini-btn.primary:hover{opacity:.85;color:#000}
+.mini-btn:disabled{opacity:.45;cursor:not-allowed}
+.mini-btn.danger:hover{border-color:var(--danger-text);color:var(--danger-text)}
+
+/* Backend older than this page: the new sections have nowhere to save to. */
+.needs-backend{display:none;background:var(--warning-bg);border:1px solid var(--warning-border);color:var(--warning-text);border-radius:var(--radius);padding:12px 14px;font-size:12.5px;line-height:1.6;margin-bottom:14px}
+.needs-backend.show{display:block}
+.needs-backend b{color:var(--warning-text)}
+
+/* ── month stepper ── */
+.month-bar{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 9px;margin-bottom:12px}
+.month-bar .mb-nav{background:none;border:1px solid var(--border2);border-radius:8px;color:var(--text2);width:36px;height:34px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.month-bar .mb-nav:hover{border-color:var(--cyan);color:var(--cyan)}
+.month-bar .mb-label{flex:1;text-align:center;font-size:15px;font-weight:700;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;padding:4px 2px;border-radius:6px}
+.month-bar .mb-label:hover{color:var(--cyan)}
+.month-bar .mb-label small{display:block;font-size:10.5px;font-weight:500;color:var(--text3);margin-top:1px}
+.month-bar select{width:auto;font-size:13px;padding:7px 9px;background:var(--bg2)}
+
+/* ── plan lines ── */
+.plan-group{margin-bottom:6px}
+.plan-group-h{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);padding:12px 2px 7px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.plan-group-h span:last-child{color:var(--text2);font-weight:600;letter-spacing:0;text-transform:none;font-size:11.5px;white-space:nowrap}
+.pline{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:start;background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--border2);border-radius:var(--radius);padding:11px 12px;margin-bottom:7px}
+.pline.st-paid{border-left-color:var(--success-text)}
+.pline.st-partial{border-left-color:var(--warning-text)}
+.pline.st-skipped{border-left-color:var(--text3);opacity:.65}
+.pline.st-planned{border-left-color:var(--cyan)}
+.pline.overdue{border-left-color:var(--danger-text);background:var(--danger-bg)}
+.pline.side-in{border-left-style:double;border-left-width:5px}
+.pl-name{font-size:14px;font-weight:600;color:var(--text);line-height:1.3;word-break:break-word}
+.pl-meta{font-size:11px;color:var(--text3);margin-top:3px;display:flex;flex-wrap:wrap;gap:3px 9px;align-items:center}
+.pl-money{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pl-prop{font-size:11px;color:var(--text3)}
+.pl-act{font-size:15px;font-weight:700;color:var(--text)}
+.pl-act.unpaid{color:var(--text3);font-weight:500;font-size:13px}
+.pl-act.in{color:var(--success-text)}
+.pl-var{font-size:10.5px;margin-top:2px;font-weight:600}
+.pl-var.over{color:var(--danger-text)}
+.pl-var.under{color:var(--success-text)}
+.pl-var.exact{color:var(--text3)}
+.pl-actions{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;padding-top:9px;border-top:1px dashed var(--border)}
+.pl-actions .mini-btn{font-size:11.5px;padding:6px 11px}
+.st-chip{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
+.st-chip.paid{background:var(--success-bg);color:var(--success-text)}
+.st-chip.partial{background:var(--warning-bg);color:var(--warning-text)}
+.st-chip.planned{background:var(--info-bg);color:var(--info-text)}
+.st-chip.skipped{background:var(--bg4);color:var(--text3)}
+.st-chip.due{background:var(--danger-bg);color:var(--danger-text)}
+
+/* ── commitment cards ── */
+.cm-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;margin-bottom:9px}
+.cm-card.off{opacity:.6}
+.cm-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.cm-name{font-size:14.5px;font-weight:700;color:var(--text);line-height:1.3;word-break:break-word}
+.cm-sub{font-size:11.5px;color:var(--text3);margin-top:3px;line-height:1.5}
+.cm-amt{font-size:16px;font-weight:700;color:var(--cyan);white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+.cm-amt small{display:block;font-size:10px;color:var(--text3);font-weight:500;margin-top:1px}
+.cm-prog{margin-top:11px}
+.cm-prog-h{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px;gap:10px}
+.cm-prog-h b{color:var(--text);font-weight:600}
+.cm-bar{background:var(--bg4);border-radius:4px;height:8px;overflow:hidden}
+.cm-bar>span{display:block;height:100%;border-radius:4px;background:var(--cyan);transition:width .3s}
+.cm-bar.save>span{background:var(--success-text)}
+.cm-bar.loan>span{background:var(--warning-text)}
+.cm-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;margin-top:11px;padding-top:11px;border-top:1px solid var(--border)}
+.cm-stat{min-width:0}
+.cm-stat .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);font-weight:600}
+.cm-stat .v{font-size:13.5px;font-weight:700;color:var(--text);margin-top:2px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cm-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+.cm-actions .mini-btn{font-size:11.5px;padding:6px 11px}
+.kind-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.kind-chip.saving{background:var(--success-bg);color:var(--success-text)}
+.kind-chip.scheme{background:var(--success-bg);color:var(--success-text)}
+.kind-chip.loan{background:var(--danger-bg);color:var(--danger-text)}
+.kind-chip.insurance{background:var(--info-bg);color:var(--info-text)}
+.kind-chip.fee{background:var(--warning-bg);color:var(--warning-text)}
+.kind-chip.bill{background:var(--bg4);color:var(--text2)}
+
+/* ── dialogs that need room (commitment editor, plan editor, pay) ─────────────
+   Head and foot are pinned and only the body scrolls. On a phone a dialog laid
+   out as one scrolling block puts Save below the fold, where it is found by
+   accident or not at all; 100dvh rather than vh because a phone's `vh` is the
+   URL-bar-hidden height, which is taller than the window actually is.      */
+.sheet-modal.wide{width:min(560px,calc(100vw - 20px));max-height:min(88dvh,88vh);display:flex;flex-direction:column;overflow:hidden}
+.sheet-modal.wide .sheet-hdr{flex-shrink:0;position:static}
+.sheet-modal.wide .sheet-body{overflow-y:auto;min-height:0;flex:1 1 auto}
+.sheet-foot{flex-shrink:0;display:flex;gap:8px;padding:12px 18px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:var(--bg3)}
+.sheet-foot .btn-save{padding:11px}
+.fld-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
+.fld-row.one{grid-template-columns:1fr}
+.fld{display:flex;flex-direction:column;gap:5px;min-width:0}
+.fld label{font-size:11.5px}
+.fld input,.fld select,.fld textarea{font-size:14.5px;padding:9px 11px;background:var(--bg3)}
+.fld textarea{font-family:var(--font);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);width:100%;resize:none;overflow:hidden;line-height:1.5;outline:none}
+.fld textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,197,255,.12)}
+.fld-hint{font-size:10.5px;color:var(--text3);line-height:1.5}
+.fld-set{border:1px solid var(--border);border-radius:var(--radius);padding:11px 12px;margin-bottom:12px;background:var(--bg3)}
+.fld-set legend,.fld-set .lg{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);font-weight:700;margin-bottom:9px;display:block}
+.kind-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:4px}
+.kind-btn{padding:9px 6px;font-size:11.5px;font-weight:600;border:1px solid var(--border2);border-radius:var(--radius);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--font);display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.2;text-align:center}
+.kind-btn i{font-size:17px}
+.kind-btn.on{border-color:var(--cyan);background:rgba(0,197,255,.1);color:var(--cyan)}
+.chk{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--text2);line-height:1.5;cursor:pointer;padding:3px 0}
+.chk input{width:auto;flex-shrink:0;accent-color:var(--cyan);cursor:pointer;margin-top:2px}
+
+/* ── plan / commitment empty states ── */
+.pane-empty{text-align:center;padding:34px 18px;color:var(--text2);font-size:13px;line-height:1.65;background:var(--bg2);border:1px dashed var(--border2);border-radius:var(--radius-lg)}
+.pane-empty i{font-size:38px;display:block;margin-bottom:11px;color:var(--text3)}
+.pane-empty b{color:var(--text);display:block;margin-bottom:5px;font-size:14.5px}
+.pane-empty .mini-btn{margin-top:14px}
+
+/* ── plan totals strip ── */
+.tot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:9px;margin-bottom:13px}
+.tot{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 11px;position:relative;overflow:hidden}
+.tot::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;background:var(--border2)}
+.tot.in::before{background:var(--success-text)}
+.tot.out::before{background:var(--danger-text)}
+.tot.cy::before{background:var(--cyan)}
+.tot.wa::before{background:var(--warning-text)}
+.tot .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);font-weight:600}
+.tot .v{font-size:16px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums;line-height:1.2}
+.tot .s{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.35}
+
+/* ── mobile: the tab bar moves to the thumb ── */
+@media(max-width:820px){
+  .viewnav{position:fixed;top:auto;bottom:0;left:0;right:0;border-bottom:none;border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 14px rgba(0,0,0,.35)}
+  .viewnav-inner{padding:0}
+  .vn-btn{border-bottom:none;border-top:2.5px solid transparent;padding:8px 4px 7px;font-size:11px;min-width:0}
+  .vn-btn.on{border-top-color:var(--cyan)}
+  .vn-dot{top:4px;right:calc(50% - 18px)}
+  /* Room for the bar, or the last row of every list hides behind it. */
+  .main{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+  .toast{bottom:calc(70px + env(safe-area-inset-bottom))}
+}
+@media(max-width:600px){
+  .pane-card{border-radius:0;border-left:none;border-right:none;padding:12px}
+  .pane-empty{border-radius:0;border-left:none;border-right:none}
+  .month-bar{border-radius:0;border-left:none;border-right:none}
+  .tot-grid{grid-template-columns:1fr 1fr;padding:0 10px}
+  .plan-group,.cm-list{padding:0 10px}
+  .pane-head{padding:0 10px}
+  .needs-backend{border-radius:0;border-left:none;border-right:none}
+  .fld-row{grid-template-columns:1fr}
+  .kind-grid{grid-template-columns:repeat(2,1fr)}
+  .sheet-modal.wide{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;top:0;left:0;transform:none;border-radius:0;border:none}
+  .sheet-modal.wide.open{transform:none}
+  .sheet-hdr{border-radius:0}
+}
+/* Under 430px a row of buttons wraps into a ladder of half-width targets;
+   one full-width primary is easier to hit and impossible to mistake. */
+@media(max-width:430px){
+  .sheet-foot{flex-direction:column-reverse}
+  .sheet-foot .btn-save,.sheet-foot .mini-btn{width:100%;justify-content:center}
+}
 </style>
 </head>
 <body>
@@ -496,7 +682,7 @@ tr.row-editing td{background:var(--info-bg) !important}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v1.3</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v2.0</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -539,12 +725,36 @@ tr.row-editing td{background:var(--info-bg) !important}
   </div>
 </div>
 
+<!-- SECTION NAV — a tab strip under the hero on a computer, a bottom bar on a phone -->
+<nav class="viewnav" id="viewNav" aria-label="Sections">
+  <div class="viewnav-inner">
+    <button class="vn-btn on" id="vnLedger" onclick="setView('ledger')" aria-label="Ledger"><i class="ti ti-notebook"></i> Ledger<span class="vn-dot"></span></button>
+    <button class="vn-btn"    id="vnPlan"   onclick="setView('plan')"   aria-label="Monthly plan"><i class="ti ti-calendar-dollar"></i> Plan<span class="vn-dot"></span></button>
+    <button class="vn-btn"    id="vnCommit" onclick="setView('commit')" aria-label="Savings, loans and commitments"><i class="ti ti-pig-money"></i> Commitments<span class="vn-dot"></span></button>
+    <button class="vn-btn"    id="vnReport" onclick="openReport()"      aria-label="Reports"><i class="ti ti-report-analytics"></i> Reports<span class="vn-dot"></span></button>
+  </div>
+</nav>
+
 <!-- MAIN CONTENT -->
 <div class="main">
 
   <div class="offline-note" id="offlineNote" role="status">
     <i class="ti ti-wifi-off"></i> Offline — this is the last copy saved on this device. New entries need a connection, so they are not saved yet.
   </div>
+
+  <!-- Shown only when her Apps Script is older than this page: the Plan and
+       Commitments sections have nowhere to save to until it is updated. -->
+  <div class="needs-backend" id="needsBackend">
+    <b><i class="ti ti-alert-triangle"></i> Your Google backend needs updating.</b><br>
+    The Plan and Commitments sections save into two new sheets that your Apps Script does not have yet.
+    Open your Google Sheet → <b>Extensions → Apps Script</b>, paste the new <b>GAS.gs</b>, then
+    <b>Deploy → Manage deployments → ✏ → Version: New version → Deploy</b>.
+    Use <b>New version</b>, not New deployment — a new deployment changes the link and signs out every device.
+    <div style="margin-top:8px"><button class="mini-btn" onclick="recheckBackend()"><i class="ti ti-refresh"></i> I have done it — check again</button></div>
+  </div>
+
+<!-- ═══════════════ VIEW: LEDGER ═══════════════ -->
+<div class="view on" id="viewLedger">
 
   <!-- SUMMARY -->
   <div class="summary-grid">
@@ -613,9 +823,31 @@ tr.row-editing td{background:var(--info-bg) !important}
         <label for="fAmount">Amount (₹)</label>
         <input type="number" id="fAmount" placeholder="0" min="0" inputmode="decimal">
       </div>
+      <!-- The diary's Remarks column, split into the two facts it was carrying.
+           "NSM", "TSM", "Sankar" say WHO settled it; "Cash", "GPay" say HOW.
+           Written into the note they could be read but never totalled, so a
+           question like "how much did TSM pay this month" had no answer. -->
+      <div class="form-group">
+        <label for="fPaidBy">Paid by / Received by <span style="color:var(--text3);font-weight:400">— optional</span></label>
+        <input type="text" id="fPaidBy" list="dlPaidBy" placeholder="e.g. NSM, TSM, Sankar" autocomplete="off">
+        <datalist id="dlPaidBy"></datalist>
+      </div>
+      <div class="form-group">
+        <label for="fMode">Payment mode <span style="color:var(--text3);font-weight:400">— optional</span></label>
+        <select id="fMode">
+          <option value="">Not stated</option>
+          <option value="Cash">Cash</option>
+          <option value="GPay">GPay / UPI</option>
+          <option value="Bank">Bank transfer</option>
+          <option value="Card">Card</option>
+          <option value="Cheque">Cheque</option>
+          <option value="Auto-debit">Auto-debit / ECS</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
       <div class="form-group full">
         <label for="fNote">Note (optional)</label>
-        <input type="text" id="fNote" placeholder="e.g. via GPay, pending ₹200, on hold...">
+        <input type="text" id="fNote" placeholder="e.g. pending ₹200, on hold, term 2...">
       </div>
     </div>
     <div class="btn-row">
@@ -691,8 +923,50 @@ tr.row-editing td{background:var(--info-bg) !important}
       </div>
     </div>
   </div>
+</div><!-- /viewLedger -->
 
-  <div class="footer">Mini Personal Finance Tracker v1.3 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+<!-- ═══════════════ VIEW: MONTHLY PLAN ═══════════════
+     The diary page kept as data: one row an item, what was proposed against
+     what was actually paid, for one month at a time. -->
+<div class="view" id="viewPlan">
+  <div class="month-bar">
+    <button class="mb-nav" onclick="planStep(-1)" aria-label="Previous month"><i class="ti ti-chevron-left"></i></button>
+    <div class="mb-label" id="planMonthLabel" onclick="planPickMonth()" title="Tap to jump to another month">August 2026<small>tap to change</small></div>
+    <button class="mb-nav" onclick="planStep(1)" aria-label="Next month"><i class="ti ti-chevron-right"></i></button>
+  </div>
+
+  <div class="tot-grid" id="planTotals"></div>
+
+  <div class="pane-head">
+    <div class="pane-h"><i class="ti ti-list-check"></i> <span id="planTitle">This Month&rsquo;s Plan</span></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="mini-btn" onclick="planBuild()" title="Add every active commitment that is due this month"><i class="ti ti-wand"></i> Fill from commitments</button>
+      <button class="mini-btn" onclick="planCopyPrev()" title="Copy last month's list into this month"><i class="ti ti-copy"></i> Copy last month</button>
+      <button class="mini-btn primary" onclick="openPlanLine('')"><i class="ti ti-plus"></i> Add line</button>
+    </div>
+  </div>
+
+  <div id="planList"></div>
+</div><!-- /viewPlan -->
+
+<!-- ═══════════════ VIEW: COMMITMENTS, SAVINGS & LOANS ═══════════════ -->
+<div class="view" id="viewCommit">
+  <div class="tot-grid" id="commitTotals"></div>
+
+  <div class="pane-head">
+    <div class="pane-h"><i class="ti ti-pig-money"></i> Savings, Loans &amp; Standing Bills</div>
+    <button class="mini-btn primary" onclick="openCommit('')"><i class="ti ti-plus"></i> Add</button>
+  </div>
+  <div class="pane-sub">
+    Everything that repeats: a recurring deposit, a gold scheme, a loan instalment, school fees, the fibre bill.
+    Each one keeps its own instalment count and running total, and can fill itself into any month&rsquo;s plan.
+  </div>
+
+  <div class="chip-row" id="commitFilter" style="margin-bottom:12px"></div>
+  <div id="commitList" class="cm-list"></div>
+</div><!-- /viewCommit -->
+
+  <div class="footer">Mini Personal Finance Tracker v2.0 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -718,7 +992,7 @@ tr.row-editing td{background:var(--info-bg) !important}
   <button class="drawer-item" onclick="closeDrawer();changeBackend()"><i class="ti ti-plug-connected"></i> Backend Connection</button>
   <button class="drawer-item" onclick="signOut()"><i class="ti ti-logout"></i> Sign Out</button>
   <div class="drawer-section-label">About</div>
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px"><i class="ti ti-info-circle"></i> Version 1.3 — August 2026</div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px"><i class="ti ti-info-circle"></i> Version 2.0 — August 2026</div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -783,7 +1057,7 @@ tr.row-editing td{background:var(--info-bg) !important}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger &middot; v1.3</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v2.0</div>
       </div>
     </div>
 
@@ -884,6 +1158,280 @@ tr.row-editing td{background:var(--info-bg) !important}
   </div>
 </div>
 
+<!-- COMMITMENT EDITOR ─────────────────────────────────────────────────────────
+     One dialog for a recurring deposit, a gold scheme, a loan, an insurance
+     premium, a term fee or a monthly bill. The blocks below the kind buttons
+     appear only for the kinds they belong to: a fibre bill has no instalment
+     count, and asking for one would be asking for a fact that does not exist. -->
+<div class="sheet-overlay" id="commitOverlay" onclick="closeCommit()"></div>
+<div class="sheet-modal wide" id="commitModal" role="dialog" aria-modal="true" aria-labelledby="commitTitle">
+  <div class="sheet-hdr">
+    <span class="sheet-hdr-title" id="commitTitle"><i class="ti ti-pig-money"></i> Add a Commitment</span>
+    <button class="drawer-close" onclick="closeCommit()" aria-label="Close"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="sheet-body">
+    <div class="fld-set">
+      <span class="lg">What kind of thing is it?</span>
+      <div class="kind-grid" id="cmKindGrid"></div>
+      <div class="fld-hint" id="cmKindHint" style="margin-top:8px"></div>
+    </div>
+
+    <div class="fld-row one">
+      <div class="fld">
+        <label for="cmName">Name</label>
+        <input type="text" id="cmName" placeholder="e.g. HDFC NSM Recurring Deposit" autocomplete="off">
+      </div>
+    </div>
+    <div class="fld-row">
+      <div class="fld">
+        <label for="cmAmount"><span id="cmAmountLabel">Amount each time (₹)</span></label>
+        <input type="number" id="cmAmount" placeholder="0" min="0" inputmode="decimal">
+      </div>
+      <div class="fld">
+        <label for="cmFreq">How often</label>
+        <select id="cmFreq" onchange="cmPaint()">
+          <option value="monthly">Every month</option>
+          <option value="quarterly">Every 3 months</option>
+          <option value="halfyearly">Every 6 months</option>
+          <option value="yearly">Once a year</option>
+          <option value="onceoff">One-off</option>
+        </select>
+      </div>
+    </div>
+    <div class="fld-row">
+      <div class="fld">
+        <label for="cmParty">Paid to</label>
+        <input type="text" id="cmParty" list="dlParty" placeholder="e.g. HDFC Bank, Thomas Jewellery" autocomplete="off">
+        <datalist id="dlParty"></datalist>
+      </div>
+      <div class="fld">
+        <label for="cmDueDay">Due on day of month</label>
+        <select id="cmDueDay"></select>
+      </div>
+    </div>
+    <div class="fld-row">
+      <div class="fld">
+        <label for="cmCategory">Category</label>
+        <input type="text" id="cmCategory" list="dlCat" placeholder="Worked out automatically if blank" autocomplete="off">
+        <datalist id="dlCat"></datalist>
+      </div>
+      <div class="fld">
+        <label for="cmPayMode">Usual payment mode</label>
+        <select id="cmPayMode">
+          <option value="">Not stated</option>
+          <option value="Cash">Cash</option>
+          <option value="GPay">GPay / UPI</option>
+          <option value="Bank">Bank transfer</option>
+          <option value="Card">Card</option>
+          <option value="Cheque">Cheque</option>
+          <option value="Auto-debit">Auto-debit / ECS</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Instalment plan — savings, schemes, loans, insurance, term fees -->
+    <div class="fld-set" id="cmInstBlock">
+      <span class="lg"><i class="ti ti-hash"></i> Instalments</span>
+      <div class="fld-row">
+        <div class="fld">
+          <label for="cmTotalInst">Total instalments</label>
+          <input type="number" id="cmTotalInst" placeholder="e.g. 60" min="0" step="1" inputmode="numeric">
+          <div class="fld-hint">Leave blank if it just keeps going.</div>
+        </div>
+        <div class="fld">
+          <label for="cmStartMonth">Started in</label>
+          <input type="month" id="cmStartMonth">
+        </div>
+      </div>
+      <div class="fld-row">
+        <div class="fld">
+          <label for="cmOpeningInst">Already paid before this app</label>
+          <input type="number" id="cmOpeningInst" placeholder="0" min="0" step="1" inputmode="numeric">
+          <div class="fld-hint">Number of instalments. A diary line reading (2/60) means 2 here.</div>
+        </div>
+        <div class="fld">
+          <label for="cmOpeningPaid">…which came to (₹)</label>
+          <input type="number" id="cmOpeningPaid" placeholder="0" min="0" inputmode="decimal">
+          <div class="fld-hint">The running total already paid. Leave blank to work it out from the count.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loans only -->
+    <div class="fld-set" id="cmLoanBlock">
+      <span class="lg"><i class="ti ti-building-bank"></i> Loan balance</span>
+      <div class="fld-row">
+        <div class="fld">
+          <label for="cmPrincipal">Total amount borrowed (₹)</label>
+          <input type="number" id="cmPrincipal" placeholder="0" min="0" inputmode="decimal">
+        </div>
+        <div class="fld">
+          <label for="cmOutstanding">Still owed today (₹)</label>
+          <input type="number" id="cmOutstanding" placeholder="0" min="0" inputmode="decimal">
+          <div class="fld-hint">The pending figure from the bank. Payments recorded here are taken off it.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schemes that accumulate something other than rupees (gold, chits) -->
+    <div class="fld-set" id="cmUnitBlock">
+      <span class="lg"><i class="ti ti-diamond"></i> What it accumulates</span>
+      <div class="fld-row">
+        <div class="fld">
+          <label for="cmUnit">Unit</label>
+          <input type="text" id="cmUnit" placeholder="e.g. gram" autocomplete="off">
+        </div>
+        <div class="fld">
+          <label for="cmUnitPerInst">Per instalment</label>
+          <input type="number" id="cmUnitPerInst" placeholder="e.g. 1" min="0" step="0.001" inputmode="decimal">
+        </div>
+      </div>
+      <div class="fld-row one">
+        <div class="fld">
+          <label for="cmOpeningUnits">Already accumulated</label>
+          <input type="number" id="cmOpeningUnits" placeholder="0" min="0" step="0.001" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+
+    <div class="fld-row one">
+      <div class="fld">
+        <label for="cmNote">Note</label>
+        <textarea id="cmNote" rows="2" placeholder="Anything worth remembering — account number, agent, terms…"></textarea>
+      </div>
+    </div>
+    <label class="chk"><input type="checkbox" id="cmActive" checked> <span>Still running — include it when a month&rsquo;s plan is filled in.<br><span style="color:var(--text3);font-size:11px">Turn this off when it closes. Nothing already recorded is lost.</span></span></label>
+  </div>
+  <div class="sheet-foot">
+    <button class="mini-btn danger" id="cmDeleteBtn" style="display:none" onclick="deleteCommit()"><i class="ti ti-trash"></i> Delete</button>
+    <button class="mini-btn" onclick="closeCommit()">Cancel</button>
+    <button class="btn-save" id="cmSaveBtn" onclick="saveCommit()"><i class="ti ti-device-floppy"></i> Save</button>
+  </div>
+</div>
+
+<!-- PLAN LINE EDITOR ─────────────────────────────────────────────────────── -->
+<div class="sheet-overlay" id="plOverlay" onclick="closePlanLine()"></div>
+<div class="sheet-modal wide" id="plModal" role="dialog" aria-modal="true" aria-labelledby="plTitle">
+  <div class="sheet-hdr">
+    <span class="sheet-hdr-title" id="plTitle"><i class="ti ti-plus"></i> Add a Plan Line</span>
+    <button class="drawer-close" onclick="closePlanLine()" aria-label="Close"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="sheet-body">
+    <div class="fld-set" id="plLinked" style="display:none">
+      <span class="lg"><i class="ti ti-link"></i> Linked commitment</span>
+      <div style="font-size:13px;color:var(--text)" id="plLinkedName"></div>
+      <div class="fld-hint" style="margin-top:5px">Paying this line counts towards that commitment&rsquo;s instalments and totals.</div>
+    </div>
+    <div class="fld-row">
+      <div class="fld">
+        <label for="plSide">Money in or out</label>
+        <select id="plSide">
+          <option value="out">Money out — something to pay</option>
+          <option value="in">Money in — something expected</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label for="plDue">Due / expected on</label>
+        <input type="date" id="plDue">
+      </div>
+    </div>
+    <div class="fld-row one">
+      <div class="fld">
+        <label for="plItem">Item</label>
+        <input type="text" id="plItem" placeholder="e.g. School Fees — Term 2" autocomplete="off">
+      </div>
+    </div>
+    <div class="fld-row">
+      <div class="fld">
+        <label for="plProposed">Proposed amount (₹)</label>
+        <input type="number" id="plProposed" placeholder="0" min="0" inputmode="decimal">
+      </div>
+      <div class="fld">
+        <label for="plParty">Party</label>
+        <input type="text" id="plParty" list="dlParty" placeholder="Paid to / received from" autocomplete="off">
+      </div>
+    </div>
+    <div class="fld-row one">
+      <div class="fld">
+        <label for="plCategory">Category</label>
+        <input type="text" id="plCategory" list="dlCat" placeholder="Worked out automatically if blank" autocomplete="off">
+      </div>
+    </div>
+    <div class="fld-row one">
+      <div class="fld">
+        <label for="plNote">Note</label>
+        <textarea id="plNote" rows="2" placeholder="e.g. Term 2 of 3, paid by TSM…"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="sheet-foot">
+    <button class="mini-btn danger" id="plDeleteBtn" style="display:none" onclick="deletePlanLine()"><i class="ti ti-trash"></i> Delete</button>
+    <button class="mini-btn" onclick="closePlanLine()">Cancel</button>
+    <button class="btn-save" id="plSaveBtn" onclick="savePlanLine()"><i class="ti ti-device-floppy"></i> Save</button>
+  </div>
+</div>
+
+<!-- MARK AS PAID ──────────────────────────────────────────────────────────────
+     The actual figure is typed once, here, and becomes both the plan's Actual
+     column and — unless it was somebody else's money — a real ledger entry.
+     Typing it twice is how a ledger and a plan end up disagreeing. -->
+<div class="sheet-overlay" id="payOverlay" onclick="closePay()"></div>
+<div class="sheet-modal wide" id="payModal" role="dialog" aria-modal="true" aria-labelledby="payTitle">
+  <div class="sheet-hdr">
+    <span class="sheet-hdr-title" id="payTitle"><i class="ti ti-checkbox"></i> Record Payment</span>
+    <button class="drawer-close" onclick="closePay()" aria-label="Close"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="sheet-body">
+    <div class="fld-set">
+      <span class="lg" id="payItemLabel">Item</span>
+      <div style="font-size:14.5px;font-weight:600;color:var(--text)" id="payItemName"></div>
+      <div class="fld-hint" style="margin-top:4px" id="payItemSub"></div>
+    </div>
+    <div class="fld-row">
+      <div class="fld">
+        <label for="payAmount"><span id="payAmountLabel">Amount actually paid (₹)</span></label>
+        <input type="number" id="payAmount" placeholder="0" min="0" inputmode="decimal">
+      </div>
+      <div class="fld">
+        <label for="payDate">On</label>
+        <input type="date" id="payDate">
+      </div>
+    </div>
+    <div class="fld-row">
+      <div class="fld">
+        <label for="payBy">Paid by</label>
+        <input type="text" id="payBy" list="dlPaidBy" placeholder="e.g. NSM, TSM" autocomplete="off">
+      </div>
+      <div class="fld">
+        <label for="payMode">Mode</label>
+        <select id="payMode">
+          <option value="">Not stated</option>
+          <option value="Cash">Cash</option>
+          <option value="GPay">GPay / UPI</option>
+          <option value="Bank">Bank transfer</option>
+          <option value="Card">Card</option>
+          <option value="Cheque">Cheque</option>
+          <option value="Auto-debit">Auto-debit / ECS</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="fld-row one">
+      <div class="fld">
+        <label for="payNote">Note</label>
+        <textarea id="payNote" rows="2" placeholder="e.g. part payment, balance next month…"></textarea>
+      </div>
+    </div>
+    <label class="chk"><input type="checkbox" id="payPartial"> <span>Only part of it — the rest is still to pay.</span></label>
+    <label class="chk"><input type="checkbox" id="payToLedger" checked> <span>Also record it in my ledger.<br><span style="color:var(--text3);font-size:11px">Untick it when somebody else&rsquo;s money paid for this — it still counts in the plan, but not as your spending.</span></span></label>
+  </div>
+  <div class="sheet-foot">
+    <button class="mini-btn" onclick="closePay()">Cancel</button>
+    <button class="btn-save" id="paySaveBtn" onclick="savePay()"><i class="ti ti-check"></i> Record it</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -894,7 +1442,9 @@ tr.row-editing td{background:var(--info-bg) !important}
 const LS = { url:'mpft_backend_url', token:'mpft_token', expires:'mpft_expires',
              user:'mpft_user', sheet:'mpft_sheet_url', profile:'mpft_profile',
              profileAt:'mpft_profile_at',
-             cache:'mpft_cache', theme:'mpft_theme', banner:'mpft_banner_dismissed' };
+             cache:'mpft_cache', theme:'mpft_theme', banner:'mpft_banner_dismissed',
+             // v2.0
+             view:'mpft_view', planMonth:'mpft_plan_month', lastPaidBy:'mpft_last_paidby' };
 let GAS_URL    = localStorage.getItem(LS.url)   || '';
 let AUTH_TOKEN = localStorage.getItem(LS.token) || '';
 let AUTH_LOST  = false;
@@ -1243,6 +1793,10 @@ function closeDrawer(){ document.getElementById('drawer').classList.remove('open
 
 // ── UTILS ──
 function fmt(n){ return '₹' + (Number(n)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+/* For figures that are genuinely allowed to be negative — a net worth, a
+   net position. fmt() would render those as "₹-89,075.00", with the sign
+   marooned inside the amount after the rupee symbol. */
+function fmtS(n){ const v=Number(n)||0; return (v<0?'−':'') + fmt(Math.abs(v)); }
 function fmtDate(s){
   if(!s) return '';
   try{
@@ -1358,9 +1912,16 @@ async function loadAll(){
     const data = await gasCall({action:'getAll'});
     if(data.status==='ok'){
       entries=(data.transactions||[]).map(normType);
+      /* A v1.x deployment answers with transactions and nothing else. The
+         absence of the key — not an empty array, which is a real answer — is
+         what says the Plan and Commitments sheets do not exist there yet. */
+      const hasPlans = Array.isArray(data.commitments) && Array.isArray(data.plans);
+      if(hasPlans){ commitments = data.commitments; plans = data.plans; }
+      setBackendOK(hasPlans);
       cacheEntries();                                   // next cold open paints instantly
       setOffline(false);
-      setStatus(true,'Connected — Google Drive'); render();
+      setStatus(true,'Connected — Google Drive');
+      render(); renderPlan(); renderCommitments();
       syncProfileIfStale(data.profileAt);                // picks up a photo set elsewhere
     }
     else{ setStatus(false,'Error: '+data.message); showToast('Load failed','error'); }
@@ -1384,6 +1945,8 @@ function startEdit(id){
   document.getElementById('fParty').value  = e.party||'';
   document.getElementById('fAmount').value = e.amount||'';
   document.getElementById('fNote').value   = e.note||'';
+  document.getElementById('fPaidBy').value = e.paidBy||'';
+  document.getElementById('fMode').value   = e.mode||'';
   setType(e.type||'income');
   document.getElementById('editBanner').style.display  = 'flex';
   document.getElementById('formCard').classList.add('editing');
@@ -1395,7 +1958,8 @@ function startEdit(id){
 }
 function cancelEdit(){
   editingId = null;
-  ['fDesc','fParty','fAmount','fNote'].forEach(id=>document.getElementById(id).value='');
+  ['fDesc','fParty','fAmount','fNote','fPaidBy'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fMode').value = '';
   document.getElementById('fDate').value = today();
   setType('income');
   document.getElementById('editBanner').style.display = 'none';
@@ -1410,8 +1974,11 @@ function cancelEdit(){
 async function saveEntry(){
   const date=document.getElementById('fDate').value, desc=document.getElementById('fDesc').value.trim(),
         party=document.getElementById('fParty').value.trim(), amount=parseFloat(document.getElementById('fAmount').value),
-        note=document.getElementById('fNote').value.trim();
+        note=document.getElementById('fNote').value.trim(),
+        paidBy=document.getElementById('fPaidBy').value.trim(),
+        mode=document.getElementById('fMode').value;
   if(!date||!desc||!party||!amount||amount<=0){ showToast('Fill date, description, party & amount','error'); return; }
+  if(paidBy) localStorage.setItem(LS.lastPaidBy, paidBy);
   const btn=document.getElementById('btnSave');
   btn.disabled=true;
   btn.innerHTML='<div class="spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:6px"></div> '+(editingId?'Updating...':'Saving...');
@@ -1420,8 +1987,8 @@ async function saveEntry(){
   const prevCount  = entries.length;
   try{
     const params = editingId
-      ? {action:'update', id:editingId, date, type:txType, description:desc, party, amount, note}
-      : {action:'add', date, type:txType, description:desc, party, amount, note};
+      ? {action:'update', id:editingId, date, type:txType, description:desc, party, amount, note, paidBy, mode}
+      : {action:'add', date, type:txType, description:desc, party, amount, note, paidBy, mode};
     const res = await gasCall(params);
     if(res.status==='ok'){
       showToast(wasEditing ? 'Updated in Google Drive!' : 'Saved to Google Drive!');
@@ -1565,13 +2132,17 @@ function render(){
   empty.style.display='none';
   body.innerHTML=list.map((e,i)=>{
     const dt=fmtDTParts(e);
+    // Paid by / mode ride under the party rather than in columns of their own:
+    // they belong to the same fact ("who handed this over, and how"), and the
+    // table is already eight columns wide on a phone.
+    const who=[e.paidBy,e.mode].filter(Boolean).join(' · ');
     return `
     <tr class="${editingId===e.id?'row-editing':''}">
       <td style="color:var(--text2)">${i+1}</td>
       <td class="dt-cell" style="color:var(--text2);font-size:12px"><div>${dt.date}</div>${dt.sub?`<div class="dt-sub">${dt.sub}</div>`:''}</td>
       <td><span class="pill ${e.type}">${(m=>`<i class="ti ${m.icon}"></i> ${m.label}`)(TYPE_META[e.type]||TYPE_META.expense)}</span></td>
       <td title="${e.description}">${e.description}</td>
-      <td title="${e.party}" style="color:var(--text2)">${e.party}</td>
+      <td class="dt-cell" title="${e.party}" style="color:var(--text2)">${e.party}${who?`<div class="dt-sub">${esc(who)}</div>`:''}</td>
       <td style="text-align:right" class="amt-${e.type}">${(TYPE_META[e.type]||TYPE_META.expense).sign}${fmt(e.amount)}</td>
       <td style="color:var(--text2);font-size:12px;font-style:italic" title="${e.note||''}">${e.note||'—'}</td>
       <td><div class="action-cell">
@@ -1585,8 +2156,8 @@ function render(){
 function exportCSV(){
   if(!entries.length){ showToast('No data to export','error'); return; }
   const sorted=[...entries].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-  const rows=[['#','Date & Time','Type','Description','Party','Amount','Note']];
-  sorted.forEach((e,i)=>rows.push([i+1,fmtDTLine(e),e.type,e.description,e.party,e.amount,e.note||'']));
+  const rows=[['#','Date & Time','Type','Description','Party','Amount','Paid by','Mode','Note']];
+  sorted.forEach((e,i)=>rows.push([i+1,fmtDTLine(e),e.type,e.description,e.party,e.amount,e.paidBy||'',e.mode||'',e.note||'']));
   const income=entries.filter(isIncomeT).reduce((s,e)=>s+e.amount,0);
   const expense=entries.filter(repIsOut).reduce((s,e)=>s+e.amount,0);
   rows.push([],[' ',' ',' ',' ','Total Income',income,''],[' ',' ',' ',' ','Total Expense',expense,''],[' ',' ',' ',' ','Net Balance',income-expense,'']);
@@ -1594,6 +2165,860 @@ function exportCSV(){
   const a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
   a.download='personal_transactions.csv'; a.click();
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   v2.0 — SECTIONS, MONTHLY PLAN, COMMITMENTS
+   ──────────────────────────────────────────────────────────────────────────
+   Her diary keeps two pages that the ledger alone could not hold:
+
+     • a monthly page of PROPOSED against ACTUAL — the plan for the month,
+       written before the money moves and ticked off as it does;
+     • a standing list behind it — the car loan at instalment 88, the RD at
+       2 of 60, the gold scheme at 1 of 12, the fibre bill every month.
+
+   A ledger records what happened. Neither of those is a record of what
+   happened: one is an intention, the other is a running position. They are
+   therefore separate data, not a filter over the transactions, and they live
+   in two new sheets alongside Transactions.
+
+   The one rule they must not break: an amount is typed ONCE. Marking a plan
+   line paid writes the ledger entry itself, so the plan's Actual column and
+   the ledger can never drift apart by a typo.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+let commitments = [], plans = [];
+let BACKEND_OK   = true;          // does her deployment know about plans yet
+let curView      = 'ledger';
+let cmEditId = '', plEditId = '', payTarget = null;
+let commitFilterKind = 'all';
+
+/* ── month keys ('yyyy-MM'); every comparison is a string comparison ── */
+const _mkey  = d => `${d.getFullYear()}-${_pad(d.getMonth()+1)}`;
+const thisMonthKey = () => _mkey(new Date());
+function monthLabel(k){ const [y,m]=String(k||'').split('-'); return (_MONFULL[+m-1]||'') + ' ' + (y||''); }
+function monthShift(k,n){ const [y,m]=k.split('-').map(Number); return _mkey(new Date(y,m-1+n,1)); }
+function monthDiff(a,b){ const [ay,am]=a.split('-').map(Number), [by,bm]=b.split('-').map(Number);
+  return (by-ay)*12 + (bm-am); }
+/* A due day of 31 in a 30-day month is the 30th, not the 1st of the month
+   after — clamping is what a person means by "end of the month". */
+function dueDateFor(k,day){
+  const [y,m]=k.split('-').map(Number);
+  const d=Math.min(Math.max(1,Math.round(day||1)),_lastDay(y,m));
+  return _mk(y,m,d);
+}
+/* Filled in by boot(). It cannot be worked out here: thisMonthKey() leans on
+   _pad, which is declared further down with `const` and is therefore still in
+   its dead zone while this line runs. */
+let planMonth = '';
+
+/* ── kinds of commitment ────────────────────────────────────────────────────
+   The kind decides which blocks of the editor are asked for, which report the
+   item lands in, and whether paying it builds an asset or clears a debt. */
+const KINDS = {
+  saving:    { label:'Savings / RD',   icon:'ti-pig-money',      inst:true,  unit:false, loan:false, asset:true,
+               hint:'A recurring deposit or a standing saving — money set aside each time.' },
+  scheme:    { label:'Gold / Chit',    icon:'ti-diamond',        inst:true,  unit:true,  loan:false, asset:true,
+               hint:'A scheme that builds up something as well as money — grams of gold, a chit turn.' },
+  loan:      { label:'Loan / EMI',     icon:'ti-building-bank',  inst:true,  unit:false, loan:true,  asset:false,
+               hint:'Money borrowed and being paid back. Each payment lowers what is still owed.' },
+  insurance: { label:'Insurance',      icon:'ti-shield-check',   inst:true,  unit:false, loan:false, asset:false,
+               hint:'A premium on a policy — yearly, half-yearly or monthly.' },
+  fee:       { label:'Fees',           icon:'ti-school',         inst:true,  unit:false, loan:false, asset:false,
+               hint:'School or college fees — usually a fixed number of terms.' },
+  bill:      { label:'Monthly bill',   icon:'ti-receipt',        inst:false, unit:false, loan:false, asset:false,
+               hint:'Something that simply repeats — fibre, cable, milk, provisions, a salary you pay.' }
+};
+const KIND_GROUPS = [
+  { k:'saving',    title:'Savings & Deposits',   icon:'ti-pig-money' },
+  { k:'scheme',    title:'Gold & Chit Schemes',  icon:'ti-diamond' },
+  { k:'loan',      title:'Loans & EMIs',         icon:'ti-building-bank' },
+  { k:'insurance', title:'Insurance',            icon:'ti-shield-check' },
+  { k:'fee',       title:'Fees',                 icon:'ti-school' },
+  { k:'bill',      title:'Standing Bills',       icon:'ti-receipt' }
+];
+const kindMeta = k => KINDS[k] || KINDS.bill;
+
+const PLAN_STATUS = {
+  planned: { label:'To pay',  cls:'planned' },
+  partial: { label:'Part paid', cls:'partial' },
+  paid:    { label:'Paid',    cls:'paid' },
+  skipped: { label:'Skipped', cls:'skipped' }
+};
+
+/* ── SECTION SWITCHING ──────────────────────────────────────────────────── */
+function setView(v){
+  curView = v;
+  [['ledger','viewLedger','vnLedger'],['plan','viewPlan','vnPlan'],['commit','viewCommit','vnCommit']]
+    .forEach(([k,vid,bid])=>{
+      document.getElementById(vid).classList.toggle('on', k===v);
+      document.getElementById(bid).classList.toggle('on', k===v);
+    });
+  localStorage.setItem(LS.view, v);
+  if(v==='plan')   renderPlan();
+  if(v==='commit') renderCommitments();
+  // A section switch is a new screen: start it at the top, the way a tab bar
+  // behaves everywhere else.
+  window.scrollTo({top:0, behavior:'auto'});
+}
+
+/* A dot on the Plan tab when something in the current month is past its due
+   date and still unpaid — the one thing worth interrupting her for. */
+function paintNavBadges(){
+  const due = planRowsFor(thisMonthKey()).filter(isPlanOverdue).length;
+  document.getElementById('vnPlan').classList.toggle('has-due', due>0);
+}
+
+/* ── BACKEND CAPABILITY ─────────────────────────────────────────────────────
+   Her Apps Script is deployed by hand, so this page can easily be newer than
+   the thing it talks to. Rather than letting Save fail with "Unknown action",
+   the two new sections say plainly what has to be pasted and redeployed. */
+function setBackendOK(ok){
+  BACKEND_OK = !!ok;
+  document.getElementById('needsBackend').classList.toggle('show', !ok);
+}
+async function recheckBackend(){
+  showToast('Checking your backend…');
+  try{
+    const d = await rawCall(GAS_URL, {action:'ping'}, 1, 20000);
+    const ok = !!(d && d.features && d.features.indexOf('plans') >= 0);
+    setBackendOK(ok);
+    showToast(ok ? 'Backend updated — Plan and Commitments are live' : 'Still the old version — paste GAS.gs and deploy a New version', ok?'success':'error');
+    if(ok) loadAll();
+  }catch(e){ showToast('Could not reach your backend', 'error'); }
+}
+function requireBackend(){
+  if(BACKEND_OK) return true;
+  setView(curView);
+  showToast('Update your Apps Script first — see the note at the top', 'error');
+  document.getElementById('needsBackend').scrollIntoView({behavior:'smooth', block:'center'});
+  return false;
+}
+
+/* ── DERIVED POSITION OF ONE COMMITMENT ─────────────────────────────────────
+   Nothing here is stored. The instalment count and the running total are
+   counted from the plan rows every time they are shown, so a payment recorded
+   on the phone and a payment recorded on the laptop cannot leave two different
+   counters behind. Only the OPENING figures — what had already been paid
+   before this app existed — are held on the commitment itself.            */
+function commitStats(c){
+  const rows = plans.filter(p => p.commitmentId === c.id);
+  const done = rows.filter(p => p.status === 'paid');
+  const part = rows.filter(p => p.status === 'partial');
+  const paidHere = done.concat(part).reduce((s,p) => s + (Number(p.actual)||0), 0);
+  // A part payment has not completed an instalment, so it does not advance the
+  // count — it still shows in the money paid.
+  const instHere = done.length;
+  const doneInst = (Number(c.openingInst)||0) + instHere;
+  const openingPaid = Number(c.openingPaid) || (Number(c.openingInst)||0) * (Number(c.amount)||0);
+  const paidTotal = openingPaid + paidHere;
+  const total = Number(c.totalInst)||0;
+  const leftInst = total ? Math.max(0, total - doneInst) : 0;
+  const pct = total ? Math.min(100, (doneInst/total)*100) : 0;
+  const units = (Number(c.openingUnits)||0) + (Number(c.unitPerInst)||0) * instHere;
+  const owed = c.kind==='loan' ? Math.max(0, (Number(c.outstanding)||0) - paidHere) : 0;
+  const stepM = {monthly:1,quarterly:3,halfyearly:6,yearly:12,onceoff:0}[c.freq] || 1;
+  const perMonth = stepM ? (Number(c.amount)||0)/stepM : 0;
+  const lastPaid = done.concat(part).map(p=>p.paidDate||p.dueDate||'').filter(Boolean).sort().pop() || '';
+  // When it finishes, if it is counting down to something.
+  let closeMonth = '';
+  if(total && leftInst && c.startMonth) closeMonth = monthShift(c.startMonth, (total-1)*stepM);
+  else if(total && leftInst) closeMonth = monthShift(thisMonthKey(), (leftInst-1)*stepM);
+  return { rows, doneInst, instHere, paidHere, paidTotal, openingPaid, total, leftInst, pct,
+           units, owed, perMonth, stepM, lastPaid, closeMonth,
+           remaining: total ? leftInst * (Number(c.amount)||0) : 0 };
+}
+
+/* Is this commitment due in that month? Driven by the first-instalment month
+   and the frequency, and it stops once the last instalment has come round —
+   a 12-month gold scheme must not keep proposing a thirteenth. */
+function commitDueInMonth(c, mk){
+  if(!c.active) return false;
+  const step = {monthly:1,quarterly:3,halfyearly:6,yearly:12,onceoff:0}[c.freq];
+  if(!c.startMonth) return c.freq==='monthly' || !c.freq;   // a plain monthly bill, no start recorded
+  const n = monthDiff(c.startMonth, mk);
+  if(n < 0) return false;
+  if(c.freq==='onceoff') return n === 0;
+  if(n % step !== 0) return false;
+  if(c.totalInst && (Math.floor(n/step) + 1) > c.totalInst) return false;
+  return true;
+}
+/* The instalment number this month carries — the "(2/60)" in the diary. */
+function instalmentNoFor(c, mk){
+  const step = {monthly:1,quarterly:3,halfyearly:6,yearly:12,onceoff:0}[c.freq] || 1;
+  if(!c.startMonth || !step) return 0;
+  const n = monthDiff(c.startMonth, mk);
+  return n < 0 ? 0 : Math.floor(n/step) + 1;
+}
+
+/* ── PLAN ROWS ──────────────────────────────────────────────────────────── */
+function planRowsFor(mk){
+  return plans.filter(p => p.month === mk)
+    .sort((a,b)=> (a.sort||0)-(b.sort||0)
+      || (a.dueDate||'zzz').localeCompare(b.dueDate||'zzz')
+      || String(a.item||'').localeCompare(String(b.item||'')));
+}
+const isPlanOpen = p => p.status==='planned' || p.status==='partial';
+function isPlanOverdue(p){
+  return p.side!=='in' && isPlanOpen(p) && !!p.dueDate && p.dueDate < today();
+}
+function planTotals(mk){
+  const rows = planRowsFor(mk);
+  const out = rows.filter(p=>p.side!=='in'), inc = rows.filter(p=>p.side==='in');
+  const sum=(a,f)=>a.reduce((s,p)=>s+(Number(p[f])||0),0);
+  const paid = out.filter(p=>p.status==='paid'||p.status==='partial');
+  const openRows = out.filter(isPlanOpen);
+  return {
+    rows, out, inc,
+    propOut:sum(out,'proposed'), actOut:sum(out,'actual'),
+    propIn:sum(inc,'proposed'),  actIn:sum(inc,'actual'),
+    nPaid:out.filter(p=>p.status==='paid').length, nOut:out.length,
+    // What is still to find this month: the unpaid proposals plus the unpaid
+    // part of anything only half settled.
+    stillToPay: openRows.reduce((s,p)=>s+Math.max(0,(Number(p.proposed)||0)-(Number(p.actual)||0)),0),
+    overdue: out.filter(isPlanOverdue),
+    paidRows: paid,
+    /* Variance measured ONLY over the lines that are settled. Half way through
+       a month the whole-plan figure says "under budget by ₹27,000" when the
+       truth is simply that the car loan has not gone out yet — a figure that
+       reads as good news right up until the money leaves. Comparing like with
+       like (what was planned for the things actually paid, against what they
+       actually cost) is the only honest reading before a month closes. */
+    settProp: sum(paid,'proposed'), settAct: sum(paid,'actual'), nSett: paid.length
+  };
+}
+
+/* ── PLAN VIEW ──────────────────────────────────────────────────────────── */
+function planStep(n){
+  planMonth = monthShift(planMonth, n);
+  localStorage.setItem(LS.planMonth, planMonth);
+  renderPlan();
+}
+function planPickMonth(){
+  const v = prompt('Jump to which month?\n\nType it as year-month, for example 2026-08', planMonth);
+  if(!v) return;
+  const m = String(v).trim().match(/^(\d{4})-(\d{1,2})$/);
+  if(!m){ showToast('Type it like 2026-08', 'error'); return; }
+  planMonth = `${m[1]}-${_pad(+m[2])}`;
+  localStorage.setItem(LS.planMonth, planMonth);
+  renderPlan();
+}
+
+function renderPlan(){
+  const mk = planMonth, T = planTotals(mk);
+  const isNow = mk === thisMonthKey();
+  document.getElementById('planMonthLabel').innerHTML =
+    `${esc(monthLabel(mk))}<small>${isNow?'this month':'tap to change'}</small>`;
+  document.getElementById('planTitle').textContent = isNow ? 'This Month’s Plan' : monthLabel(mk) + ' Plan';
+
+  const used = T.propOut ? (T.actOut/T.propOut*100) : 0;
+  const sv   = T.settAct - T.settProp;      // like-for-like: settled lines only
+  document.getElementById('planTotals').innerHTML =
+      tot('out','Proposed to spend',fmt(T.propOut),'', `${T.nOut} item${T.nOut===1?'':'s'}`)
+    + tot('cy','Actually paid',fmt(T.actOut),'', T.propOut?`${used.toFixed(0)}% of the plan`:'')
+    + tot(T.stillToPay?'wa':'in','Still to pay',fmt(T.stillToPay),T.stillToPay?'k-warn':'k-good',
+          `${T.nPaid} of ${T.nOut} done`)
+    + tot(sv<=0?'in':'out', sv<=0?'Under plan, so far':'Over plan, so far',
+          fmt(Math.abs(sv)), sv<=0?'k-good':'k-bad',
+          T.nSett ? `on the ${T.nSett} line${T.nSett===1?'':'s'} paid${T.settProp?' · '+fmtPct(Math.abs(_pct(sv,T.settProp))):''}`
+                  : 'nothing paid yet')
+    + (T.inc.length ? tot('in','Money expected in',fmt(T.propIn),'k-good',`received ${fmt(T.actIn)}`) : '');
+
+  const box = document.getElementById('planList');
+  if(!T.rows.length){
+    box.innerHTML = `<div class="pane-empty">
+      <i class="ti ti-calendar-plus"></i>
+      <b>Nothing planned for ${esc(monthLabel(mk))} yet</b>
+      Write the month down before it happens — what has to be paid, and roughly how much — then tick each one off as it goes out.
+      <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="mini-btn primary" onclick="planBuild()"><i class="ti ti-wand"></i> Fill from my commitments</button>
+        <button class="mini-btn" onclick="planCopyPrev()"><i class="ti ti-copy"></i> Copy ${esc(monthLabel(monthShift(mk,-1)))}</button>
+      </div></div>`;
+    paintNavBadges();
+    return;
+  }
+
+  // Overdue first, then still to pay, then what is done, then what was set
+  // aside. A list ordered by "what needs me" beats one ordered by entry date.
+  const groups = [
+    { key:'overdue', title:'Past due',        rows:T.out.filter(isPlanOverdue) },
+    { key:'todo',    title:'Still to pay',    rows:T.out.filter(p=>isPlanOpen(p) && !isPlanOverdue(p)) },
+    { key:'in',      title:'Expected to come in', rows:T.inc },
+    { key:'done',    title:'Paid',            rows:T.out.filter(p=>p.status==='paid') },
+    { key:'skip',    title:'Skipped',         rows:T.out.filter(p=>p.status==='skipped') }
+  ].filter(g=>g.rows.length);
+
+  box.innerHTML = groups.map(g=>{
+    const gt = g.rows.reduce((s,p)=>s + (g.key==='done' ? (Number(p.actual)||0) : (Number(p.proposed)||0)), 0);
+    return `<div class="plan-group">
+      <div class="plan-group-h"><span>${g.title} · ${g.rows.length}</span><span>${fmt(gt)}</span></div>
+      ${g.rows.map(planLineHTML).join('')}
+    </div>`;
+  }).join('');
+  paintNavBadges();
+}
+function tot(cls,label,val,valCls,sub){
+  return `<div class="tot ${cls}"><div class="l">${label}</div><div class="v ${valCls||''}">${val}</div>${sub?`<div class="s">${sub}</div>`:''}</div>`;
+}
+
+function planLineHTML(p){
+  const st = PLAN_STATUS[p.status] || PLAN_STATUS.planned;
+  const over = isPlanOverdue(p);
+  const isIn = p.side === 'in';
+  const c = p.commitmentId ? commitments.find(x=>x.id===p.commitmentId) : null;
+  const prop = Number(p.proposed)||0, act = Number(p.actual)||0;
+  const diff = act - prop;
+
+  const meta = [];
+  if(p.dueDate) meta.push(`<span><i class="ti ti-calendar-event"></i> ${over?'was due ':''}${esc(fmtDate(p.dueDate))}</span>`);
+  if(p.status==='paid'||p.status==='partial'){
+    if(p.paidDate) meta.push(`<span><i class="ti ti-check"></i> ${esc(fmtDate(p.paidDate))}</span>`);
+    if(p.paidBy)   meta.push(`<span><i class="ti ti-user"></i> ${esc(p.paidBy)}</span>`);
+    if(p.payMode)  meta.push(`<span><i class="ti ti-wallet"></i> ${esc(p.payMode)}</span>`);
+    if(!p.txId)    meta.push(`<span title="Recorded in the plan only — it is not in the ledger"><i class="ti ti-notebook-off"></i> not in ledger</span>`);
+  }
+  if(p.party && !p.paidBy) meta.push(`<span><i class="ti ti-users"></i> ${esc(p.party)}</span>`);
+  if(c){
+    const n = instalmentNoFor(c, p.month);
+    meta.push(`<span title="${esc(c.name)}"><i class="ti ${kindMeta(c.kind).icon}"></i> ${n&&c.totalInst?`instalment ${n} of ${c.totalInst}`:kindMeta(c.kind).label}</span>`);
+  }
+  if(p.note) meta.push(`<span style="font-style:italic">${esc(p.note)}</span>`);
+
+  const money = (p.status==='paid'||p.status==='partial')
+    ? `<div class="pl-prop">planned ${fmt(prop)}</div>
+       <div class="pl-act ${isIn?'in':''}">${fmt(act)}</div>
+       ${prop ? `<div class="pl-var ${diff>0?'over':diff<0?'under':'exact'}">${diff>0?'▲ ':diff<0?'▼ ':''}${diff?fmt(Math.abs(diff)):'exactly as planned'}</div>` : ''}`
+    : `<div class="pl-prop">planned</div><div class="pl-act unpaid">${fmt(prop)}</div>`;
+
+  const acts = [];
+  if(isPlanOpen(p)) acts.push(`<button class="mini-btn primary" onclick="openPay('${p.id}')"><i class="ti ti-check"></i> ${isIn?'Received':'Mark paid'}</button>`);
+  if(p.status==='paid'||p.status==='partial') acts.push(`<button class="mini-btn" onclick="openPay('${p.id}')"><i class="ti ti-pencil"></i> Change amount</button>`);
+  if(p.status==='paid'||p.status==='partial') acts.push(`<button class="mini-btn" onclick="planUnpay('${p.id}')"><i class="ti ti-arrow-back-up"></i> Undo</button>`);
+  if(p.status==='planned') acts.push(`<button class="mini-btn" onclick="planSkip('${p.id}')"><i class="ti ti-player-skip-forward"></i> Skip</button>`);
+  if(p.status==='skipped') acts.push(`<button class="mini-btn" onclick="planUnpay('${p.id}')"><i class="ti ti-arrow-back-up"></i> Un-skip</button>`);
+  acts.push(`<button class="mini-btn" onclick="openPlanLine('${p.id}')"><i class="ti ti-edit"></i> Edit</button>`);
+
+  return `<div class="pline st-${st.cls}${over?' overdue':''}${isIn?' side-in':''}">
+    <div style="min-width:0">
+      <div class="pl-name">${esc(p.item)} <span class="st-chip ${over?'due':st.cls}">${over?'overdue':st.label}</span></div>
+      <div class="pl-meta">${meta.join('')}</div>
+    </div>
+    <div class="pl-money">${money}</div>
+    <div class="pl-actions">${acts.join('')}</div>
+  </div>`;
+}
+
+/* ── FILL A MONTH FROM THE STANDING LIST ────────────────────────────────────
+   Idempotent by commitment: running it twice does not double the month. That
+   matters because it is the button she will press when a line is missing. */
+async function planBuild(){
+  if(!requireBackend()) return;
+  const mk = planMonth;
+  const have = new Set(planRowsFor(mk).map(p=>p.commitmentId).filter(Boolean));
+  const due = commitments.filter(c => commitDueInMonth(c, mk) && !have.has(c.id));
+  if(!due.length){
+    showToast(commitments.length ? 'Every commitment due this month is already listed' : 'Add a commitment first', 'error');
+    if(!commitments.length) setView('commit');
+    return;
+  }
+  const rows = due.map((c,i) => ({
+    month:mk, side:'out', commitmentId:c.id,
+    item:c.name, category:c.category || '', party:c.party || '',
+    proposed:Number(c.amount)||0, actual:0,
+    dueDate: c.dueDay ? dueDateFor(mk, c.dueDay) : '',
+    paidDate:'', status:'planned', payMode:c.payMode||'', paidBy:'', txId:'',
+    note:'', sort: 100 + i
+  }));
+  showToast(`Adding ${rows.length} line${rows.length===1?'':'s'}…`);
+  try{
+    const res = await gasCall({action:'savePlans', rows:JSON.stringify(rows)}, 2, 30000);
+    if(res && res.status==='ok'){ showToast(`${rows.length} line${rows.length===1?'':'s'} added`); await loadAll(); }
+    else showToast(backendMsg(res), 'error');
+  }catch(e){ if(!AUTH_LOST) showToast('Could not reach Google Drive', 'error'); }
+}
+
+async function planCopyPrev(){
+  if(!requireBackend()) return;
+  const mk = planMonth, prev = monthShift(mk,-1);
+  const src = planRowsFor(prev);
+  if(!src.length){ showToast(`Nothing in ${monthLabel(prev)} to copy`, 'error'); return; }
+  const have = new Set(planRowsFor(mk).map(p => (p.commitmentId || String(p.item||'').trim().toLowerCase())));
+  const rows = src.filter(p => p.status!=='skipped')
+    .filter(p => !have.has(p.commitmentId || String(p.item||'').trim().toLowerCase()))
+    .map((p,i)=>({
+      month:mk, side:p.side, commitmentId:p.commitmentId,
+      item:p.item, category:p.category, party:p.party,
+      // Last month's ACTUAL is the better proposal for this month — it is what
+      // the thing really costs. Falls back to the proposal when it was skipped.
+      proposed: (Number(p.actual)||0) || (Number(p.proposed)||0),
+      actual:0,
+      dueDate: p.dueDate ? shiftDueToMonth(p.dueDate, mk) : '',
+      paidDate:'', status:'planned', payMode:p.payMode, paidBy:'', txId:'',
+      note:'', sort:(Number(p.sort)||0) || (100+i)
+    }));
+  if(!rows.length){ showToast('Everything from last month is already here', 'error'); return; }
+  showToast(`Copying ${rows.length} line${rows.length===1?'':'s'}…`);
+  try{
+    const res = await gasCall({action:'savePlans', rows:JSON.stringify(rows)}, 2, 30000);
+    if(res && res.status==='ok'){ showToast(`Copied ${rows.length} line${rows.length===1?'':'s'} from ${monthLabel(prev)}`); await loadAll(); }
+    else showToast(backendMsg(res), 'error');
+  }catch(e){ if(!AUTH_LOST) showToast('Could not reach Google Drive', 'error'); }
+}
+function shiftDueToMonth(iso, mk){
+  const d = Number(String(iso).slice(8,10)) || 1;
+  return dueDateFor(mk, d);
+}
+
+/* An "Unknown action" reply is not a bug in her data — it is a deployment that
+   has not been updated. Say the thing she has to do, not the error text. */
+function backendMsg(res){
+  const m = (res && res.message) || 'Save failed';
+  if(/Unknown action/i.test(m)){ setBackendOK(false); return 'Your Apps Script is out of date — paste the new GAS.gs and deploy a New version'; }
+  return m;
+}
+
+/* ── PLAN LINE EDITOR ───────────────────────────────────────────────────── */
+function openPlanLine(id){
+  if(!requireBackend()) return;
+  const p = id ? plans.find(x=>x.id===id) : null;
+  plEditId = p ? p.id : '';
+  document.getElementById('plTitle').innerHTML = p
+    ? '<i class="ti ti-edit"></i> Edit Plan Line' : '<i class="ti ti-plus"></i> Add a Plan Line';
+  document.getElementById('plDeleteBtn').style.display = p ? '' : 'none';
+  document.getElementById('plSide').value      = p ? (p.side||'out') : 'out';
+  document.getElementById('plItem').value      = p ? p.item : '';
+  document.getElementById('plProposed').value  = p && p.proposed ? p.proposed : '';
+  document.getElementById('plParty').value     = p ? p.party : '';
+  document.getElementById('plCategory').value  = p ? p.category : '';
+  document.getElementById('plNote').value      = p ? p.note : '';
+  document.getElementById('plDue').value       = p ? p.dueDate : '';
+  const c = p && p.commitmentId ? commitments.find(x=>x.id===p.commitmentId) : null;
+  document.getElementById('plLinked').style.display = c ? '' : 'none';
+  if(c) document.getElementById('plLinkedName').textContent = c.name;
+  fillDatalists();
+  autoGrow(document.getElementById('plNote'));
+  openSheet('pl');
+}
+function closePlanLine(){ closeSheet('pl'); }
+
+async function savePlanLine(){
+  const item = document.getElementById('plItem').value.trim();
+  const prop = parseFloat(document.getElementById('plProposed').value);
+  if(!item){ showToast('Give the line a name', 'error'); return; }
+  const old = plEditId ? plans.find(x=>x.id===plEditId) : null;
+  const p = {
+    id: plEditId || '',
+    month: old ? old.month : planMonth,
+    side: document.getElementById('plSide').value,
+    commitmentId: old ? old.commitmentId : '',
+    item,
+    category: document.getElementById('plCategory').value.trim(),
+    party: document.getElementById('plParty').value.trim(),
+    proposed: isNaN(prop) ? 0 : prop,
+    actual: old ? old.actual : 0,
+    dueDate: document.getElementById('plDue').value || '',
+    paidDate: old ? old.paidDate : '',
+    status: old ? old.status : 'planned',
+    payMode: old ? old.payMode : '',
+    paidBy: old ? old.paidBy : '',
+    txId: old ? old.txId : '',
+    note: document.getElementById('plNote').value.trim(),
+    sort: old ? old.sort : 100
+  };
+  await pushPlan(p, 'plSaveBtn', '<i class="ti ti-device-floppy"></i> Save', ()=>closePlanLine());
+}
+
+async function pushPlan(p, btnId, idleHTML, after){
+  if(btnId) gateBusy(btnId, true, 'Saving…');
+  try{
+    const res = await gasCall(Object.assign({action:'savePlan'}, p), 2, 30000);
+    if(res && res.status==='ok'){
+      showToast('Saved');
+      if(after) after();
+      await loadAll();
+      return true;
+    }
+    showToast(backendMsg(res), 'error');
+  }catch(e){ if(!AUTH_LOST) showToast('Could not reach Google Drive', 'error'); }
+  finally{ if(btnId) gateBusy(btnId, false, '', idleHTML); }
+  return false;
+}
+
+async function deletePlanLine(){
+  const p = plans.find(x=>x.id===plEditId); if(!p) return;
+  if(!confirm(`Remove "${p.item}" from ${monthLabel(p.month)}?` + (p.txId ? '\n\nThe ledger entry it created stays where it is.' : ''))) return;
+  try{
+    const res = await gasCall({action:'deletePlan', id:p.id});
+    if(res && res.status==='ok'){ showToast('Removed'); closePlanLine(); await loadAll(); }
+    else showToast(backendMsg(res), 'error');
+  }catch(e){ if(!AUTH_LOST) showToast('Could not reach Google Drive', 'error'); }
+}
+
+async function planSkip(id){
+  const p = plans.find(x=>x.id===id); if(!p) return;
+  await pushPlan(Object.assign({}, p, {status:'skipped', actual:0}), null, null, null);
+}
+
+/* Undo takes the line back to unpaid AND offers to remove the ledger entry it
+   created. Leaving that behind is how the same rupee ends up counted twice. */
+async function planUnpay(id){
+  const p = plans.find(x=>x.id===id); if(!p) return;
+  let killTx = false;
+  if(p.txId && entries.some(e=>e.id===p.txId)){
+    killTx = confirm(`Also delete the ledger entry this created (${fmt(p.actual)})?\n\nOK = delete it too.\nCancel = leave it in the ledger.`);
+  }
+  if(killTx){
+    try{ await gasCall({action:'delete', id:p.txId}); }catch(e){}
+  }
+  await pushPlan(Object.assign({}, p, {status:'planned', actual:0, paidDate:'', txId: killTx ? '' : p.txId}), null, null, null);
+}
+
+/* ── MARK AS PAID ───────────────────────────────────────────────────────── */
+function openPay(planId){
+  if(!requireBackend()) return;
+  const p = plans.find(x=>x.id===planId); if(!p) return;
+  payTarget = p;
+  const isIn = p.side === 'in';
+  const c = p.commitmentId ? commitments.find(x=>x.id===p.commitmentId) : null;
+  document.getElementById('payTitle').innerHTML = isIn
+    ? '<i class="ti ti-arrow-down-circle"></i> Record What Came In'
+    : '<i class="ti ti-checkbox"></i> Record Payment';
+  document.getElementById('payAmountLabel').textContent = isIn ? 'Amount actually received (₹)' : 'Amount actually paid (₹)';
+  document.getElementById('payItemLabel').textContent = monthLabel(p.month);
+  document.getElementById('payItemName').textContent = p.item;
+  const sub = [];
+  sub.push(`Planned ${fmt(p.proposed)}`);
+  if(p.dueDate) sub.push(`due ${fmtDate(p.dueDate)}`);
+  if(c){ const n = instalmentNoFor(c, p.month);
+    sub.push(n && c.totalInst ? `instalment ${n} of ${c.totalInst}` : kindMeta(c.kind).label); }
+  document.getElementById('payItemSub').textContent = sub.join(' · ');
+
+  document.getElementById('payAmount').value = (Number(p.actual)||0) || (Number(p.proposed)||0) || '';
+  document.getElementById('payDate').value   = p.paidDate || today();
+  document.getElementById('payBy').value     = p.paidBy || localStorage.getItem(LS.lastPaidBy) || '';
+  document.getElementById('payMode').value   = p.payMode || '';
+  document.getElementById('payNote').value   = p.note || '';
+  document.getElementById('payPartial').checked  = p.status === 'partial';
+  // Editing something already in the ledger must not offer to add it twice.
+  const already = !!(p.txId && entries.some(e=>e.id===p.txId));
+  const box = document.getElementById('payToLedger');
+  box.checked  = already || !p.txId;
+  box.disabled = already;
+  box.closest('.chk').style.opacity = already ? '.6' : '';
+  autoGrow(document.getElementById('payNote'));
+  fillDatalists();
+  openSheet('pay');
+}
+function closePay(){ closeSheet('pay'); payTarget = null; }
+
+async function savePay(){
+  const p = payTarget; if(!p) return;
+  const amt = parseFloat(document.getElementById('payAmount').value);
+  if(isNaN(amt) || amt <= 0){ showToast('Enter the amount', 'error'); return; }
+  const date   = document.getElementById('payDate').value || today();
+  const paidBy = document.getElementById('payBy').value.trim();
+  const mode   = document.getElementById('payMode').value;
+  const note   = document.getElementById('payNote').value.trim();
+  const partial= document.getElementById('payPartial').checked;
+  const toLedger = document.getElementById('payToLedger').checked && !document.getElementById('payToLedger').disabled;
+  const isIn = p.side === 'in';
+
+  gateBusy('paySaveBtn', true, 'Recording…');
+  let txId = p.txId || '';
+  try{
+    if(toLedger){
+      // The ledger entry is written FIRST: if it fails, nothing has been said
+      // about the plan either, and one tap of Cancel undoes the whole thing.
+      const res = await gasCall({
+        action:'add', date,
+        type: isIn ? 'income' : 'expense',
+        description: p.item,
+        party: p.party || (isIn ? 'Received' : 'Paid'),
+        amount: amt,
+        note: [note, p.commitmentId ? commitmentNoteFor(p) : ''].filter(Boolean).join(' · '),
+        paidBy, mode
+      }, 2, 30000);
+      if(res && res.status==='ok') txId = res.id || '';
+      else { showToast(backendMsg(res), 'error'); gateBusy('paySaveBtn', false, '', '<i class="ti ti-check"></i> Record it'); return; }
+    }
+    if(paidBy) localStorage.setItem(LS.lastPaidBy, paidBy);
+    const ok = await pushPlan(Object.assign({}, p, {
+      actual: amt, paidDate: date, status: partial ? 'partial' : 'paid',
+      payMode: mode, paidBy, txId, note
+    }), null, null, null);
+    if(ok){ closePay(); showToast(isIn ? 'Recorded as received' : 'Recorded as paid'); }
+  }catch(e){ if(!AUTH_LOST) showToast('Could not reach Google Drive', 'error'); }
+  finally{ gateBusy('paySaveBtn', false, '', '<i class="ti ti-check"></i> Record it'); }
+}
+
+/* The instalment stamp that goes into the ledger note — so the Sheet row on
+   its own still says which instalment of what it was. */
+function commitmentNoteFor(p){
+  const c = commitments.find(x=>x.id===p.commitmentId); if(!c) return '';
+  const n = instalmentNoFor(c, p.month);
+  if(!n) return kindMeta(c.kind).label;
+  return c.totalInst ? `instalment ${n}/${c.totalInst}` : `instalment ${n}`;
+}
+
+/* ── COMMITMENTS VIEW ───────────────────────────────────────────────────── */
+function renderCommitments(){
+  const box = document.getElementById('commitList');
+  const totBox = document.getElementById('commitTotals');
+
+  const live = commitments.filter(c=>c.active);
+  const perMonth = live.reduce((s,c)=>s+commitStats(c).perMonth, 0);
+  const savePM = live.filter(c=>kindMeta(c.kind).asset).reduce((s,c)=>s+commitStats(c).perMonth, 0);
+  const assets = live.filter(c=>kindMeta(c.kind).asset).reduce((s,c)=>s+commitStats(c).paidTotal, 0);
+  const debts  = commitments.filter(c=>c.kind==='loan').reduce((s,c)=>s+commitStats(c).owed, 0);
+  const grams  = live.filter(c=>c.unit).map(c=>({u:c.unit, n:commitStats(c).units}));
+  const gramTxt = grams.length ? grams.map(g=>`${(+g.n.toFixed(3))} ${g.u}`).join(' · ') : '';
+
+  totBox.innerHTML =
+      tot('out','Committed each month',fmt(perMonth),'', `${live.length} live item${live.length===1?'':'s'}`)
+    + tot('in','Of that, saved',fmt(savePM),'k-good', perMonth?`${fmtPct(_pct(savePM,perMonth))} of the commitment`:'')
+    + tot('cy','Built up so far',fmt(assets),'k-cy', gramTxt || 'savings & schemes paid in')
+    + tot(debts?'out':'in','Still owed',fmt(debts),debts?'k-bad':'k-good', debts?'across your loans':'no loan outstanding')
+    + tot('wa','Net position',fmtS(assets-debts),(assets-debts)>=0?'k-good':'k-bad','saved minus owed');
+
+  // Kind filter chips, each carrying its own count so an empty one is obvious.
+  const counts = {};
+  commitments.forEach(c=>{ counts[c.kind] = (counts[c.kind]||0)+1; });
+  document.getElementById('commitFilter').innerHTML =
+    [`<button class="chip${commitFilterKind==='all'?' on':''}" onclick="setCommitFilter('all')">All ${commitments.length?`(${commitments.length})`:''}</button>`]
+    .concat(KIND_GROUPS.filter(g=>counts[g.k]).map(g=>
+      `<button class="chip${commitFilterKind===g.k?' on':''}" onclick="setCommitFilter('${g.k}')"><i class="ti ${g.icon}"></i> ${g.title} (${counts[g.k]})</button>`)).join('');
+
+  if(!commitments.length){
+    box.innerHTML = `<div class="pane-empty">
+      <i class="ti ti-pig-money"></i>
+      <b>Nothing here yet</b>
+      Put in the things that come round every month — the recurring deposit, the gold scheme, the car loan, the school fees, the fibre bill.
+      Each one then keeps its own count (2 of 60), its running total, and fills itself into every month&rsquo;s plan.
+      <button class="mini-btn primary" onclick="openCommit('')"><i class="ti ti-plus"></i> Add the first one</button>
+    </div>`;
+    return;
+  }
+
+  const groups = KIND_GROUPS
+    .filter(g => commitFilterKind==='all' || commitFilterKind===g.k)
+    .map(g => ({ ...g, rows: commitments.filter(c=>c.kind===g.k) }))
+    .filter(g => g.rows.length);
+
+  box.innerHTML = groups.map(g=>{
+    const pm = g.rows.filter(c=>c.active).reduce((s,c)=>s+commitStats(c).perMonth,0);
+    return `<div class="plan-group">
+      <div class="plan-group-h"><span><i class="ti ${g.icon}"></i> ${g.title} · ${g.rows.length}</span><span>${fmt(pm)}/month</span></div>
+      ${g.rows.map(commitCardHTML).join('')}
+    </div>`;
+  }).join('') || `<div class="pane-empty"><i class="ti ti-filter-off"></i><b>Nothing in this group</b>Choose another chip above.</div>`;
+}
+function setCommitFilter(k){ commitFilterKind = k; renderCommitments(); }
+
+function commitCardHTML(c){
+  const s = commitStats(c), K = kindMeta(c.kind);
+  const freqTxt = {monthly:'every month',quarterly:'every 3 months',halfyearly:'every 6 months',yearly:'once a year',onceoff:'one-off'}[c.freq] || 'every month';
+
+  const sub = [`<span class="kind-chip ${c.kind}">${K.label}</span>`];
+  if(c.party) sub.push(esc(c.party));
+  sub.push(freqTxt + (c.dueDay ? `, on the ${ordinal(c.dueDay)}` : ''));
+  if(!c.active) sub.push('<b style="color:var(--text3)">closed</b>');
+
+  let prog = '';
+  if(s.total){
+    prog = `<div class="cm-prog">
+      <div class="cm-prog-h"><span>Instalment <b>${s.doneInst}</b> of <b>${s.total}</b></span><span>${s.leftInst} to go</span></div>
+      <div class="cm-bar ${K.asset?'save':c.kind==='loan'?'loan':''}"><span style="width:${s.pct.toFixed(1)}%"></span></div>
+    </div>`;
+  }
+
+  const stats = [];
+  stats.push(st('Paid in total', fmt(s.paidTotal)));
+  if(c.kind==='loan')      stats.push(st('Still owed', fmt(s.owed)));
+  else if(s.total)         stats.push(st('Left to pay', fmt(s.remaining)));
+  if(c.unit && s.units)    stats.push(st(c.unit + 's held', (+s.units.toFixed(3)) + ' ' + c.unit));
+  if(s.lastPaid)           stats.push(st('Last paid', fmtDate(s.lastPaid)));
+  if(s.closeMonth)         stats.push(st('Finishes', monthLabel(s.closeMonth)));
+  if(c.kind==='loan' && c.principal) stats.push(st('Borrowed', fmt(c.principal)));
+
+  const inThisMonth = plans.find(p => p.commitmentId===c.id && p.month===planMonth);
+  const acts = [];
+  if(c.active && !inThisMonth && commitDueInMonth(c, planMonth))
+    acts.push(`<button class="mini-btn primary" onclick="commitAddToPlan('${c.id}')"><i class="ti ti-calendar-plus"></i> Add to ${esc(monthLabel(planMonth))}</button>`);
+  if(inThisMonth && isPlanOpen(inThisMonth))
+    acts.push(`<button class="mini-btn primary" onclick="setView('plan');openPay('${inThisMonth.id}')"><i class="ti ti-check"></i> Pay ${esc(monthLabel(planMonth))}</button>`);
+  if(inThisMonth && !isPlanOpen(inThisMonth))
+    acts.push(`<button class="mini-btn" onclick="setView('plan')"><i class="ti ti-circle-check"></i> ${esc(monthLabel(planMonth))} done</button>`);
+  acts.push(`<button class="mini-btn" onclick="openCommit('${c.id}')"><i class="ti ti-edit"></i> Edit</button>`);
+
+  return `<div class="cm-card${c.active?'':' off'}">
+    <div class="cm-top">
+      <div style="min-width:0">
+        <div class="cm-name">${esc(c.name)}</div>
+        <div class="cm-sub">${sub.join(' · ')}</div>
+      </div>
+      <div class="cm-amt">${fmt(c.amount)}<small>${c.unitPerInst?`${+c.unitPerInst} ${esc(c.unit||'unit')} each`:'each time'}</small></div>
+    </div>
+    ${prog}
+    ${stats.length?`<div class="cm-stats">${stats.join('')}</div>`:''}
+    <div class="cm-actions">${acts.join('')}</div>
+  </div>`;
+}
+function st(l,v){ return `<div class="cm-stat"><div class="l">${l}</div><div class="v">${v}</div></div>`; }
+function ordinal(n){ n=Math.round(n); const s=['th','st','nd','rd'], v=n%100; return n + (s[(v-20)%10]||s[v]||s[0]); }
+
+async function commitAddToPlan(id){
+  if(!requireBackend()) return;
+  const c = commitments.find(x=>x.id===id); if(!c) return;
+  await pushPlan({
+    id:'', month:planMonth, side:'out', commitmentId:c.id,
+    item:c.name, category:c.category||'', party:c.party||'',
+    proposed:Number(c.amount)||0, actual:0,
+    dueDate: c.dueDay ? dueDateFor(planMonth, c.dueDay) : '',
+    paidDate:'', status:'planned', payMode:c.payMode||'', paidBy:'', txId:'', note:'', sort:100
+  }, null, null, ()=>showToast(`Added to ${monthLabel(planMonth)}`));
+}
+
+/* ── COMMITMENT EDITOR ──────────────────────────────────────────────────── */
+let cmKind = 'saving';
+function openCommit(id){
+  if(!requireBackend()) return;
+  const c = id ? commitments.find(x=>x.id===id) : null;
+  cmEditId = c ? c.id : '';
+  cmKind = c ? (c.kind || 'bill') : 'saving';
+  document.getElementById('commitTitle').innerHTML = c
+    ? '<i class="ti ti-edit"></i> Edit Commitment' : '<i class="ti ti-pig-money"></i> Add a Commitment';
+  document.getElementById('cmDeleteBtn').style.display = c ? '' : 'none';
+
+  const dd = document.getElementById('cmDueDay');
+  if(!dd.options.length){
+    dd.innerHTML = '<option value="0">No fixed day</option>' +
+      Array.from({length:31},(_,i)=>`<option value="${i+1}">${ordinal(i+1)}</option>`).join('');
+  }
+  const v = (el,val) => document.getElementById(el).value = val;
+  v('cmName',   c ? c.name : '');
+  v('cmAmount', c && c.amount ? c.amount : '');
+  v('cmFreq',   c ? (c.freq||'monthly') : 'monthly');
+  v('cmParty',  c ? c.party : '');
+  v('cmDueDay', c ? String(Math.round(c.dueDay)||0) : '0');
+  v('cmCategory', c ? c.category : '');
+  v('cmPayMode',  c ? c.payMode : '');
+  v('cmTotalInst',   c && c.totalInst   ? c.totalInst   : '');
+  v('cmStartMonth',  c && c.startMonth  ? c.startMonth  : thisMonthKey());
+  v('cmOpeningInst', c && c.openingInst ? c.openingInst : '');
+  v('cmOpeningPaid', c && c.openingPaid ? c.openingPaid : '');
+  v('cmPrincipal',   c && c.principal   ? c.principal   : '');
+  v('cmOutstanding', c && c.outstanding ? c.outstanding : '');
+  v('cmUnit',        c ? c.unit : '');
+  v('cmUnitPerInst', c && c.unitPerInst ? c.unitPerInst : '');
+  v('cmOpeningUnits',c && c.openingUnits? c.openingUnits: '');
+  v('cmNote',        c ? c.note : '');
+  document.getElementById('cmActive').checked = c ? !!c.active : true;
+  fillDatalists();
+  cmPaint();
+  autoGrow(document.getElementById('cmNote'));
+  openSheet('commit');
+}
+function closeCommit(){ closeSheet('commit'); }
+function setCmKind(k){ cmKind = k; cmPaint(); }
+
+/* Only the blocks that belong to the chosen kind are on screen. A fibre bill
+   has no instalment count and a loan has no grams; showing every field to
+   everybody is how a form ends up being abandoned halfway. */
+function cmPaint(){
+  document.getElementById('cmKindGrid').innerHTML = Object.keys(KINDS).map(k=>
+    `<button type="button" class="kind-btn${cmKind===k?' on':''}" onclick="setCmKind('${k}')">
+       <i class="ti ${KINDS[k].icon}"></i> ${KINDS[k].label}</button>`).join('');
+  document.getElementById('cmKindHint').textContent = kindMeta(cmKind).hint;
+  const K = kindMeta(cmKind);
+  document.getElementById('cmInstBlock').style.display = K.inst ? '' : 'none';
+  document.getElementById('cmLoanBlock').style.display = K.loan ? '' : 'none';
+  document.getElementById('cmUnitBlock').style.display = K.unit ? '' : 'none';
+  const freq = document.getElementById('cmFreq').value;
+  document.getElementById('cmAmountLabel').textContent =
+    freq==='monthly' ? 'Amount each month (₹)' :
+    freq==='onceoff' ? 'Amount (₹)' : 'Amount each instalment (₹)';
+}
+
+async function saveCommit(){
+  const name = document.getElementById('cmName').value.trim();
+  if(!name){ showToast('Give it a name', 'error'); return; }
+  const n = id => { const x = parseFloat(document.getElementById(id).value); return isNaN(x) ? 0 : x; };
+  const K = kindMeta(cmKind);
+  const c = {
+    id: cmEditId || '',
+    name, kind: cmKind,
+    category: document.getElementById('cmCategory').value.trim(),
+    party: document.getElementById('cmParty').value.trim(),
+    amount: n('cmAmount'),
+    dueDay: n('cmDueDay'),
+    freq: document.getElementById('cmFreq').value,
+    startMonth: K.inst ? (document.getElementById('cmStartMonth').value || '') : '',
+    totalInst:    K.inst ? n('cmTotalInst')   : 0,
+    openingInst:  K.inst ? n('cmOpeningInst') : 0,
+    openingPaid:  K.inst ? n('cmOpeningPaid') : 0,
+    principal:    K.loan ? n('cmPrincipal')   : 0,
+    outstanding:  K.loan ? n('cmOutstanding') : 0,
+    unit:         K.unit ? document.getElementById('cmUnit').value.trim() : '',
+    unitPerInst:  K.unit ? n('cmUnitPerInst') : 0,
+    openingUnits: K.unit ? n('cmOpeningUnits'): 0,
+    payMode: document.getElementById('cmPayMode').value,
+    active: document.getElementById('cmActive').checked ? 'TRUE' : 'FALSE',
+    note: document.getElementById('cmNote').value.trim()
+  };
+  gateBusy('cmSaveBtn', true, 'Saving…');
+  try{
+    const res = await gasCall(Object.assign({action:'saveCommitment'}, c), 2, 30000);
+    if(res && res.status==='ok'){ showToast('Saved'); closeCommit(); await loadAll(); }
+    else showToast(backendMsg(res), 'error');
+  }catch(e){ if(!AUTH_LOST) showToast('Could not reach Google Drive', 'error'); }
+  finally{ gateBusy('cmSaveBtn', false, '', '<i class="ti ti-device-floppy"></i> Save'); }
+}
+
+async function deleteCommit(){
+  const c = commitments.find(x=>x.id===cmEditId); if(!c) return;
+  const used = plans.filter(p=>p.commitmentId===c.id).length;
+  const msg = used
+    ? `Delete "${c.name}"?\n\n${used} plan line${used===1?'':'s'} refer to it. They stay, but they stop counting towards its instalments and totals.\n\nIf it has simply finished, untick "Still running" instead — that keeps the history.`
+    : `Delete "${c.name}"?`;
+  if(!confirm(msg)) return;
+  try{
+    const res = await gasCall({action:'deleteCommitment', id:c.id});
+    if(res && res.status==='ok'){ showToast('Deleted'); closeCommit(); await loadAll(); }
+    else showToast(backendMsg(res), 'error');
+  }catch(e){ if(!AUTH_LOST) showToast('Could not reach Google Drive', 'error'); }
+}
+
+/* ── shared dialog plumbing ─────────────────────────────────────────────── */
+function openSheet(k){
+  document.getElementById(k+'Overlay').classList.add('open');
+  document.getElementById(k+'Modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSheet(k){
+  document.getElementById(k+'Overlay').classList.remove('open');
+  document.getElementById(k+'Modal').classList.remove('open');
+  if(!document.querySelector('.sheet-modal.open, .report-modal.open')) document.body.style.overflow = '';
+}
+/* A note box that has to be dragged open to read what is in it is a note box
+   nobody reads. It grows to its content when opened and while typing. */
+function autoGrow(el){
+  if(!el) return;
+  el.style.height = 'auto';
+  el.style.height = Math.min(260, Math.max(46, el.scrollHeight + 2)) + 'px';
+}
+document.addEventListener('input', e => { if(e.target && e.target.tagName === 'TEXTAREA') autoGrow(e.target); });
+
+/* Party, category and payer suggestions come from what she has already typed —
+   never a fixed list, which would be wrong for her within a week. */
+function fillDatalists(){
+  const parties = new Set(), cats = new Set(), payers = new Set();
+  entries.forEach(e=>{ if(e.party) parties.add(String(e.party).trim()); if(e.paidBy) payers.add(String(e.paidBy).trim()); });
+  commitments.forEach(c=>{ if(c.party) parties.add(c.party); if(c.category) cats.add(c.category); });
+  plans.forEach(p=>{ if(p.party) parties.add(p.party); if(p.category) cats.add(p.category); if(p.paidBy) payers.add(p.paidBy); });
+  allCategories().forEach(c=>cats.add(c));
+  const put=(id,set)=>{ const el=document.getElementById(id); if(el)
+    el.innerHTML=[...set].filter(Boolean).sort().map(v=>`<option value="${esc(v)}">`).join(''); };
+  put('dlParty', parties); put('dlCat', cats); put('dlPaidBy', payers);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -1822,7 +3247,8 @@ function closeReport(){
   document.getElementById('reportOverlay').classList.remove('open');
 }
 function repShowing(){ return document.getElementById('reportOutput').style.display==='block'; }
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeReport(); });
+// Escape is handled once, at the foot of the script, so that a dialog opened
+// on top of the report closes before the report underneath it does.
 
 /* ── QUERY ────────────────────────────────────────────────────────────────
    Non-date filters live in one place so an empty result can be diagnosed by
@@ -2101,6 +3527,9 @@ function chartCumulative(buckets){
 /* ── TAB RENDERERS ── */
 const REP_TABS=[
   {k:'overview',  label:'Overview',   icon:'ti-dashboard'},
+  {k:'budget',    label:'Budget',     icon:'ti-target'},        // v2.0 — plan vs actual
+  {k:'savings',   label:'Savings',    icon:'ti-pig-money'},     // v2.0 — schemes & deposits
+  {k:'liabilities',label:'Loans',     icon:'ti-building-bank'}, // v2.0 — what is owed
   {k:'statement', label:'Statement',  icon:'ti-list-details'},
   {k:'trends',    label:'Trends',     icon:'ti-chart-line'},
   {k:'categories',label:'Categories', icon:'ti-category-2'},
@@ -2154,6 +3583,25 @@ function paneOverview(A,C){
       +`</tbody></table></div>`
       +`<div class="rep-note">Like-for-like: the previous window is the same number of days (${C.days}) ending the day before this one starts. On “Expenditure”, ▲ means you spent more.</div>`);
   }
+  /* v2.0 — the standing position. Income and spending say what moved; this
+     says where it left her: what is being built up, what is still owed, and
+     how much of a month is already spoken for before anything is decided. */
+  if(commitments.length || plans.length){
+    const S=savingsAnalysis(A.p), L=loanAnalysis(A.p), BG=budgetAnalysis(A.p);
+    const monthsN=Math.max(1,monthsInPeriod(A.p).length);
+    const committed=commitments.filter(c=>c.active).reduce((s,c)=>s+commitStats(c).perMonth,0);
+    const incPM=A.tInc/monthsN;
+    r.push(`<div class="rep-section-title" style="color:var(--cyan)"><i class="ti ti-scale-outline"></i> Standing position</div>
+      <div class="kpi-grid">`
+      + kpi('good','<i class="ti ti-pig-money"></i> Built up',fmt(S.built),'k-good',S.units.length?S.units.map(u=>`${+u.n.toFixed(3)} ${u.unit}`).join(' · '):'savings & schemes')
+      + kpi(L.owed?'bad':'good','<i class="ti ti-building-bank"></i> Still owed',fmt(L.owed),L.owed?'k-bad':'k-good',L.rows.length?`${L.rows.length} loan${L.rows.length===1?'':'s'}`:'no loans')
+      + kpi((S.built-L.owed)>=0?'good':'bad','<i class="ti ti-scale"></i> Net worth here',fmtS(S.built-L.owed),(S.built-L.owed)>=0?'k-good':'k-bad','saved minus owed')
+      + kpi('warn','<i class="ti ti-calendar-repeat"></i> Committed monthly',fmt(committed),'k-warn',incPM?`${fmtPct(_pct(committed,incPM))} of monthly income`:'standing obligations')
+      + (BG.out.length?kpi(BG.varOut.fav?'good':'bad','<i class="ti ti-target"></i> Against the plan',(BG.varOut.d>=0?'+':'−')+fmt(Math.abs(BG.varOut.d)),BG.varOut.fav?'k-good':'k-bad',`${BG.varOut.word} · planned ${fmt(BG.propOut)}`):'')
+      + (BG.overdue.length?kpi('bad','<i class="ti ti-alarm"></i> Past due',String(BG.overdue.length),'k-bad',fmt(BG.overdue.reduce((s,x)=>s+(Number(x.proposed)||0),0))+' unpaid'):'')
+      + `</div>`);
+  }
+
   const B=bucketise(A.rows,A.p);
   if(B.buckets.length>1){
     r.push(`<div class="rep-section-title" style="color:var(--cyan)"><i class="ti ti-chart-bar"></i> In vs out by ${B.grain}</div>`+chartIncExp(B.buckets));
@@ -2448,6 +3896,320 @@ function paneInsights(A,C){
     ${qHtml}${dupHtml}${flagHtml}`;
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   v2.0 REPORTS — BUDGET, SAVINGS, LIABILITIES
+   ──────────────────────────────────────────────────────────────────────────
+   Three things a ledger alone cannot answer, and which every household
+   accounting pack answers:
+
+     1. BUDGET VARIANCE — what was planned against what was spent, line by
+        line. The convention is the standard one and it is not symmetrical:
+        on a cost line, spending LESS than planned is FAVOURABLE; on an income
+        line, receiving less is ADVERSE. Reporting a single signed number
+        without saying which is which is how a good month reads as a bad one.
+     2. SAVINGS — what is being built up, how far through each scheme is, and
+        what share of income is being kept rather than spent.
+     3. LIABILITIES — what is still owed, what was repaid in the period, and
+        when each loan finishes at the present rate.
+
+   All of it is computed from the plan rows and the commitments; none of it is
+   stored twice.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+function monthsInPeriod(p){
+  const out=[]; let k=p.from.slice(0,7); const end=p.to.slice(0,7);
+  let guard=0;
+  while(k<=end && guard++<600){ out.push(k); k=monthShift(k,1); }
+  return out;
+}
+function planRowsInPeriod(p){
+  const ms=new Set(monthsInPeriod(p));
+  return plans.filter(x=>ms.has(x.month));
+}
+
+/* Favourable / adverse, stated the way a variance report states it. */
+function varianceOf(proposed, actual, side){
+  const d = actual - proposed;                       // + means more money moved
+  const fav = side==='in' ? d >= 0 : d <= 0;         // more in is good, more out is not
+  return { d, fav, pct:_pct(d, proposed || 0),
+           cls: d===0 ? 'exact' : (fav ? 'under' : 'over'),
+           word: d===0 ? 'On plan' : (fav ? 'Favourable' : 'Adverse') };
+}
+
+function budgetAnalysis(p){
+  const rows = planRowsInPeriod(p);
+  const out  = rows.filter(r=>r.side!=='in');
+  const inc  = rows.filter(r=>r.side==='in');
+  const sum  = (a,f)=>a.reduce((s,r)=>s+(Number(r[f])||0),0);
+  const propOut=sum(out,'proposed'), actOut=sum(out,'actual');
+  const propIn =sum(inc,'proposed'), actIn =sum(inc,'actual');
+  // Category roll-up of plan against outturn.
+  const m=new Map();
+  out.forEach(r=>{
+    const c = r.category || categoryOf({description:r.item, party:r.party, note:r.note, type:'expense'});
+    const g = m.get(c) || {cat:c, proposed:0, actual:0, n:0, paid:0};
+    g.proposed += Number(r.proposed)||0; g.actual += Number(r.actual)||0; g.n++;
+    if(r.status==='paid') g.paid++;
+    m.set(c,g);
+  });
+  const cats=[...m.values()].sort((a,b)=>b.proposed-a.proposed || b.actual-a.actual);
+  const overdue = out.filter(isPlanOverdue);
+  const unpaid  = out.filter(isPlanOpen);
+  /* Settled-only variance. Until every line is closed, planned-versus-spent
+     flatters the month: a bill that has not gone out yet is not a saving. The
+     headline therefore compares what the SETTLED lines were planned to cost
+     with what they did cost, and the unspent remainder is reported apart. */
+  const settled = out.filter(r=>r.status==='paid'||r.status==='partial');
+  const settProp = sum(settled,'proposed'), settAct = sum(settled,'actual');
+  return { rows, out, inc, cats, months:monthsInPeriod(p),
+           propOut, actOut, propIn, actIn,
+           settled, settProp, settAct,
+           varSettled:varianceOf(settProp,settAct,'out'),
+           varOut:varianceOf(propOut,actOut,'out'), varIn:varianceOf(propIn,actIn,'in'),
+           allClosed: out.length>0 && unpaid.length===0,
+           nPaid:out.filter(r=>r.status==='paid').length,
+           nSkipped:out.filter(r=>r.status==='skipped').length,
+           overdue, unpaid,
+           stillToPay:unpaid.reduce((s,r)=>s+Math.max(0,(Number(r.proposed)||0)-(Number(r.actual)||0)),0),
+           used: propOut ? _pct(actOut,propOut) : 0 };
+}
+
+function paneBudget(A){
+  if(!plans.length) return repNoPlanHTML();
+  const B = budgetAnalysis(A.p);
+  if(!B.rows.length) return `<div class="rep-empty"><i class="ti ti-calendar-off"></i>
+    Nothing was planned for ${esc(A.p.label)}.<br>
+    <span style="color:var(--text3)">Open the <b>Plan</b> section, pick a month and fill it from your commitments.</span></div>`;
+
+  const r=[];
+  r.push(`<div class="kpi-grid">`
+    + kpi('neutral','<i class="ti ti-target"></i> Budgeted to spend',fmt(B.propOut),'k-cy',`${B.out.length} line${B.out.length===1?'':'s'} over ${B.months.length} month${B.months.length===1?'':'s'}`)
+    + kpi('bad','<i class="ti ti-cash"></i> Actually spent',fmt(B.actOut),'k-bad',B.propOut?`${fmtPct(B.used)} of the budget used`:'nothing budgeted')
+    + kpi(B.varSettled.fav?'good':'bad',`<i class="ti ti-arrows-diff"></i> Variance on what is settled`,(B.varSettled.d>=0?'+':'−')+fmt(Math.abs(B.varSettled.d)),B.varSettled.fav?'k-good':'k-bad',
+          B.settled.length?`${B.varSettled.word} · ${B.settled.length} line${B.settled.length===1?'':'s'}${B.settProp?' · '+fmtPct(Math.abs(B.varSettled.pct)):''}`:'nothing settled yet')
+    + kpi(B.stillToPay?'warn':'good','<i class="ti ti-hourglass"></i> Still to pay',fmt(B.stillToPay),B.stillToPay?'k-warn':'k-good',`${B.nPaid} of ${B.out.length} lines settled`)
+    + kpi(B.overdue.length?'bad':'good','<i class="ti ti-alarm"></i> Past due',String(B.overdue.length),B.overdue.length?'k-bad':'k-good',B.overdue.length?fmt(B.overdue.reduce((s,x)=>s+(Number(x.proposed)||0),0))+' overdue':'nothing overdue')
+    + (B.inc.length ? kpi(B.varIn.fav?'good':'warn','<i class="ti ti-arrow-down-circle"></i> Expected in',fmt(B.propIn),'k-good',`received ${fmt(B.actIn)} · ${B.varIn.word}`) : '')
+    + kpi('neutral','<i class="ti ti-percentage"></i> Budget vs income',A.tInc?fmtPct(_pct(B.propOut,A.tInc)):'—','k-cy','share of the period’s income committed')
+    + kpi(B.nSkipped?'warn':'neutral','<i class="ti ti-player-skip-forward"></i> Skipped',String(B.nSkipped),'k-warn','deliberately not paid')
+    + `</div>`);
+
+  r.push(`<div class="rep-note"><b>How to read the variance.</b> On a cost line, paying <i>less</i> than planned is favourable; on an income line, receiving less is adverse — the two are never added together into one signed figure.
+    ${B.allClosed
+      ? 'Every line here is closed, so the headline variance covers the whole plan.'
+      : `The headline compares only the <b>${B.settled.length} line${B.settled.length===1?'':'s'} already settled</b> with what ${B.settled.length===1?'it was':'they were'} planned to cost. The remaining <b>${fmt(B.stillToPay)}</b> has not been spent <i>yet</i>, which is not the same as having been saved; against the full plan the position is ${(B.varOut.d>=0?'+':'−')+fmt(Math.abs(B.varOut.d))}.`}</div>`);
+
+  // Line-level statement — the diary page, totalled.
+  const line=rw=>{
+    const v=varianceOf(Number(rw.proposed)||0, Number(rw.actual)||0, rw.side);
+    const st=PLAN_STATUS[rw.status]||PLAN_STATUS.planned;
+    const over=isPlanOverdue(rw);
+    return `<tr>
+      <td>${esc(rw.item)}${rw.note?`<div style="color:var(--text3);font-style:italic;font-size:11px">${esc(rw.note)}</div>`:''}</td>
+      <td style="color:var(--text2)">${esc(monthLabel(rw.month).replace(/ (\d{4})$/,' $1'))}${rw.dueDate?`<div style="color:var(--text3);font-size:11px">${over?'was due ':'due '}${fmtDate(rw.dueDate)}</div>`:''}</td>
+      <td class="num">${fmt(rw.proposed)}</td>
+      <td class="num">${rw.actual?fmt(rw.actual):'—'}</td>
+      <td class="num" style="color:var(--${v.d===0?'text3':v.fav?'success':'danger'}-text)">${rw.actual||rw.status==='paid'?((v.d>=0?'+':'−')+fmt(Math.abs(v.d))):'—'}</td>
+      <td><span class="st-chip ${over?'due':st.cls}">${over?'overdue':st.label}</span>${rw.paidBy?`<div style="color:var(--text3);font-size:11px;margin-top:2px">${esc(rw.paidBy)}${rw.payMode?' · '+esc(rw.payMode):''}</div>`:''}</td>
+    </tr>`;
+  };
+  const foot=(rows,label)=>{
+    const pp=rows.reduce((s,x)=>s+(Number(x.proposed)||0),0), aa=rows.reduce((s,x)=>s+(Number(x.actual)||0),0);
+    const v=varianceOf(pp,aa,rows[0]?rows[0].side:'out');
+    return `<tfoot><tr><td colspan="2">${label} (${rows.length})</td><td class="num">${fmt(pp)}</td><td class="num">${fmt(aa)}</td>
+      <td class="num" style="color:var(--${v.d===0?'text3':v.fav?'success':'danger'}-text)">${(v.d>=0?'+':'−')+fmt(Math.abs(v.d))}</td><td></td></tr></tfoot>`;
+  };
+  const tbl=(rows,title,icon,colour)=>rows.length?`
+    <div class="rep-section-title" style="color:var(--${colour})"><i class="ti ${icon}"></i> ${title}</div>
+    <div class="rep-scroll"><table class="rep-table">
+      <thead><tr><th>Item</th><th>Month</th><th class="num">Planned</th><th class="num">Actual</th><th class="num">Variance</th><th>Status</th></tr></thead>
+      <tbody>${rows.map(line).join('')}</tbody>${foot(rows,'Total')}
+    </table></div>`:'';
+
+  const sorted=[...B.out].sort((a,b)=>(a.month||'').localeCompare(b.month||'')
+    || (a.dueDate||'zzz').localeCompare(b.dueDate||'zzz')
+    || String(a.item).localeCompare(String(b.item)));
+  r.push(tbl(sorted,'Planned expenditure — line by line','ti-list-details','danger-text'));
+  r.push(tbl([...B.inc].sort((a,b)=>(a.month||'').localeCompare(b.month||'')),'Expected receipts','ti-arrow-down-circle','success-text'));
+
+  if(B.cats.length){
+    const tp=B.cats.reduce((s,c)=>s+c.proposed,0);
+    r.push(`<div class="rep-section-title" style="color:var(--cyan)"><i class="ti ti-category-2"></i> Budget by category</div>
+    <div class="rep-scroll"><table class="rep-table">
+      <thead><tr><th>Category</th><th class="num">Planned</th><th class="num">Actual</th><th class="num">Variance</th><th class="num">Used</th><th class="num">Lines</th></tr></thead>
+      <tbody>${B.cats.map(c=>{
+        const v=varianceOf(c.proposed,c.actual,'out');
+        const used=c.proposed?_pct(c.actual,c.proposed):0;
+        return `<tr><td>${esc(c.cat)}
+            <div class="bar-cell"><span style="width:${Math.min(100,used).toFixed(1)}%;background:var(--${used>100?'danger':'success'}-text)"></span></div></td>
+          <td class="num">${fmt(c.proposed)}</td><td class="num">${fmt(c.actual)}</td>
+          <td class="num" style="color:var(--${v.d===0?'text3':v.fav?'success':'danger'}-text)">${(v.d>=0?'+':'−')+fmt(Math.abs(v.d))}</td>
+          <td class="num">${c.proposed?fmtPct(used,0):'—'}</td><td class="num">${c.paid}/${c.n}</td></tr>`;
+      }).join('')}</tbody>
+      <tfoot><tr><td>Total</td><td class="num">${fmt(tp)}</td><td class="num">${fmt(B.actOut)}</td>
+        <td class="num">${(B.varOut.d>=0?'+':'−')+fmt(Math.abs(B.varOut.d))}</td>
+        <td class="num">${tp?fmtPct(B.used,0):'—'}</td><td class="num">${B.nPaid}/${B.out.length}</td></tr></tfoot>
+    </table></div>`);
+  }
+
+  if(B.overdue.length){
+    r.push(`<div class="rep-section-title" style="color:var(--danger-text)"><i class="ti ti-alarm"></i> Past their due date and still unpaid</div>
+    <div class="rep-scroll"><table class="rep-table">
+      <thead><tr><th>Item</th><th>Was due</th><th class="num">Days late</th><th class="num">Amount</th></tr></thead>
+      <tbody>${B.overdue.sort((a,b)=>(a.dueDate||'').localeCompare(b.dueDate||'')).map(x=>
+        `<tr><td>${esc(x.item)}</td><td>${fmtDate(x.dueDate)}</td><td class="num">${_daysBetween(x.dueDate,today())}</td><td class="num">${fmt(x.proposed)}</td></tr>`).join('')}</tbody>
+      <tfoot><tr><td colspan="3">Total overdue</td><td class="num">${fmt(B.overdue.reduce((s,x)=>s+(Number(x.proposed)||0),0))}</td></tr></tfoot>
+    </table></div>`);
+  }
+  return r.join('');
+}
+
+function repNoPlanHTML(){
+  return `<div class="rep-empty"><i class="ti ti-calendar-plus"></i>
+    <b style="color:var(--text)">No monthly plan yet.</b><br>
+    <span style="color:var(--text3);line-height:1.7">Open the <b>Plan</b> section and write a month down — what has to be paid and roughly how much.<br>
+    This report then shows planned against actual, line by line, the way the diary page does.</span></div>`;
+}
+
+/* ── SAVINGS & SCHEMES ──────────────────────────────────────────────────── */
+function savingsAnalysis(p){
+  const ms=new Set(monthsInPeriod(p));
+  const assets = commitments.filter(c=>kindMeta(c.kind).asset);
+  const rows = assets.map(c=>{
+    const s = commitStats(c);
+    const inPeriod = s.rows.filter(r=>ms.has(r.month) && (r.status==='paid'||r.status==='partial'));
+    return { c, s, thisPeriod: inPeriod.reduce((t,r)=>t+(Number(r.actual)||0),0), nPeriod: inPeriod.length };
+  }).sort((a,b)=>b.s.perMonth-a.s.perMonth);
+  return {
+    rows,
+    perMonth: rows.filter(x=>x.c.active).reduce((t,x)=>t+x.s.perMonth,0),
+    contributed: rows.reduce((t,x)=>t+x.thisPeriod,0),
+    built: rows.reduce((t,x)=>t+x.s.paidTotal,0),
+    remaining: rows.reduce((t,x)=>t+x.s.remaining,0),
+    units: rows.filter(x=>x.c.unit && x.s.units).map(x=>({unit:x.c.unit, n:x.s.units, name:x.c.name}))
+  };
+}
+
+function paneSavings(A){
+  const S = savingsAnalysis(A.p);
+  if(!S.rows.length) return `<div class="rep-empty"><i class="ti ti-pig-money"></i>
+    <b style="color:var(--text)">No savings or schemes recorded.</b><br>
+    <span style="color:var(--text3);line-height:1.7">Add them in the <b>Commitments</b> section — a recurring deposit, a gold scheme, a chit.<br>
+    Each one then keeps its own instalment count, its running total and its finishing date.</span></div>`;
+
+  const monthsN = Math.max(1, monthsInPeriod(A.p).length);
+  const savRate = A.tInc ? _pct(S.contributed, A.tInc) : 0;
+  const unitTxt = S.units.length ? S.units.map(u=>`${+u.n.toFixed(3)} ${u.unit}`).join(' · ') : '';
+
+  const r=[];
+  r.push(`<div class="kpi-grid">`
+    + kpi('good','<i class="ti ti-pig-money"></i> Put away this period',fmt(S.contributed),'k-good',`${monthsN} month${monthsN===1?'':'s'} · ${fmt(S.contributed/monthsN)} a month`)
+    + kpi('neutral','<i class="ti ti-calendar-repeat"></i> Committed each month',fmt(S.perMonth),'k-cy',`${S.rows.filter(x=>x.c.active).length} live scheme${S.rows.filter(x=>x.c.active).length===1?'':'s'}`)
+    + kpi(savRate>=20?'good':savRate>0?'warn':'bad','<i class="ti ti-percentage"></i> Saved out of income',A.tInc?fmtPct(savRate):'—',savRate>=20?'k-good':savRate>0?'k-warn':'k-bad','contributions ÷ money in')
+    + kpi('neutral','<i class="ti ti-building-bank"></i> Built up in total',fmt(S.built),'k-cy','since each scheme began')
+    + kpi('warn','<i class="ti ti-hourglass"></i> Left to contribute',fmt(S.remaining),'k-warn','to finish every scheme')
+    + (unitTxt ? kpi('good','<i class="ti ti-diamond"></i> Also holding',esc(unitTxt),'k-good','accumulated by scheme') : '')
+    + `</div>`);
+
+  r.push(`<div class="rep-section-title" style="color:var(--success-text)"><i class="ti ti-list-details"></i> Scheme by scheme</div>
+  <div class="rep-scroll"><table class="rep-table">
+    <thead><tr><th>Scheme</th><th class="num">Each</th><th>Progress</th><th class="num">This period</th><th class="num">Paid in total</th><th class="num">Left</th><th>Finishes</th></tr></thead>
+    <tbody>${S.rows.map(({c,s,thisPeriod,nPeriod})=>`
+      <tr>
+        <td>${esc(c.name)}<div style="color:var(--text3);font-size:11px">${kindMeta(c.kind).label}${c.party?' · '+esc(c.party):''}${c.active?'':' · closed'}</div></td>
+        <td class="num">${fmt(c.amount)}${c.unitPerInst?`<div style="color:var(--text3);font-size:11px">${+c.unitPerInst} ${esc(c.unit||'')}</div>`:''}</td>
+        <td style="min-width:130px">${s.total?`${s.doneInst} of ${s.total}
+          <div class="bar-cell"><span style="width:${s.pct.toFixed(1)}%;background:var(--success-text)"></span></div>`:'<span style="color:var(--text3)">open-ended</span>'}</td>
+        <td class="num">${thisPeriod?fmt(thisPeriod):'—'}${nPeriod>1?`<div style="color:var(--text3);font-size:11px">${nPeriod}×</div>`:''}</td>
+        <td class="num">${fmt(s.paidTotal)}${s.units?`<div style="color:var(--text3);font-size:11px">${+s.units.toFixed(3)} ${esc(c.unit||'')}</div>`:''}</td>
+        <td class="num">${s.total?fmt(s.remaining):'—'}</td>
+        <td style="color:var(--text2)">${s.closeMonth?esc(monthLabel(s.closeMonth)):(s.total&&!s.leftInst?'<span style="color:var(--success-text)">complete</span>':'—')}</td>
+      </tr>`).join('')}</tbody>
+    <tfoot><tr><td>Total (${S.rows.length})</td><td class="num">${fmt(S.rows.reduce((t,x)=>t+(Number(x.c.amount)||0),0))}</td><td></td>
+      <td class="num">${fmt(S.contributed)}</td><td class="num">${fmt(S.built)}</td><td class="num">${fmt(S.remaining)}</td><td></td></tr></tfoot>
+  </table></div>`);
+
+  r.push(`<div class="rep-note"><b>Paid in total</b> includes whatever was already paid before this app was set up — the opening figure recorded on each scheme — plus every instalment ticked off here since.</div>`);
+  return r.join('');
+}
+
+/* ── LOANS & LIABILITIES ────────────────────────────────────────────────── */
+function loanAnalysis(p){
+  const ms=new Set(monthsInPeriod(p));
+  const rows = commitments.filter(c=>c.kind==='loan').map(c=>{
+    const s=commitStats(c);
+    const inPeriod=s.rows.filter(r=>ms.has(r.month)&&(r.status==='paid'||r.status==='partial'));
+    return { c, s, repaid: inPeriod.reduce((t,r)=>t+(Number(r.actual)||0),0), nPeriod: inPeriod.length };
+  }).sort((a,b)=>b.s.owed-a.s.owed);
+  return {
+    rows,
+    owed: rows.reduce((t,x)=>t+x.s.owed,0),
+    borrowed: rows.reduce((t,x)=>t+(Number(x.c.principal)||0),0),
+    repaid: rows.reduce((t,x)=>t+x.repaid,0),
+    emi: rows.filter(x=>x.c.active).reduce((t,x)=>t+x.s.perMonth,0)
+  };
+}
+
+function paneLiabilities(A){
+  const L = loanAnalysis(A.p);
+  const pb = payableLots();          // the informal side: unpaid credit at the shops
+  if(!L.rows.length && !pb.lots.length) return `<div class="rep-empty"><i class="ti ti-building-bank"></i>
+    <b style="color:var(--text)">Nothing owed.</b><br>
+    <span style="color:var(--text3);line-height:1.7">No loans recorded in <b>Commitments</b>, and no unpaid credit in the ledger.</span></div>`;
+
+  const monthsN=Math.max(1,monthsInPeriod(A.p).length);
+  const incPM = A.tInc/monthsN;
+  const dti = incPM ? _pct(L.emi, incPM) : 0;   // debt service as a share of income
+  const S = savingsAnalysis(A.p);
+
+  const r=[];
+  r.push(`<div class="kpi-grid">`
+    + kpi(L.owed?'bad':'good','<i class="ti ti-building-bank"></i> Still owed',fmt(L.owed),L.owed?'k-bad':'k-good',`${L.rows.length} loan${L.rows.length===1?'':'s'}`)
+    + kpi('neutral','<i class="ti ti-receipt"></i> Repaid this period',fmt(L.repaid),'k-cy',`${fmt(L.repaid/monthsN)} a month`)
+    + kpi('warn','<i class="ti ti-calendar-repeat"></i> Instalments due monthly',fmt(L.emi),'k-warn','while every loan is running')
+    + kpi(dti<=36?'good':dti<=50?'warn':'bad','<i class="ti ti-percentage"></i> Of monthly income',incPM?fmtPct(dti):'—',dti<=36?'k-good':dti<=50?'k-warn':'k-bad',dti<=36?'comfortable':dti<=50?'stretched':'heavy')
+    + kpi('neutral','<i class="ti ti-scale"></i> Net position',fmtS(S.built-L.owed),(S.built-L.owed)>=0?'k-good':'k-bad','saved up minus still owed')
+    + (pb.total?kpi('warn','<i class="ti ti-clock-dollar"></i> Unpaid credit',fmt(pb.total),'k-warn',`${pb.lots.length} entries at the shops`):'')
+    + `</div>`);
+
+  if(L.rows.length){
+    r.push(`<div class="rep-section-title" style="color:var(--danger-text)"><i class="ti ti-list-details"></i> Loan by loan</div>
+    <div class="rep-scroll"><table class="rep-table">
+      <thead><tr><th>Loan</th><th class="num">Instalment</th><th>Progress</th><th class="num">Repaid (period)</th><th class="num">Paid in total</th><th class="num">Still owed</th><th>Closes</th></tr></thead>
+      <tbody>${L.rows.map(({c,s,repaid,nPeriod})=>`
+        <tr>
+          <td>${esc(c.name)}<div style="color:var(--text3);font-size:11px">${c.party?esc(c.party)+' · ':''}${c.principal?'borrowed '+fmt(c.principal):''}${c.active?'':' · closed'}</div></td>
+          <td class="num">${fmt(c.amount)}</td>
+          <td style="min-width:130px">${s.total?`${s.doneInst} of ${s.total}
+            <div class="bar-cell"><span style="width:${s.pct.toFixed(1)}%;background:var(--warning-text)"></span></div>`:'<span style="color:var(--text3)">open-ended</span>'}</td>
+          <td class="num">${repaid?fmt(repaid):'—'}${nPeriod>1?`<div style="color:var(--text3);font-size:11px">${nPeriod}×</div>`:''}</td>
+          <td class="num">${fmt(s.paidTotal)}</td>
+          <td class="num" style="color:var(--danger-text);font-weight:700">${fmt(s.owed)}</td>
+          <td style="color:var(--text2)">${s.closeMonth?esc(monthLabel(s.closeMonth)):(s.total&&!s.leftInst?'<span style="color:var(--success-text)">cleared</span>':'—')}</td>
+        </tr>`).join('')}</tbody>
+      <tfoot><tr><td>Total (${L.rows.length})</td><td class="num">${fmt(L.emi)}</td><td></td>
+        <td class="num">${fmt(L.repaid)}</td><td class="num">${fmt(L.rows.reduce((t,x)=>t+x.s.paidTotal,0))}</td>
+        <td class="num">${fmt(L.owed)}</td><td></td></tr></tfoot>
+    </table></div>`);
+    r.push(`<div class="rep-note"><b>Still owed</b> is the balance recorded on each loan less every instalment ticked off in this app. If the bank's figure has moved for another reason — interest, a part-payment made elsewhere — correct it on the loan itself and it re-bases from there.</div>`);
+  }
+
+  if(pb.lots.length){
+    r.push(`<div class="rep-section-title" style="color:var(--warning-text)"><i class="ti ti-clock-dollar"></i> Informal credit still unpaid</div>
+    <div class="rep-note">Credit taken from a shop or a person and not yet settled. It is not a loan, but it is money owed, so it belongs in the same picture. Full ageing is on the <b>Payables</b> tab.</div>
+    <div class="rep-scroll"><table class="rep-table">
+      <thead><tr><th>Party</th><th class="num">Open</th><th class="num">Oldest</th></tr></thead>
+      <tbody>${(()=>{ const m=new Map();
+        pb.lots.forEach(l=>{ const g=m.get(l.party)||{party:l.party,open:0,age:0};
+          g.open+=l.open; g.age=Math.max(g.age,l.age||0); m.set(l.party,g); });
+        return [...m.values()].sort((a,b)=>b.open-a.open).map(g=>
+          `<tr><td>${esc(g.party)}</td><td class="num">${fmt(g.open)}</td><td class="num">${g.age} days</td></tr>`).join(''); })()}
+      </tbody><tfoot><tr><td>Total</td><td class="num">${fmt(pb.total)}</td><td></td></tr></tfoot>
+    </table></div>`);
+  }
+  return r.join('');
+}
+
 /* ── PAINT ── */
 function paintReport(){
   if(!lastReport) return;
@@ -2455,6 +4217,9 @@ function paintReport(){
   const tabs=REP_TABS.map(t=>`<button class="rep-tab${repTab===t.k?' on':''}" onclick="repSetTab('${t.k}')"><i class="ti ${t.icon}"></i> ${t.label}</button>`).join('');
   let pane='';
   switch(repTab){
+    case 'budget':      pane=paneBudget(A); break;
+    case 'savings':     pane=paneSavings(A); break;
+    case 'liabilities': pane=paneLiabilities(A); break;
     case 'statement':  pane=paneStatement(A); break;
     case 'trends':     pane=paneTrends(A); break;
     case 'categories': pane=paneCategories(A); break;
@@ -2519,7 +4284,14 @@ function generateReport(){
   const rows=repQuery(p,f);
   const out=document.getElementById('reportOutput');
 
-  if(!rows.length){
+  /* A month can be fully planned before a single rupee has moved. Bailing out
+     on "no transactions" would then hide the Budget tab exactly when it is the
+     only thing there is to look at, so an empty ledger with a live plan still
+     produces a report — with zeros where the ledger figures go. */
+  const hasPlan = planRowsInPeriod(p).length > 0;
+  if(!rows.length && hasPlan && repTab!=='budget') repTab='budget';
+
+  if(!rows.length && !hasPlan){
     const d=diagnoseEmpty(p,f);
     let msg;
     if(d.name) msg=`<b>Nothing matched — ${d.name} is what excluded everything.</b> Drop it and there are entries in ${esc(p.label)}.`
@@ -2616,6 +4388,47 @@ function printReport(){
     +Q.items.map(it=>`<tr><td class="r">${it.n}</td><td>${esc(it.what)}</td><td>${esc(it.detail)}</td></tr>`).join('')
     +`</tbody></table>`
     :h('Data quality audit',GRN)+`<p class="muted">Clean — every entry has a date, party, description and a positive amount, with no duplicates.</p>`;
+  /* v2.0 — budget, savings and loans in the printed pack. A PDF that carried
+     the ledger but not the plan it was measured against would be half a
+     report, and the plan is the half she actually writes by hand. */
+  const BG=budgetAnalysis(A.p), SV=savingsAnalysis(A.p), LN=loanAnalysis(A.p);
+  const vCell=v=>`<td class="r" style="color:${v.d===0?'#666':v.fav?GRN:RED}">${(v.d>=0?'+':'−')+M(Math.abs(v.d))}</td>`;
+  const budTbl=BG.out.length?h('Budget vs actual — line by line',CY)
+    +`<p class="muted">On a cost line, spending less than planned is <b>favourable</b>; on a receipt line, receiving less is <b>adverse</b>. The two are never netted into one figure.</p>`
+    +`<table><thead><tr><th>Item</th><th>Month</th><th>Due</th><th class="r">Planned</th><th class="r">Actual</th><th class="r">Variance</th><th>Result</th><th>Status</th></tr></thead><tbody>`
+    +[...BG.out].sort((a,b)=>(a.month||'').localeCompare(b.month||'')||(a.dueDate||'zzz').localeCompare(b.dueDate||'zzz'))
+      .map(x=>{ const v=varianceOf(Number(x.proposed)||0,Number(x.actual)||0,'out');
+        return `<tr><td>${esc(x.item)}${x.note?`<br><i style="color:#777">${esc(x.note)}</i>`:''}</td><td>${esc(monthLabel(x.month))}</td>
+        <td>${x.dueDate?fmtDate(x.dueDate):'—'}</td><td class="r">${M(x.proposed)}</td><td class="r">${x.actual?M(x.actual):'—'}</td>
+        ${x.actual||x.status==='paid'?vCell(v):'<td class="r">—</td>'}<td>${x.actual||x.status==='paid'?v.word:'—'}</td>
+        <td>${isPlanOverdue(x)?'Overdue':(PLAN_STATUS[x.status]||PLAN_STATUS.planned).label}${x.paidBy?' ('+esc(x.paidBy)+')':''}</td></tr>`; }).join('')
+    +`</tbody><tfoot><tr><td colspan="3">Total (${BG.out.length} lines, ${BG.nPaid} settled)</td><td class="r">${M(BG.propOut)}</td><td class="r">${M(BG.actOut)}</td>`
+    +`<td class="r" style="color:${BG.varOut.fav?GRN:RED}">${(BG.varOut.d>=0?'+':'−')+M(Math.abs(BG.varOut.d))}</td><td>${BG.varOut.word}</td><td>${BG.propOut?P(BG.used,0)+' used':''}</td></tr></tfoot></table>`
+    +(BG.cats.length?`<table style="margin-top:8px"><thead><tr><th>Category</th><th class="r">Planned</th><th class="r">Actual</th><th class="r">Variance</th><th class="r">Used</th></tr></thead><tbody>`
+      +BG.cats.map(c=>{ const v=varianceOf(c.proposed,c.actual,'out');
+        return `<tr><td>${esc(c.cat)}</td><td class="r">${M(c.proposed)}</td><td class="r">${M(c.actual)}</td>${vCell(v)}<td class="r">${c.proposed?P(_pct(c.actual,c.proposed),0):'—'}</td></tr>`; }).join('')
+      +`</tbody></table>`:''):'';
+  const budInTbl=BG.inc.length?h('Expected receipts vs actual',GRN)
+    +`<table><thead><tr><th>Item</th><th>Month</th><th class="r">Expected</th><th class="r">Received</th><th class="r">Variance</th><th>Result</th></tr></thead><tbody>`
+    +BG.inc.map(x=>{ const v=varianceOf(Number(x.proposed)||0,Number(x.actual)||0,'in');
+      return `<tr><td>${esc(x.item)}</td><td>${esc(monthLabel(x.month))}</td><td class="r">${M(x.proposed)}</td><td class="r">${x.actual?M(x.actual):'—'}</td>${vCell(v)}<td>${v.word}</td></tr>`; }).join('')
+    +`</tbody><tfoot><tr><td colspan="2">Total</td><td class="r">${M(BG.propIn)}</td><td class="r">${M(BG.actIn)}</td>${vCell(BG.varIn)}<td>${BG.varIn.word}</td></tr></tfoot></table>`:'';
+  const savTbl=SV.rows.length?h('Savings, deposits & schemes',GRN)
+    +`<table><thead><tr><th>Scheme</th><th>Paid to</th><th class="r">Each</th><th class="r">Instalments</th><th class="r">This period</th><th class="r">Paid in total</th><th class="r">Left</th><th>Finishes</th></tr></thead><tbody>`
+    +SV.rows.map(({c,s,thisPeriod})=>`<tr><td>${esc(c.name)}${c.active?'':' <i style="color:#777">(closed)</i>'}</td><td>${esc(c.party||'—')}</td>
+      <td class="r">${M(c.amount)}</td><td class="r">${s.total?s.doneInst+' / '+s.total:'open'}</td><td class="r">${thisPeriod?M(thisPeriod):'—'}</td>
+      <td class="r">${M(s.paidTotal)}${s.units?`<br><i style="color:#777">${+s.units.toFixed(3)} ${esc(c.unit||'')}</i>`:''}</td>
+      <td class="r">${s.total?M(s.remaining):'—'}</td><td>${s.closeMonth?esc(monthLabel(s.closeMonth)):(s.total&&!s.leftInst?'complete':'—')}</td></tr>`).join('')
+    +`</tbody><tfoot><tr><td colspan="4">Total (${SV.rows.length}) — ${M(SV.perMonth)} a month</td><td class="r">${M(SV.contributed)}</td><td class="r">${M(SV.built)}</td><td class="r">${M(SV.remaining)}</td><td></td></tr></tfoot></table>`:'';
+  const loanTbl=LN.rows.length?h('Loans & liabilities',RED)
+    +`<table><thead><tr><th>Loan</th><th>Lender</th><th class="r">Instalment</th><th class="r">Instalments</th><th class="r">Borrowed</th><th class="r">Repaid (period)</th><th class="r">Still owed</th><th>Closes</th></tr></thead><tbody>`
+    +LN.rows.map(({c,s,repaid})=>`<tr><td>${esc(c.name)}${c.active?'':' <i style="color:#777">(closed)</i>'}</td><td>${esc(c.party||'—')}</td>
+      <td class="r">${M(c.amount)}</td><td class="r">${s.total?s.doneInst+' / '+s.total:'open'}</td><td class="r">${c.principal?M(c.principal):'—'}</td>
+      <td class="r">${repaid?M(repaid):'—'}</td><td class="r" style="color:${RED};font-weight:700">${M(s.owed)}</td>
+      <td>${s.closeMonth?esc(monthLabel(s.closeMonth)):(s.total&&!s.leftInst?'cleared':'—')}</td></tr>`).join('')
+    +`</tbody><tfoot><tr><td colspan="2">Total (${LN.rows.length})</td><td class="r">${M(LN.emi)}</td><td></td><td class="r">${M(LN.borrowed)}</td><td class="r">${M(LN.repaid)}</td><td class="r">${M(LN.owed)}</td><td></td></tr></tfoot></table>`
+    +`<p class="muted">Net position: built up ${M(SV.built)} less still owed ${M(LN.owed)} = <b>${(SV.built-LN.owed<0?'−':'')}${M(Math.abs(SV.built-LN.owed))}</b>.</p>`:'';
+
   const cmpTbl=C?h(`Comparison with ${esc(C.p.label)}`,CY)
     +`<table><thead><tr><th>Measure</th><th class="r">${esc(A.p.label)}</th><th class="r">${esc(C.p.label)}</th><th class="r">Change</th></tr></thead><tbody>`
     +[['Money in',A.tInc,C.tInc],['Expenditure (accrual)',A.tExp,C.tExp],['— paid on the spot',A.tCash,C.tCash],
@@ -2673,8 +4486,18 @@ function printReport(){
       ${card('Committed share',A.tExp?P(_pct(fixed,A.tExp)):'—',CY)}
     </div>
     <div class="note"><b>Two views, kept separate.</b> <b>Accrual expenditure</b> ${M(A.tExp)} counts a credit purchase on the day it was taken. <b>Cash outflow</b> ${M(A.cashOut)} counts money that actually left — cash payments plus settlements of earlier credit. A settlement is never added to expenditure a second time.</div>
+    ${(BG.out.length||SV.rows.length||LN.rows.length)?`<div class="cards">
+      ${card('Budgeted',M(BG.propOut),CY)}
+      ${card('Against budget',(BG.varOut.d>=0?'+':'−')+M(Math.abs(BG.varOut.d)),BG.varOut.fav?GRN:RED)}
+      ${card('Saved this period',M(SV.contributed),GRN)}
+      ${card('Built up in total',M(SV.built),GRN)}
+      ${card('Still owed',M(LN.owed),LN.owed?RED:GRN)}
+      ${card('Net position',(SV.built-LN.owed<0?'−':'')+M(Math.abs(SV.built-LN.owed)),(SV.built-LN.owed)>=0?GRN:RED)}
+    </div>`:''}
     ${cmpTbl}
     ${h('Insights',CY)}<ul class="ins">${printInsights(A,C).map(t=>`<li>${t}</li>`).join('')}</ul>
+    ${(budTbl||budInTbl)?`<div class="sec">${budTbl}${budInTbl}</div>`:''}
+    ${(savTbl||loanTbl)?`<div class="sec">${savTbl}${loanTbl}</div>`:''}
     <div class="sec">${catTbl(outC,A.tExp,'Where the money went (accrual)',RED)}
     ${catTbl(inC,A.tInc,'Where the money came from',GRN)}</div>
     <div class="sec">${partyTbl(payees,'out','Paid to — ABC by value',RED,'Paid')}
@@ -2686,7 +4509,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v1.3</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v2.0</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -2710,6 +4533,15 @@ function printInsights(A,C){
   if(rec.length){ const c=rec.filter(r=>r.side==='out').reduce((s,r)=>s+r.perMonth,0), i=rec.filter(r=>r.side==='in').reduce((s,r)=>s+r.perMonth,0);
     L.push(`<b>Recurring commitments ${M(c)}/month</b> against ${M(i)}/month of dependable income (${i>=c?'cushion':'shortfall'} ${M(Math.abs(i-c))}).`); }
   if(A.biggestOut) L.push(`<b>Largest payment ${M(A.biggestOut.amount)}</b> — ${esc(A.biggestOut.description)} (${fmtDate(A.biggestOut.date)}).`);
+  // v2.0 — what the plan and the standing list add to the picture.
+  const BG=budgetAnalysis(A.p), SV=savingsAnalysis(A.p), LN=loanAnalysis(A.p);
+  if(BG.out.length){
+    L.push(`<b>Against the plan:</b> ${M(BG.propOut)} budgeted, ${M(BG.actOut)} spent — ${M(Math.abs(BG.varOut.d))} ${BG.varOut.d<=0?'under':'over'}, which is <b>${BG.varOut.word.toLowerCase()}</b> (${P(Math.abs(BG.varOut.pct))}). ${BG.nPaid} of ${BG.out.length} lines settled.`);
+    if(BG.overdue.length) L.push(`<b>${BG.overdue.length} planned payment${BG.overdue.length===1?' is':'s are'} past due</b> — ${M(BG.overdue.reduce((s,x)=>s+(Number(x.proposed)||0),0))} still to go out.`);
+    if(BG.stillToPay>0) L.push(`<b>${M(BG.stillToPay)} of the plan is still unpaid</b> at this point in the period.`);
+  }
+  if(SV.rows.length) L.push(`<b>Savings:</b> ${M(SV.contributed)} put away this period at ${M(SV.perMonth)} a month committed; ${M(SV.built)} built up in total${SV.units.length?', plus '+SV.units.map(u=>`${+u.n.toFixed(3)} ${u.unit}`).join(' and '):''}.`);
+  if(LN.rows.length) L.push(`<b>Loans:</b> ${M(LN.owed)} still owed across ${LN.rows.length} loan${LN.rows.length===1?'':'s'}, ${M(LN.repaid)} repaid this period, ${M(LN.emi)} a month while they run. Net of savings the position is ${(SV.built-LN.owed<0?'−':'')}${M(Math.abs(SV.built-LN.owed))}.`);
   if(C) L.push(`<b>Versus ${esc(C.p.label)}:</b> spend ${A.tExp>=C.tExp?'up':'down'} ${M(Math.abs(A.tExp-C.tExp))}, income ${A.tInc>=C.tInc?'up':'down'} ${M(Math.abs(A.tInc-C.tInc))}, net ${M(C.net)} → ${M(A.net)}.`);
   return L;
 }
@@ -2752,6 +4584,52 @@ function downloadReportCSV(){
       .forEach(([l,a,b])=>rows.push([l,a,b,a-b,b?_pct(a-b,Math.abs(b)).toFixed(2):'']));
     rows.push([]);
   }
+  /* v2.0 — the plan, the schemes and the loans go into the same file. A
+     spreadsheet that held the ledger but not what it was measured against
+     could not reproduce the report it came from. */
+  const BG=budgetAnalysis(A.p), SV=savingsAnalysis(A.p), LN=loanAnalysis(A.p);
+  if(BG.out.length || BG.inc.length){
+    rows.push(['== BUDGET vs ACTUAL =='],
+      ['Note','Cost line: spending less than planned is Favourable. Receipt line: receiving less is Adverse.'],
+      ['Item','Month','Side','Due','Planned','Actual','Variance','Result','Status','Paid by','Mode','Category','Note']);
+    [...BG.out,...BG.inc]
+      .sort((a,b)=>(a.month||'').localeCompare(b.month||'')||(a.dueDate||'zzz').localeCompare(b.dueDate||'zzz'))
+      .forEach(x=>{ const v=varianceOf(Number(x.proposed)||0,Number(x.actual)||0,x.side);
+        rows.push([x.item, monthLabel(x.month), x.side==='in'?'In':'Out', x.dueDate||'',
+          x.proposed, x.actual||'', (x.actual||x.status==='paid')?v.d:'',
+          (x.actual||x.status==='paid')?v.word:'',
+          isPlanOverdue(x)?'Overdue':(PLAN_STATUS[x.status]||PLAN_STATUS.planned).label,
+          x.paidBy||'', x.payMode||'', x.category||'', x.note||'']); });
+    rows.push(['TOTAL OUT','','','',BG.propOut,BG.actOut,BG.varOut.d,BG.varOut.word,BG.nPaid+' of '+BG.out.length+' settled','','','','']);
+    if(BG.inc.length) rows.push(['TOTAL IN','','','',BG.propIn,BG.actIn,BG.varIn.d,BG.varIn.word,'','','','','']);
+    rows.push([]);
+    if(BG.cats.length){
+      rows.push(['== BUDGET BY CATEGORY =='],['Category','Planned','Actual','Variance','Result','Used %','Lines settled','Lines']);
+      BG.cats.forEach(c=>{ const v=varianceOf(c.proposed,c.actual,'out');
+        rows.push([c.cat,c.proposed,c.actual,v.d,v.word,c.proposed?_pct(c.actual,c.proposed).toFixed(2):'',c.paid,c.n]); });
+      rows.push(['Total',BG.propOut,BG.actOut,BG.varOut.d,BG.varOut.word,BG.propOut?BG.used.toFixed(2):'',BG.nPaid,BG.out.length]);
+      rows.push([]);
+    }
+  }
+  if(SV.rows.length){
+    rows.push(['== SAVINGS, DEPOSITS & SCHEMES =='],
+      ['Scheme','Kind','Paid to','Each','Frequency','Instalments done','Instalments total','This period','Paid in total','Left to pay','Units held','Unit','Finishes','Running?']);
+    SV.rows.forEach(({c,s,thisPeriod})=>rows.push([c.name,kindMeta(c.kind).label,c.party||'',c.amount,c.freq||'monthly',
+      s.doneInst,s.total||'',thisPeriod||'',s.paidTotal,s.total?s.remaining:'',s.units?+s.units.toFixed(3):'',c.unit||'',
+      s.closeMonth?monthLabel(s.closeMonth):'',c.active?'Yes':'No']));
+    rows.push(['Total ('+SV.rows.length+')','','',SV.perMonth+' per month','','','',SV.contributed,SV.built,SV.remaining,'','','','']);
+    rows.push([]);
+  }
+  if(LN.rows.length){
+    rows.push(['== LOANS & LIABILITIES =='],
+      ['Loan','Lender','Instalment','Instalments done','Instalments total','Borrowed','Repaid this period','Paid in total','Still owed','Closes','Running?']);
+    LN.rows.forEach(({c,s,repaid})=>rows.push([c.name,c.party||'',c.amount,s.doneInst,s.total||'',c.principal||'',
+      repaid||'',s.paidTotal,s.owed,s.closeMonth?monthLabel(s.closeMonth):'',c.active?'Yes':'No']));
+    rows.push(['Total ('+LN.rows.length+')','',LN.emi,'','',LN.borrowed,LN.repaid,'',LN.owed,'','']);
+    rows.push(['Net position (built up - still owed)', SV.built - LN.owed]);
+    rows.push([]);
+  }
+
   const outC=catRollup(A.rows,'out'), inC=catRollup(A.rows,'in');
   const catSec=(arr,title,tot)=>{ if(!arr.length) return;
     rows.push(['== '+title+' =='],['Category','Amount','Share %','Cumulative %','Entries','Average','Committed?']);
@@ -2990,18 +4868,22 @@ function applySheetUrl(u){
    replaces it a moment later. Writes still need a connection — the banner is
    explicit that an entry made offline is not saved. */
 function cacheEntries(){
-  try{ localStorage.setItem(LS.cache, JSON.stringify({at:Date.now(), rows:entries})); }
+  try{ localStorage.setItem(LS.cache, JSON.stringify({at:Date.now(), rows:entries,
+       commitments:commitments, plans:plans})); }
   catch(e){ /* quota — the app works fine without the cache */ }
 }
 function renderCached(){
   try{
     const c = JSON.parse(localStorage.getItem(LS.cache) || 'null');
-    if(c && Array.isArray(c.rows) && c.rows.length){
+    if(!c) return;
+    if(Array.isArray(c.commitments)) commitments = c.commitments;
+    if(Array.isArray(c.plans))       plans       = c.plans;
+    if(Array.isArray(c.rows) && c.rows.length){
       entries = c.rows.map(normType);
       setStatus(false, 'Saved copy — syncing…');
-      render();
       document.getElementById('loadingState').style.display = 'none';
     }
+    render(); renderPlan(); renderCommitments();
   }catch(e){}
 }
 function setOffline(on){
@@ -3159,7 +5041,10 @@ async function syncProfileIfStale(remoteAt){
 // Escape closes the topmost thing that is open.
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;
-  if(document.getElementById('installModal').classList.contains('open')) closeInstall();
+  if(document.getElementById('payModal').classList.contains('open')) closePay();
+  else if(document.getElementById('plModal').classList.contains('open')) closePlanLine();
+  else if(document.getElementById('commitModal').classList.contains('open')) closeCommit();
+  else if(document.getElementById('installModal').classList.contains('open')) closeInstall();
   else if(document.getElementById('profileModal').classList.contains('open')) closeProfile();
   else if(document.getElementById('reportModal').classList.contains('open')) closeReport();
   else if(document.getElementById('drawer').classList.contains('open')) closeDrawer();
@@ -3174,6 +5059,10 @@ function boot(){
   applySheetUrl('');
   paintUser();
   maybeNudgeIOS();
+  // Safe here, unlike at the top of the script: every const it leans on has
+  // been evaluated by the time boot() runs.
+  planMonth = localStorage.getItem(LS.planMonth) || thisMonthKey();
+  setView(localStorage.getItem(LS.view) || 'ledger');
   const exp = +(localStorage.getItem(LS.expires) || 0);
   if(!GAS_URL){ openGate('connect'); return; }
   if(!AUTH_TOKEN || (exp && exp < Date.now())){

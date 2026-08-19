@@ -2,9 +2,17 @@
 
 **Live:** <https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/>
 
-A private income, expense, credit and settlement ledger for
-**N. Sowdhamini Sasimurugan**, with an eight-tab financial analysis pack.
-Installable as an app on phone and laptop, and readable offline.
+A private household finance app for **N. Sowdhamini Sasimurugan** in three
+parts, matching the way her diary is actually kept:
+
+- a **Ledger** of income, expense, credit and settlement;
+- a **Monthly Plan** of proposed against actual, ticked off as the month goes;
+- a standing list of **Commitments** — savings schemes, gold scheme, loans,
+  EMIs, term fees and monthly bills, each with its own instalment count and
+  running total.
+
+On top of all three sits an eleven-tab financial analysis pack. Installable as
+an app on phone and laptop, and readable offline.
 
 Cloned from **IBI Personal Finance Tracker** v5.1, rebuilt around a backend that
 lives in her own Google account and is protected by a password held in Apps
@@ -73,16 +81,74 @@ Party balances (credit taken − settled) are shown per party, and only
 credit/settlement rows form a balance — a cash expense is square the moment it
 happens and must never look like a debt.
 
+## The three sections
+
+A tab bar switches between them — pinned to the bottom of the screen on a
+phone, where the thumb is, and sitting under the hero as a normal tab strip on
+a computer.
+
+### Ledger
+What actually happened. The four entry types below, plus **Paid by** and
+**Mode** — the diary's Remarks column ("NSM", "TSM", "Cash", "GPay") split into
+the two facts it was carrying: who settled it, and how. Written into the free
+text note they could be read but never totalled.
+
+### Monthly Plan
+The diary page kept as data: one row per item per month, with Proposed against
+Actual, a due date, and a status. **Fill from commitments** writes the month's
+standing items in one call and is idempotent, so pressing it twice does not
+double the month; **Copy last month** brings the rest forward, proposing last
+month's *actual* because that is what the thing really costs.
+
+Marking a line paid asks for the amount **once** and writes both the plan's
+Actual column and the ledger entry, so the two can never drift apart by a typo.
+Untick *Also record it in my ledger* when somebody else's money paid for it —
+the gas cylinder TSM settled still counts in the plan, but is not her spending.
+Undo offers to remove the ledger entry it created, because leaving it behind is
+how one rupee gets counted twice.
+
+### Commitments
+Everything that comes round again: a recurring deposit, the gold scheme
+(1 gram a month for 12), a car loan, insurance, school fees by term, the fibre
+bill. Each holds only its *opening* position — what had already been paid before
+this app existed. The instalment count, the running total, the grams held and
+the loan's outstanding balance are all **counted from the plan rows every time
+they are shown**, so a payment recorded on the phone and one recorded on the
+laptop cannot leave two different counters behind.
+
+The editor asks only for the fields the chosen kind actually has: a fibre bill
+has no instalment count and a loan has no grams.
+
+---
+
 ## Financial Analysis
 
-Eight tabs over any period — Indian financial year, Apr–Mar, quarters following
+Eleven tabs over any period — Indian financial year, Apr–Mar, quarters following
 it — with an optional like-for-like comparison against the previous window of
 the same length:
 
-Overview (12 KPIs) · Statement (cash book with running balance) · Trends
-(auto-bucketed, inline SVG charts — no chart library, because the app must work
-offline) · Categories · Parties (ABC/Pareto) · Payables (FIFO ageing) ·
-Recurring · Insights with a data-quality audit.
+Overview (12 KPIs plus the standing position) · **Budget** (plan vs actual,
+line by line) · **Savings** (schemes, progress, what is being built up) ·
+**Loans** (what is still owed and when each one closes) · Statement (cash book
+with running balance) · Trends (auto-bucketed, inline SVG charts — no chart
+library, because the app must work offline) · Categories · Parties
+(ABC/Pareto) · Payables (FIFO ageing) · Recurring · Insights with a
+data-quality audit.
+
+### How the budget variance is stated
+
+Two conventions are followed, and both matter:
+
+1. **Favourable / adverse is not symmetrical.** On a cost line, spending *less*
+   than planned is favourable; on an income line, receiving less is adverse.
+   The two are never netted into one signed number.
+2. **Mid-month, the headline compares only what is settled.** Half way through
+   August, planned-versus-spent says "under budget by ₹27,000" when the truth
+   is that the car loan has not gone out yet — a figure that reads as good news
+   right up until the money leaves. The headline therefore compares what the
+   *settled* lines were planned to cost against what they did cost, and reports
+   the unspent remainder separately. Once every line is closed, the two
+   readings coincide and the report says so.
 
 Print/PDF and CSV carry every section, not only the visible tab.
 
@@ -172,6 +238,15 @@ lands locally and the app says the backend needs updating, because that is a
 paste-and-redeploy she has to do — see [SETUP.md](SETUP.md).
 
 ## Version
+
+**v2.0** — August 2026. **Monthly Plan** and **Commitments** sections, **Paid by**
+and **Mode** on every transaction, and three new report tabs (Budget, Savings,
+Loans) carried through to the print pack and the CSV.
+**Requires re-pasting `GAS.gs` and redeploying as a New version** — the new
+sections save into two new sheets (`Plans`, `Commitments`) and two new columns
+on `Transactions`, all created automatically on first run. Until that is done
+the app says so plainly at the top of the two new sections rather than failing
+at Save; the Ledger keeps working throughout.
 
 **v1.3** — August 2026. Profile (name, subtitle, photo) syncs across her devices
 through the Sheet. **Requires re-pasting `GAS.gs` and redeploying.**
