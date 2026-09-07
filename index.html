@@ -41,6 +41,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
+  --ts:1;   /* v3.5 text-size multiplier at phone widths, set from the drawer's Text size */
   --cyan:#00c5ff;
   --cyan-dark:#009ac7;
   --black:#000000;
@@ -714,7 +715,7 @@ tbody tr.tx-row{cursor:pointer}
 .dt-f .v{font-size:13.5px;color:var(--text);word-break:break-word;line-height:1.45}
 @media(max-width:600px){ .dash-period{padding:0 10px} }
 
-/* ══ v3.4 — PHONE TYPE SCALE ═══════════════════════════════════════════════
+/* ══ v3.4 — PHONE TYPE SCALE · v3.5 — × the Text size setting (--ts) ═══════
    Her Galaxy F42 showed 10.5–13px text everywhere. Material's mobile scale
    puts body copy at 16sp with 12sp as the floor; Apple's is 17pt body,
    11pt floor. So on a phone: body and every input 16px, labels 13–14px, no
@@ -722,39 +723,40 @@ tbody tr.tx-row{cursor:pointer}
    the earlier phone blocks; desktop is untouched. Only sizes change — the
    layouts already scroll or wrap where they must.                          */
 @media(max-width:820px){
-  body{font-size:16px}
-  .app-name{font-size:15px}.ver-badge{font-size:11px}.tbar-btn{font-size:13px}.toggle-label{font-size:12px}
-  .hero-name{font-size:20px}.hero-sub{font-size:14px}.hero-clock{font-size:14px}
-  .dash-period .dp-label{font-size:12px}.dp-range{font-size:12.5px}.dash-period .mini-btn{font-size:13.5px}
-  .chip{font-size:14px;padding:7px 13px}
-  .metric-label{font-size:13px}.metric-value{font-size:24px}.metric-sub{font-size:12.5px}
-  .status-txt{font-size:14px}.s-btn{font-size:13px}
-  .section-title{font-size:16px}.count-badge{font-size:12px}
-  .quick-lbl{font-size:12px}.qk{min-width:116px;max-width:170px}.qk-name{font-size:15px}.qk-sub{font-size:12.5px}
-  label{font-size:14px}input,select,textarea{font-size:16px}
-  .type-btn{font-size:15px}.btn-save,.btn-clear{font-size:16px}
-  .edit-banner-left{font-size:14px}.edit-cancel-btn{font-size:13px}
-  .bal-title,.pending-title{font-size:15px}.bal-item,.pending-item{font-size:14px}.bal-sub{font-size:12.5px}
-  .filter-row select,.filter-row input{font-size:15px}.filter-summary{font-size:14px}
-  table{font-size:14px}th{font-size:12px}td{font-size:14px}.dt-sub{font-size:12.5px}.pill{font-size:12.5px}.action-btn{font-size:18px}
-  .toast{font-size:15px}.footer{font-size:12.5px}
-  .drawer-section-label{font-size:11.5px}.drawer-item{font-size:16px}
-  .rep-tab{font-size:14px}.rep-card .lbl{font-size:12px}.rep-card .val{font-size:20px}.rep-section-title{font-size:14px}
-  .rep-table{font-size:13.5px}.rep-table th{font-size:12px}.kpi .k-lbl{font-size:12px}.kpi .k-val{font-size:19px}.kpi .k-sub{font-size:12.5px}
-  .rep-note{font-size:13px}.rep-legend{font-size:12.5px}.rc-legend{font-size:12px}.tag{font-size:12px}.ins{font-size:14px}.cmp-row{font-size:13.5px}
-  .rc-grid .form-group label{font-size:13px}.rc-grid input,.rc-grid select{font-size:15px}.rep-empty{font-size:14px}.rep-diag{font-size:14px}.rep-diag .fixbtn{font-size:13px}
-  .gate-title{font-size:18px}.gate-h{font-size:16px}.gate-sub{font-size:13px}.gate-p,.gate-msg{font-size:14px}.gate-help{font-size:13px}.gate-link{font-size:13.5px}
-  .vn-btn{font-size:12.5px}
-  .pane-h{font-size:15px}.pane-sub{font-size:13px}.mini-btn{font-size:13.5px}.needs-backend{font-size:14px}.offline-note{font-size:13.5px}
-  .month-bar select{font-size:15px}.month-bar .mb-label small{font-size:12px}
-  .plan-group-h{font-size:12.5px}.plan-group-h span:last-child{font-size:13px}
-  .pl-name{font-size:15.5px}.pl-meta{font-size:12.5px}.pl-prop{font-size:12.5px}.pl-act{font-size:16.5px}.pl-act.unpaid{font-size:14px}.pl-var{font-size:12px}.pl-actions .mini-btn{font-size:13px}.st-chip{font-size:11.5px}
-  .cm-name{font-size:16px}.cm-sub{font-size:13px}.cm-amt{font-size:17.5px}.cm-amt small{font-size:11.5px}.cm-prog-h{font-size:12.5px}.cm-stat .l{font-size:11px}.cm-stat .v{font-size:15px}.cm-actions .mini-btn{font-size:13px}.kind-chip{font-size:12px}
-  .fld label{font-size:13.5px}.fld input,.fld select,.fld textarea{font-size:16px}.fld-hint{font-size:12.5px}.fld-set legend,.fld-set .lg{font-size:11.5px}
-  .tot .l{font-size:11px}.tot .v{font-size:18px}.tot .s{font-size:12px}
-  .sheet-hdr-title{font-size:16px}.dt-amt{font-size:30px}.dt-f .lg{font-size:11.5px}.dt-f .v{font-size:15.5px}
-  .ins-hero-sub{font-size:13px}.ins-why div{font-size:14px}.ins-steps-h{font-size:13.5px}.ins-steps li{font-size:14px}.ins-key{font-size:13px}.ins-note{font-size:13px}.ins-done{font-size:14px}
-  .pane-empty{font-size:14px}.pane-empty b{font-size:16px}
+  body{font-size:calc(16px*var(--ts))}
+  .ts-chips .chip{font-size:calc(13px*var(--ts))}
+  .app-name{font-size:calc(15px*var(--ts))}.ver-badge{font-size:calc(11px*var(--ts))}.tbar-btn{font-size:calc(13px*var(--ts))}.toggle-label{font-size:calc(12px*var(--ts))}
+  .hero-name{font-size:calc(20px*var(--ts))}.hero-sub{font-size:calc(14px*var(--ts))}.hero-clock{font-size:calc(14px*var(--ts))}
+  .dash-period .dp-label{font-size:calc(12px*var(--ts))}.dp-range{font-size:calc(12.5px*var(--ts))}.dash-period .mini-btn{font-size:calc(13.5px*var(--ts))}
+  .chip{font-size:calc(14px*var(--ts));padding:7px 13px}
+  .metric-label{font-size:calc(13px*var(--ts))}.metric-value{font-size:min(calc(24px*var(--ts)),5.8vw)}.metric-sub{font-size:calc(12.5px*var(--ts))}
+  .status-txt{font-size:calc(14px*var(--ts))}.s-btn{font-size:calc(13px*var(--ts))}
+  .section-title{font-size:calc(16px*var(--ts))}.count-badge{font-size:calc(12px*var(--ts))}
+  .quick-lbl{font-size:calc(12px*var(--ts))}.qk{min-width:116px;max-width:170px}.qk-name{font-size:calc(15px*var(--ts))}.qk-sub{font-size:calc(12.5px*var(--ts))}
+  label{font-size:calc(14px*var(--ts))}input,select,textarea{font-size:calc(16px*var(--ts))}
+  .type-btn{font-size:calc(15px*var(--ts))}.btn-save,.btn-clear{font-size:calc(16px*var(--ts))}
+  .edit-banner-left{font-size:calc(14px*var(--ts))}.edit-cancel-btn{font-size:calc(13px*var(--ts))}
+  .bal-title,.pending-title{font-size:calc(15px*var(--ts))}.bal-item,.pending-item{font-size:calc(14px*var(--ts))}.bal-sub{font-size:calc(12.5px*var(--ts))}
+  .filter-row select,.filter-row input{font-size:calc(15px*var(--ts))}.filter-summary{font-size:calc(14px*var(--ts))}
+  table{font-size:calc(14px*var(--ts))}th{font-size:calc(12px*var(--ts))}td{font-size:calc(14px*var(--ts))}.dt-sub{font-size:calc(12.5px*var(--ts))}.pill{font-size:calc(12.5px*var(--ts))}.action-btn{font-size:calc(18px*var(--ts))}
+  .toast{font-size:calc(15px*var(--ts))}.footer{font-size:calc(12.5px*var(--ts))}
+  .drawer-section-label{font-size:calc(11.5px*var(--ts))}.drawer-item{font-size:calc(16px*var(--ts))}
+  .rep-tab{font-size:calc(14px*var(--ts))}.rep-card .lbl{font-size:calc(12px*var(--ts))}.rep-card .val{font-size:calc(20px*var(--ts))}.rep-section-title{font-size:calc(14px*var(--ts))}
+  .rep-table{font-size:calc(13.5px*var(--ts))}.rep-table th{font-size:calc(12px*var(--ts))}.kpi .k-lbl{font-size:calc(12px*var(--ts))}.kpi .k-val{font-size:calc(19px*var(--ts))}.kpi .k-sub{font-size:calc(12.5px*var(--ts))}
+  .rep-note{font-size:calc(13px*var(--ts))}.rep-legend{font-size:calc(12.5px*var(--ts))}.rc-legend{font-size:calc(12px*var(--ts))}.tag{font-size:calc(12px*var(--ts))}.ins{font-size:calc(14px*var(--ts))}.cmp-row{font-size:calc(13.5px*var(--ts))}
+  .rc-grid .form-group label{font-size:calc(13px*var(--ts))}.rc-grid input,.rc-grid select{font-size:calc(15px*var(--ts))}.rep-empty{font-size:calc(14px*var(--ts))}.rep-diag{font-size:calc(14px*var(--ts))}.rep-diag .fixbtn{font-size:calc(13px*var(--ts))}
+  .gate-title{font-size:calc(18px*var(--ts))}.gate-h{font-size:calc(16px*var(--ts))}.gate-sub{font-size:calc(13px*var(--ts))}.gate-p,.gate-msg{font-size:calc(14px*var(--ts))}.gate-help{font-size:calc(13px*var(--ts))}.gate-link{font-size:calc(13.5px*var(--ts))}
+  .vn-btn{font-size:calc(12.5px*var(--ts))}
+  .pane-h{font-size:calc(15px*var(--ts))}.pane-sub{font-size:calc(13px*var(--ts))}.mini-btn{font-size:calc(13.5px*var(--ts))}.needs-backend{font-size:calc(14px*var(--ts))}.offline-note{font-size:calc(13.5px*var(--ts))}
+  .month-bar select{font-size:calc(15px*var(--ts))}.month-bar .mb-label small{font-size:calc(12px*var(--ts))}
+  .plan-group-h{font-size:calc(12.5px*var(--ts))}.plan-group-h span:last-child{font-size:calc(13px*var(--ts))}
+  .pl-name{font-size:calc(15.5px*var(--ts))}.pl-meta{font-size:calc(12.5px*var(--ts))}.pl-prop{font-size:calc(12.5px*var(--ts))}.pl-act{font-size:calc(16.5px*var(--ts))}.pl-act.unpaid{font-size:calc(14px*var(--ts))}.pl-var{font-size:calc(12px*var(--ts))}.pl-actions .mini-btn{font-size:calc(13px*var(--ts))}.st-chip{font-size:calc(11.5px*var(--ts))}
+  .cm-name{font-size:calc(16px*var(--ts))}.cm-sub{font-size:calc(13px*var(--ts))}.cm-amt{font-size:calc(17.5px*var(--ts))}.cm-amt small{font-size:calc(11.5px*var(--ts))}.cm-prog-h{font-size:calc(12.5px*var(--ts))}.cm-stat .l{font-size:calc(11px*var(--ts))}.cm-stat .v{font-size:calc(15px*var(--ts))}.cm-actions .mini-btn{font-size:calc(13px*var(--ts))}.kind-chip{font-size:calc(12px*var(--ts))}
+  .fld label{font-size:calc(13.5px*var(--ts))}.fld input,.fld select,.fld textarea{font-size:calc(16px*var(--ts))}.fld-hint{font-size:calc(12.5px*var(--ts))}.fld-set legend,.fld-set .lg{font-size:calc(11.5px*var(--ts))}
+  .tot .l{font-size:calc(11px*var(--ts))}.tot .v{font-size:calc(18px*var(--ts))}.tot .s{font-size:calc(12px*var(--ts))}
+  .sheet-hdr-title{font-size:calc(16px*var(--ts))}.dt-amt{font-size:calc(30px*var(--ts))}.dt-f .lg{font-size:calc(11.5px*var(--ts))}.dt-f .v{font-size:calc(15.5px*var(--ts))}
+  .ins-hero-sub{font-size:calc(13px*var(--ts))}.ins-why div{font-size:calc(14px*var(--ts))}.ins-steps-h{font-size:calc(13.5px*var(--ts))}.ins-steps li{font-size:calc(14px*var(--ts))}.ins-key{font-size:calc(13px*var(--ts))}.ins-note{font-size:calc(13px*var(--ts))}.ins-done{font-size:calc(14px*var(--ts))}
+  .pane-empty{font-size:calc(14px*var(--ts))}.pane-empty b{font-size:calc(16px*var(--ts))}
 }
 </style>
 </head>
@@ -766,7 +768,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.4</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.5</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1081,7 +1083,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v3.4 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v3.5 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1097,6 +1099,16 @@ tbody tr.tx-row{cursor:pointer}
   <button class="drawer-item" onclick="exportCSV();closeDrawer()"><i class="ti ti-download"></i> Export CSV</button>
   <a class="drawer-item" id="sheetLinkDrawer" href="#" target="_blank" rel="noopener" style="display:none" onclick="closeDrawer()"><i class="ti ti-external-link"></i> Open Google Sheet</a>
   <div class="drawer-section-label">Settings</div>
+  <!-- v3.5 — Text size, per device, like WhatsApp / Gmail. Applies at phone
+       widths; the phone default is Large (CEO, 7 Sep 2026: "increase more"). -->
+  <div class="drawer-item" style="cursor:default;flex-direction:column;align-items:flex-start;gap:8px">
+    <span><i class="ti ti-text-size"></i> Text size <span style="color:var(--text3);font-size:11px;font-weight:400">— phones and small screens</span></span>
+    <div class="chip-row ts-chips" id="tsChips">
+      <button class="chip" data-k="default" onclick="setTextSize('default')">Default</button>
+      <button class="chip" data-k="large" onclick="setTextSize('large')">Large</button>
+      <button class="chip" data-k="xl" onclick="setTextSize('xl')">Extra large</button>
+    </div>
+  </div>
   <button class="drawer-item" onclick="toggleTheme();closeDrawer()"><i class="ti ti-sun"></i> Toggle Dark / Light Mode</button>
   <!-- Always shown. beforeinstallprompt never fires on iOS, so gating this on
        it left the whole iPhone install path invisible. -->
@@ -1110,7 +1122,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.4 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.5 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1175,7 +1187,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.4</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.5</div>
       </div>
     </div>
 
@@ -1577,7 +1589,9 @@ const LS = { url:'mpft_backend_url', token:'mpft_token', expires:'mpft_expires',
              profileAt:'mpft_profile_at',
              cache:'mpft_cache', theme:'mpft_theme', banner:'mpft_banner_dismissed',
              // v2.0
-             view:'mpft_view', planMonth:'mpft_plan_month', lastPaidBy:'mpft_last_paidby' };
+             view:'mpft_view', planMonth:'mpft_plan_month', lastPaidBy:'mpft_last_paidby',
+             // v3.5
+             textSize:'mpft_text_size' };
 let GAS_URL    = localStorage.getItem(LS.url)   || '';
 let AUTH_TOKEN = localStorage.getItem(LS.token) || '';
 let AUTH_LOST  = false;
@@ -1689,6 +1703,19 @@ let editingId = null;
 let deferredPrompt = null;
 
 // ── THEME ──
+/* v3.5 — Text size. Three steps, like every mainstream app's setting; kept
+   per device. Large (18px body) is the phone default. */
+const TEXT_SIZES = { default:1, large:1.125, xl:1.25 };
+const TEXT_SIZE_LABEL = { default:'Default', large:'Large', xl:'Extra large' };
+function applyTextSize(k){
+  if(!TEXT_SIZES[k]) k = 'large';
+  document.documentElement.style.setProperty('--ts', TEXT_SIZES[k]);
+  document.querySelectorAll('#tsChips .chip').forEach(b => b.classList.toggle('on', b.dataset.k === k));
+  return k;
+}
+function setTextSize(k){ k = applyTextSize(k); localStorage.setItem(LS.textSize, k); showToast('Text size: ' + TEXT_SIZE_LABEL[k]); }
+applyTextSize(localStorage.getItem(LS.textSize) || 'large');
+
 function applyTheme(light){
   document.body.setAttribute('data-theme', light ? 'light' : 'dark');
   document.getElementById('themeLabel').textContent = light ? 'Light' : 'Dark';
@@ -5015,7 +5042,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.4</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.5</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
