@@ -713,6 +713,49 @@ tbody tr.tx-row{cursor:pointer}
 .dt-f .lg{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);font-weight:700;margin-bottom:3px;display:block}
 .dt-f .v{font-size:13.5px;color:var(--text);word-break:break-word;line-height:1.45}
 @media(max-width:600px){ .dash-period{padding:0 10px} }
+
+/* ══ v3.4 — PHONE TYPE SCALE ═══════════════════════════════════════════════
+   Her Galaxy F42 showed 10.5–13px text everywhere. Material's mobile scale
+   puts body copy at 16sp with 12sp as the floor; Apple's is 17pt body,
+   11pt floor. So on a phone: body and every input 16px, labels 13–14px, no
+   caption under 12px, headline figures 24px. Declared last so it wins over
+   the earlier phone blocks; desktop is untouched. Only sizes change — the
+   layouts already scroll or wrap where they must.                          */
+@media(max-width:820px){
+  body{font-size:16px}
+  .app-name{font-size:15px}.ver-badge{font-size:11px}.tbar-btn{font-size:13px}.toggle-label{font-size:12px}
+  .hero-name{font-size:20px}.hero-sub{font-size:14px}.hero-clock{font-size:14px}
+  .dash-period .dp-label{font-size:12px}.dp-range{font-size:12.5px}.dash-period .mini-btn{font-size:13.5px}
+  .chip{font-size:14px;padding:7px 13px}
+  .metric-label{font-size:13px}.metric-value{font-size:24px}.metric-sub{font-size:12.5px}
+  .status-txt{font-size:14px}.s-btn{font-size:13px}
+  .section-title{font-size:16px}.count-badge{font-size:12px}
+  .quick-lbl{font-size:12px}.qk{min-width:116px;max-width:170px}.qk-name{font-size:15px}.qk-sub{font-size:12.5px}
+  label{font-size:14px}input,select,textarea{font-size:16px}
+  .type-btn{font-size:15px}.btn-save,.btn-clear{font-size:16px}
+  .edit-banner-left{font-size:14px}.edit-cancel-btn{font-size:13px}
+  .bal-title,.pending-title{font-size:15px}.bal-item,.pending-item{font-size:14px}.bal-sub{font-size:12.5px}
+  .filter-row select,.filter-row input{font-size:15px}.filter-summary{font-size:14px}
+  table{font-size:14px}th{font-size:12px}td{font-size:14px}.dt-sub{font-size:12.5px}.pill{font-size:12.5px}.action-btn{font-size:18px}
+  .toast{font-size:15px}.footer{font-size:12.5px}
+  .drawer-section-label{font-size:11.5px}.drawer-item{font-size:16px}
+  .rep-tab{font-size:14px}.rep-card .lbl{font-size:12px}.rep-card .val{font-size:20px}.rep-section-title{font-size:14px}
+  .rep-table{font-size:13.5px}.rep-table th{font-size:12px}.kpi .k-lbl{font-size:12px}.kpi .k-val{font-size:19px}.kpi .k-sub{font-size:12.5px}
+  .rep-note{font-size:13px}.rep-legend{font-size:12.5px}.rc-legend{font-size:12px}.tag{font-size:12px}.ins{font-size:14px}.cmp-row{font-size:13.5px}
+  .rc-grid .form-group label{font-size:13px}.rc-grid input,.rc-grid select{font-size:15px}.rep-empty{font-size:14px}.rep-diag{font-size:14px}.rep-diag .fixbtn{font-size:13px}
+  .gate-title{font-size:18px}.gate-h{font-size:16px}.gate-sub{font-size:13px}.gate-p,.gate-msg{font-size:14px}.gate-help{font-size:13px}.gate-link{font-size:13.5px}
+  .vn-btn{font-size:12.5px}
+  .pane-h{font-size:15px}.pane-sub{font-size:13px}.mini-btn{font-size:13.5px}.needs-backend{font-size:14px}.offline-note{font-size:13.5px}
+  .month-bar select{font-size:15px}.month-bar .mb-label small{font-size:12px}
+  .plan-group-h{font-size:12.5px}.plan-group-h span:last-child{font-size:13px}
+  .pl-name{font-size:15.5px}.pl-meta{font-size:12.5px}.pl-prop{font-size:12.5px}.pl-act{font-size:16.5px}.pl-act.unpaid{font-size:14px}.pl-var{font-size:12px}.pl-actions .mini-btn{font-size:13px}.st-chip{font-size:11.5px}
+  .cm-name{font-size:16px}.cm-sub{font-size:13px}.cm-amt{font-size:17.5px}.cm-amt small{font-size:11.5px}.cm-prog-h{font-size:12.5px}.cm-stat .l{font-size:11px}.cm-stat .v{font-size:15px}.cm-actions .mini-btn{font-size:13px}.kind-chip{font-size:12px}
+  .fld label{font-size:13.5px}.fld input,.fld select,.fld textarea{font-size:16px}.fld-hint{font-size:12.5px}.fld-set legend,.fld-set .lg{font-size:11.5px}
+  .tot .l{font-size:11px}.tot .v{font-size:18px}.tot .s{font-size:12px}
+  .sheet-hdr-title{font-size:16px}.dt-amt{font-size:30px}.dt-f .lg{font-size:11.5px}.dt-f .v{font-size:15.5px}
+  .ins-hero-sub{font-size:13px}.ins-why div{font-size:14px}.ins-steps-h{font-size:13.5px}.ins-steps li{font-size:14px}.ins-key{font-size:13px}.ins-note{font-size:13px}.ins-done{font-size:14px}
+  .pane-empty{font-size:14px}.pane-empty b{font-size:16px}
+}
 </style>
 </head>
 <body>
@@ -723,7 +766,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.3</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.4</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1038,7 +1081,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v3.3 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v3.4 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1067,7 +1110,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.3 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.4 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1132,7 +1175,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.3</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.4</div>
       </div>
     </div>
 
@@ -4972,7 +5015,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.3</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.4</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
