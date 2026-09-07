@@ -777,7 +777,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.6</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.7</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1092,7 +1092,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v3.6 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v3.7 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1133,7 +1133,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.6 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.7 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1198,7 +1198,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.6</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.7</div>
       </div>
     </div>
 
@@ -4620,17 +4620,19 @@ function savingsAnalysis(p){
   };
 }
 
-/* v3.0 — the deposits she typed straight into the ledger, grouped by what
-   they were. Shown above the schemes so the two views of "put away" sit
-   together; a plan line ticked off writes here too, so it is one total. */
+/* The deposits typed straight into the ledger, grouped by what they were —
+   shown above the schemes so the two views of "put away" sit together. Takes
+   only {p}, like the rest of the shared panes, and derives its own rows. */
 function ledgerSavingsBlock(A){
-  if(!A.savings.length) return '';
-  const m=new Map();
-  A.savings.forEach(e=>{ const k=String(e.description||'').trim().toLowerCase()||'(untitled)';
+  const list = Array.isArray(A.savings) ? A.savings
+             : entries.filter(e => isSavingT(e) && (e.date||'') >= A.p.from && (e.date||'') <= A.p.to);
+  if(!list.length) return '';
+  const m=new Map(); let tot=0;
+  list.forEach(e=>{ const k=String(e.description||'').trim().toLowerCase()||'(untitled)';
     const r=m.get(k)||{name:String(e.description||'').trim()||'(untitled)',total:0,n:0,last:''};
-    r.total+=Number(e.amount)||0; r.n++; if((e.date||'')>r.last) r.last=e.date||''; m.set(k,r); });
+    const a=Number(e.amount)||0; r.total+=a; tot+=a; r.n++; if((e.date||'')>r.last) r.last=e.date||''; m.set(k,r); });
   const rows=[...m.values()].sort((a,b)=>b.total-a.total);
-  return `<div class="rep-section-title" style="color:var(--save-text)"><i class="ti ti-pig-money"></i> Deposits recorded in the ledger — ${fmt(A.tSav)}</div>
+  return `<div class="rep-section-title" style="color:var(--save-text)"><i class="ti ti-pig-money"></i> Deposits recorded in the ledger — ${fmt(tot)}</div>
   <div class="rep-scroll"><table class="rep-table" style="min-width:420px"><thead><tr><th>What</th><th class="num">Deposits</th><th class="num">Total</th><th>Last</th></tr></thead><tbody>
   ${rows.map(r=>`<tr><td>${esc(r.name)}</td><td class="num">${r.n}</td><td class="num k-save" style="font-weight:700">${fmt(r.total)}</td><td style="color:var(--text3)">${fmtDate(r.last)}</td></tr>`).join('')}
   </tbody></table></div>`;
@@ -5056,7 +5058,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.6</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.7</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
