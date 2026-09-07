@@ -177,11 +177,14 @@ balance. The app shows it less every instalment ticked off here. If the bank's
 number moves for another reason — interest, a part-payment made elsewhere —
 type the bank's current figure into the loan and it re-bases from there.
 
-## Hosting it in another account (how it is set up since 7 September 2026)
+## Hosting it in another account (optional — hers is the normal setup)
 
-The backend does not have to live in her Google account. Since 7 Sep 2026 it
-runs as a project in the **CEO's** account, so he can paste updates himself.
-The steps are the same as above with three differences:
+The backend does not have to live in her Google account: since v3.3 it can run
+as a project in someone else's, for instance so the CEO can paste updates
+himself. (Tried on 7 Sep 2026; the authorisation popup in a multi-account
+browser kept failing with a 401, so it was completed in her own account after
+all.) If you ever do move it, the steps are the same as above with three
+differences:
 
 1. **Create the Sheet in that account** (any name), copy its ID from the URL —
    the long string between `/d/` and `/edit`.

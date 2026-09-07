@@ -28,7 +28,7 @@ Script Properties.
 |---|---|
 | The app | Static HTML/CSS/JS on GitHub Pages, in this repo. No build step, no framework, no bundler. |
 | Her data | A Google Sheet in **her own** Google account. |
-| The API | An Apps Script Web app (`GAS.gs`). Bound to the Sheet, or standalone with a `SHEET_ID` property; since 7 Sep 2026 it is hosted in the **CEO's** Google account (see SETUP.md, "Hosting it in another account"). |
+| The API | An Apps Script Web app (`GAS.gs`), bound to that Sheet and deployed from **her own** account. (Since v3.3 it can also run as a standalone project in another account with a `SHEET_ID` property — see SETUP.md — but her own account is where it lives.) |
 | The password | `APP_PASSWORD` in that script's **Script Properties**. Never in this repo, never in the page. |
 
 The two halves are deliberately separate: this repo is public and holds no
@@ -241,9 +241,10 @@ paste-and-redeploy she has to do — see [SETUP.md](SETUP.md).
 
 **v3.3** — 7 September 2026. The backend no longer assumes it is bound to
 the Sheet: `book()` uses the bound spreadsheet when there is one, else opens
-the Sheet named by Script Property `SHEET_ID`. This is what lets the script
-be hosted as a standalone project in the CEO's account rather than from her
-Drive. `checkSetup()` reports which mode it is in. No frontend change beyond
+the Sheet named by Script Property `SHEET_ID`, so it can also be hosted as a
+standalone project in another account. In the end it stayed in her own
+account, bound to her Sheet, which needs nothing extra. `checkSetup()` reports
+which mode it is in. No frontend change beyond
 the version, kept in step.
 
 **v3.2** — 7 September 2026. **The backend carries the same version number as
