@@ -239,6 +239,20 @@ paste-and-redeploy she has to do — see [SETUP.md](SETUP.md).
 
 ## Version
 
+**v3.0** — 7 September 2026. Built from the diary's own line, *Balance = Income −
+(Savings + Expenses)*. A fifth transaction type, **Savings**, for money put away
+(RD, SSY, chit, gold): it leaves the wallet but is not spent, so it is neither an
+expense nor part of the balance. The four headline tiles are now **Income ·
+Expenses · Savings · Balance**, live for the chosen period and recalculated on
+every save; ticking off a Savings / Gold-Chit commitment writes a Savings entry,
+not an Expense. **Quick entry**: a strip of one-tap presets learned from her own
+ledger (most used lately first) that fills type, description, party, mode and
+last amount; description and party autocomplete from history. **Tap any row**
+for a detail sheet with Edit / Duplicate / Delete. The dashboard's period chips
+gain a **Report** button that opens the analysis for the same window; the report
+gains *Put into Savings*, *Balance (left to spend)* and a Savings filter chip.
+No Apps Script change: the Sheet stores the type verbatim.
+
 **v2.0** — August 2026. **Monthly Plan** and **Commitments** sections, **Paid by**
 and **Mode** on every transaction, and three new report tabs (Budget, Savings,
 Loans) carried through to the print pack and the CSV.

@@ -57,6 +57,7 @@
   --danger-bg:#2e0d0d;--danger-text:#ff7070;--danger-border:#5c1e1e;
   --warning-bg:#2e200d;--warning-text:#ffb84d;--warning-border:#5c3e1e;
   --info-bg:#0d1e2e;--info-text:#4db8ff;--info-border:#1e3e5c;
+  --save-bg:#1f0d2e;--save-text:#c58cff;--save-border:#3e1e5c;
   --radius:10px;--radius-lg:14px;--radius-xl:18px;
   --font:'Roboto',sans-serif;
 }
@@ -68,6 +69,7 @@ body[data-theme="light"]{
   --danger-bg:#fdeaea;--danger-text:#8b1a1a;--danger-border:#f5a5a5;
   --warning-bg:#fef6e4;--warning-text:#7a4a00;--warning-border:#ffd080;
   --info-bg:#e4f0fd;--info-text:#0c447c;--info-border:#85b7eb;
+  --save-bg:#f1e6fd;--save-text:#5b21b6;--save-border:#c4a5f0;
 }
 
 html,body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
@@ -129,6 +131,8 @@ body[data-theme="light"]{color-scheme:light}
 .metric.m-expense::before{background:var(--danger-text)}
 .metric.m-net::before{background:var(--cyan)}
 .metric.m-count::before{background:var(--text3)}
+.metric.m-saving::before{background:var(--save-text)}
+.metric-sub{font-size:10.5px;color:var(--text3);margin-top:4px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .metric-label{font-size:11px;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:0.06em;font-weight:500}
 .metric-value{font-size:22px;font-weight:700;font-family:var(--font)}
 .metric-value.income{color:var(--success-text)}
@@ -136,6 +140,7 @@ body[data-theme="light"]{color-scheme:light}
 .metric-value.positive{color:var(--cyan)}
 .metric-value.negative{color:var(--danger-text)}
 .metric-value.count{color:var(--text)}
+.metric-value.saving{color:var(--save-text)}
 
 /* ── SECTION HEADER ── */
 .section-hdr{background:var(--black);border:1px solid var(--border);border-radius:var(--radius-lg) var(--radius-lg) 0 0;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
@@ -158,11 +163,13 @@ input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,19
 input[type="date"]{cursor:pointer}
 input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:0.85}
 .type-toggle{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.type-toggle .type-btn:last-child:nth-child(odd){grid-column:1/-1}
 .type-btn{flex:1;padding:10px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.15s;font-family:var(--font);font-weight:500}
 .type-btn.active-income{background:var(--success-bg);color:var(--success-text);border-color:var(--success-border)}
 .type-btn.active-expense{background:var(--danger-bg);color:var(--danger-text);border-color:var(--danger-border)}
 .type-btn.active-credit{background:var(--warning-bg);color:var(--warning-text);border-color:var(--warning-border)}
 .type-btn.active-settlement{background:var(--info-bg);color:var(--info-text);border-color:var(--info-border)}
+.type-btn.active-saving{background:var(--save-bg);color:var(--save-text);border-color:var(--save-border)}
 .btn-row{display:flex;gap:10px;margin-top:14px}
 .btn-save{flex:1;padding:12px;font-size:15px;font-weight:700;border:none;border-radius:var(--radius);background:var(--cyan);color:#000;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:opacity 0.15s;font-family:var(--font)}
 .btn-save:hover{opacity:0.85}
@@ -220,10 +227,13 @@ tr.row-editing td{background:var(--info-bg) !important}
 .pill.expense{background:var(--danger-bg);color:var(--danger-text)}
 .pill.credit{background:var(--warning-bg);color:var(--warning-text)}
 .pill.settlement{background:var(--info-bg);color:var(--info-text)}
+.pill.saving{background:var(--save-bg);color:var(--save-text)}
 .amt-income{color:var(--success-text);font-weight:700}
 .amt-expense{color:var(--danger-text);font-weight:700}
 .amt-credit{color:var(--warning-text);font-weight:700}
 .amt-settlement{color:var(--info-text);font-weight:700}
+.amt-saving{color:var(--save-text);font-weight:700}
+tbody tr.tx-row{cursor:pointer}
 .action-btn{background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;font-size:16px;line-height:1;color:var(--text3)}
 .action-btn.edit:hover{color:var(--cyan);background:rgba(0,197,255,0.1)}
 .action-btn.del:hover{color:var(--danger-text);background:var(--danger-bg)}
@@ -296,6 +306,7 @@ tr.row-editing td{background:var(--info-bg) !important}
 .chip.on-expense{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger-text);font-weight:700}
 .chip.on-credit{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text);font-weight:700}
 .chip.on-settlement{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text);font-weight:700}
+.chip.on-saving{background:var(--save-bg);border-color:var(--save-border);color:var(--save-text);font-weight:700}
 .rc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 .rc-grid .form-group label{font-size:11px}
 .rc-grid input,.rc-grid select{font-size:13px;padding:8px 10px;background:var(--bg2)}
@@ -326,7 +337,8 @@ tr.row-editing td{background:var(--info-bg) !important}
 .kpi .k-val{font-size:16.5px;font-weight:700;font-family:var(--font);line-height:1.2}
 .kpi .k-sub{font-size:10.5px;color:var(--text3);margin-top:3px;line-height:1.35}
 .k-good{color:var(--success-text)}.k-bad{color:var(--danger-text)}
-.k-warn{color:var(--warning-text)}.k-cy{color:var(--cyan)}.k-info{color:var(--info-text)}
+.k-warn{color:var(--warning-text)}.k-cy{color:var(--cyan)}.k-info{color:var(--info-text)}.k-save{color:var(--save-text)}
+.kpi.save::before{background:var(--save-text)}
 
 /* ── REPORT: NOTE / CHART / BARS ── */
 .rep-note{font-size:11.5px;color:var(--text3);line-height:1.5;margin:5px 0 2px}
@@ -683,6 +695,23 @@ tr.row-editing td{background:var(--info-bg) !important}
 .dash-period .chip-row::-webkit-scrollbar{display:none}
 .dash-period .chip{flex-shrink:0}
 .dp-range{font-size:10.5px;color:var(--text3);width:100%;line-height:1.4;margin-top:-3px}
+.dash-period .mini-btn{flex-shrink:0;padding:5px 11px;border-radius:20px;font-size:12px}
+/* ── v3.0 QUICK ENTRY — one tap fills the form from something she has entered before ── */
+.quick-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);font-weight:700;display:flex;align-items:center;gap:5px;margin-bottom:7px;flex-wrap:wrap}
+.quick-lbl .plain{font-weight:400;text-transform:none;letter-spacing:0}
+.quick-strip{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding:2px 0 10px;margin-bottom:8px;border-bottom:1px dashed var(--border)}
+.quick-strip::-webkit-scrollbar{display:none}
+.qk{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:100px;max-width:150px;padding:8px 11px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--bg3);color:var(--text);cursor:pointer;font-family:var(--font);text-align:left}
+.qk:hover{border-color:var(--cyan)}
+.qk-name{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;display:flex;align-items:center;gap:5px}
+.qk-sub{font-size:10.5px;color:var(--text3);white-space:nowrap}
+.qk.t-income .qk-name i{color:var(--success-text)}.qk.t-expense .qk-name i{color:var(--danger-text)}.qk.t-saving .qk-name i{color:var(--save-text)}.qk.t-credit .qk-name i{color:var(--warning-text)}.qk.t-settlement .qk-name i{color:var(--info-text)}
+/* ── v3.0 TRANSACTION DETAIL — tap a row, see every field ── */
+.dt-amt{font-size:26px;font-weight:700;letter-spacing:-.01em;margin:4px 0 6px}
+.dt-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px 14px;margin-top:12px}
+.dt-f{min-width:0}.dt-f.full{grid-column:1/-1}
+.dt-f .lg{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);font-weight:700;margin-bottom:3px;display:block}
+.dt-f .v{font-size:13.5px;color:var(--text);word-break:break-word;line-height:1.45}
 @media(max-width:600px){ .dash-period{padding:0 10px} }
 </style>
 </head>
@@ -694,7 +723,7 @@ tr.row-editing td{background:var(--info-bg) !important}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v2.1</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.0</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -773,24 +802,32 @@ tr.row-editing td{background:var(--info-bg) !important}
   <div class="dash-period">
     <span class="dp-label"><i class="ti ti-calendar-stats"></i> Showing</span>
     <div class="chip-row" id="dashChips"></div>
+    <button class="mini-btn" onclick="openReportFor(dashPeriod)" title="The full report for the same period as these tiles"><i class="ti ti-report-analytics"></i> Report</button>
     <div class="dp-range" id="dashRangeTxt"></div>
   </div>
+  <!-- v3.0 — the diary's own line: Balance = Income − (Savings + Expenses).
+       Savings is money put AWAY (RD, SSY, chit, gold): it leaves the wallet but
+       it is not spent, so it is neither an expense nor part of the balance. -->
   <div class="summary-grid">
     <div class="metric m-income">
       <div class="metric-label"><i class="ti ti-arrow-down-circle"></i> Income</div>
       <div class="metric-value income" id="sumIncome">₹0</div>
+      <div class="metric-sub" id="sumIncomeSub"></div>
     </div>
     <div class="metric m-expense">
-      <div class="metric-label"><i class="ti ti-arrow-up-circle"></i> Expense</div>
+      <div class="metric-label"><i class="ti ti-arrow-up-circle"></i> Expenses</div>
       <div class="metric-value expense" id="sumExpense">₹0</div>
+      <div class="metric-sub" id="sumExpenseSub"></div>
+    </div>
+    <div class="metric m-saving">
+      <div class="metric-label"><i class="ti ti-pig-money"></i> Savings</div>
+      <div class="metric-value saving" id="sumSaving">₹0</div>
+      <div class="metric-sub" id="sumSavingSub"></div>
     </div>
     <div class="metric m-net">
-      <div class="metric-label"><i class="ti ti-scale"></i> Net Balance</div>
+      <div class="metric-label"><i class="ti ti-scale"></i> Balance</div>
       <div class="metric-value positive" id="sumNet">₹0</div>
-    </div>
-    <div class="metric m-count">
-      <div class="metric-label"><i class="ti ti-list-numbers"></i> Entries</div>
-      <div class="metric-value count" id="sumCount">0</div>
+      <div class="metric-sub" id="sumNetSub">Income − Expenses − Savings</div>
     </div>
   </div>
 
@@ -814,6 +851,11 @@ tr.row-editing td{background:var(--info-bg) !important}
       <div class="edit-banner-left"><i class="ti ti-pencil"></i> Editing — make changes then click Update</div>
       <button class="edit-cancel-btn" onclick="cancelEdit()"><i class="ti ti-x"></i> Cancel</button>
     </div>
+    <!-- v3.0 QUICK ENTRY — learned from her own ledger; nothing to set up -->
+    <div id="quickWrap">
+      <div class="quick-lbl"><i class="ti ti-bolt"></i> Quick entry <span class="plain">— tap one, check the amount, save</span></div>
+      <div class="quick-strip" id="quickStrip"></div>
+    </div>
     <div class="form-grid">
       <div class="form-group">
         <label for="fDate">Date</label>
@@ -824,6 +866,7 @@ tr.row-editing td{background:var(--info-bg) !important}
         <div class="type-toggle">
           <button class="type-btn active-income" id="btnIncome" onclick="setType('income')"><i class="ti ti-arrow-down-circle"></i> Income</button>
           <button class="type-btn" id="btnExpense" onclick="setType('expense')"><i class="ti ti-arrow-up-circle"></i> Expense</button>
+          <button class="type-btn" id="btnSaving" onclick="setType('saving')" title="Money put away — RD, SSY, chit, gold. It leaves the wallet but is not spent, so it never counts as an expense"><i class="ti ti-pig-money"></i> Savings</button>
           <button class="type-btn" id="btnCredit" onclick="setType('credit')" title="Taken now, not yet paid for — raises what you owe this party"><i class="ti ti-clock-dollar"></i> Credit (unpaid)</button>
           <button class="type-btn" id="btnSettlement" onclick="setType('settlement')" title="Paying off what you already owe — clears the balance, not a new expense"><i class="ti ti-checkbox"></i> Settlement</button>
         </div>
@@ -831,11 +874,12 @@ tr.row-editing td{background:var(--info-bg) !important}
       </div>
       <div class="form-group full">
         <label for="fDesc">Description</label>
-        <input type="text" id="fDesc" placeholder="e.g. Rent received, Labour charge, EB Bill...">
+        <input type="text" id="fDesc" list="dlDesc" autocomplete="off" placeholder="e.g. Rent received, Labour charge, EB Bill...">
+        <datalist id="dlDesc"></datalist>
       </div>
       <div class="form-group">
         <label for="fParty" id="partyLabel">Received from</label>
-        <input type="text" id="fParty" placeholder="Party name">
+        <input type="text" id="fParty" list="dlParty" autocomplete="off" placeholder="Party name">
       </div>
       <div class="form-group">
         <label for="fAmount">Amount (₹)</label>
@@ -898,6 +942,7 @@ tr.row-editing td{background:var(--info-bg) !important}
         <option value="all">All types</option>
         <option value="income">Income</option>
         <option value="expense">Expense</option>
+        <option value="saving">Savings</option>
         <option value="credit">Credit (unpaid)</option>
         <option value="settlement">Settlement</option>
       </select>
@@ -912,8 +957,9 @@ tr.row-editing td{background:var(--info-bg) !important}
       <span class="fs-label" id="fsLabel"></span>
       <span class="fs-item">Income <b class="amt-income" id="fsIncome">₹0</b></span>
       <span class="fs-item">Expense <b class="amt-expense" id="fsExpense">₹0</b></span>
+      <span class="fs-item" id="fsSavItem" style="display:none">Savings <b class="amt-saving" id="fsSaving">₹0</b></span>
       <span class="fs-item" id="fsSettled" style="display:none">Settled <b class="amt-settlement" id="fsSettledVal">₹0</b></span>
-      <span class="fs-item" id="fsNetItem" title="Net position after payments = Income − Expense + Settled"><span id="fsNetLabel">Net</span> <b id="fsNet">₹0</b></span>
+      <span class="fs-item" id="fsNetItem" title="Net position after payments = Income − Expense − Savings + Settled"><span id="fsNetLabel">Net</span> <b id="fsNet">₹0</b></span>
       <span class="fs-item">Entries <b id="fsCount">0</b></span>
     </div>
     <div style="overflow-x:auto">
@@ -984,7 +1030,7 @@ tr.row-editing td{background:var(--info-bg) !important}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v2.1 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v3.0 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1075,7 +1121,7 @@ tr.row-editing td{background:var(--info-bg) !important}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v2.1</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.0</div>
       </div>
     </div>
 
@@ -1450,6 +1496,21 @@ tr.row-editing td{background:var(--info-bg) !important}
   </div>
 </div>
 
+<!-- ═══ v3.0 TRANSACTION DETAIL — every field of one entry, with Edit / Duplicate / Delete ═══ -->
+<div class="sheet-overlay" id="detailOverlay" onclick="closeDetail()"></div>
+<div class="sheet-modal wide" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+  <div class="sheet-hdr">
+    <span class="sheet-hdr-title" id="detailTitle"><i class="ti ti-receipt"></i> Transaction</span>
+    <button class="drawer-close" onclick="closeDetail()" aria-label="Close"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="sheet-body" id="detailBody"></div>
+  <div class="sheet-foot">
+    <button class="mini-btn danger" onclick="detailDelete()"><i class="ti ti-trash"></i> Delete</button>
+    <button class="mini-btn" onclick="detailDuplicate()" title="Start a new entry with these details"><i class="ti ti-copy"></i> Duplicate</button>
+    <button class="btn-save" onclick="detailEdit()"><i class="ti ti-pencil"></i> Edit</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1485,6 +1546,10 @@ let txType    = 'income';
 const isIncomeT = e => e.type === 'income';
 const isCreditT = e => e.type === 'credit';
 const isSettleT = e => e.type === 'settlement';
+/* v3.0 — Savings: money put AWAY (RD, SSY, chit, gold). It leaves the wallet
+   but it is not spent, so it is neither income, nor expense, nor a settlement.
+   The diary's line is Balance = Income − (Savings + Expenses). */
+const isSavingT = e => e.type === 'saving';
 // Both cash expenses and credit purchases are real spend — the only difference
 // is whether the money has left yet.
 const isExpenseT = e => e.type === 'expense' || e.type === 'credit';
@@ -1495,18 +1560,20 @@ const isExpenseT = e => e.type === 'expense' || e.type === 'credit';
    vanishing from the headline, the filter summary and the CSV while the report
    (which uses this predicate) included it, so the two disagreed. Everything
    that totals spend must use these two. */
-const repIsOut     = e => !isIncomeT(e) && !isSettleT(e);   // cash + credit + anything unrecognised
+const repIsOut     = e => !isIncomeT(e) && !isSettleT(e) && !isSavingT(e);   // cash + credit + anything unrecognised
 const repIsCashOut = e => repIsOut(e) && !isCreditT(e);     // ...that moved money on the day
 const TYPE_META = {
   income:     { label:'Income',          icon:'ti-arrow-down-circle', sign:'+' },
   expense:    { label:'Expense',         icon:'ti-arrow-up-circle',   sign:'−' },
+  saving:     { label:'Savings',         icon:'ti-pig-money',         sign:'−' },
   credit:     { label:'Credit',          icon:'ti-clock-dollar',      sign:'−' },
   settlement: { label:'Settlement',      icon:'ti-checkbox',          sign:'−' }
 };
-const PARTY_LABEL = { income:'Received from', expense:'Paid to', credit:'Owed to', settlement:'Paid to' };
+const PARTY_LABEL = { income:'Received from', expense:'Paid to', saving:'Deposited to', credit:'Owed to', settlement:'Paid to' };
 const TYPE_HINT = {
   income:     '',
   expense:    'Paid on the spot.',
+  saving:     'Put away into an RD, SSY, chit or gold scheme. Counted under Savings — never as an expense.',
   credit:     'Taken now, not paid yet — counts as spend today and raises what you owe this party.',
   settlement: 'Clears what you already owe. Not counted as spend again — the credit entries already did that.'
 };
@@ -1521,7 +1588,8 @@ const TYPE_HINT = {
 function normType(e){
   const t = String(e.type||'').trim().toLowerCase().replace(/s$/,'');
   const canon = { income:'income', expense:'expense', credit:'credit', settlement:'settlement',
-                  unpaid:'credit', due:'credit', settle:'settlement', payment:'settlement' }[t];
+                  unpaid:'credit', due:'credit', settle:'settlement', payment:'settlement',
+                  saving:'saving', deposit:'saving', investment:'saving' }[t];   // "Savings" → s-stripped → saving
   return canon ? { ...e, type:canon } : e;
 }
 
@@ -1861,7 +1929,7 @@ function showToast(msg, type='success'){
 function setType(t){
   if(!TYPE_META[t]) t = 'income';
   txType = t;
-  [['btnIncome','income'],['btnExpense','expense'],['btnCredit','credit'],['btnSettlement','settlement']]
+  [['btnIncome','income'],['btnExpense','expense'],['btnSaving','saving'],['btnCredit','credit'],['btnSettlement','settlement']]
     .forEach(([id,kind]) => {
       document.getElementById(id).className = 'type-btn' + (t===kind ? ' active-'+kind : '');
     });
@@ -1967,6 +2035,7 @@ function startEdit(id){
   document.getElementById('fMode').value   = e.mode||'';
   setType(e.type||'income');
   document.getElementById('editBanner').style.display  = 'flex';
+  document.getElementById('quickWrap').style.display   = 'none';
   document.getElementById('formCard').classList.add('editing');
   document.getElementById('formTitle').innerHTML = '<i class="ti ti-pencil"></i> Edit Transaction';
   document.getElementById('btnSave').classList.add('mode-edit');
@@ -1981,6 +2050,7 @@ function cancelEdit(){
   document.getElementById('fDate').value = today();
   setType('income');
   document.getElementById('editBanner').style.display = 'none';
+  document.getElementById('quickWrap').style.display  = '';
   document.getElementById('formCard').classList.remove('editing');
   document.getElementById('formTitle').innerHTML = '<i class="ti ti-plus"></i> Add Transaction';
   document.getElementById('btnSave').classList.remove('mode-edit');
@@ -2206,18 +2276,31 @@ function paintDashChips(){
 function render(){
   const list=filtered(), body=document.getElementById('txBody'), empty=document.getElementById('emptyState');
   paintDashChips();
+  renderQuick(); fillLedgerLists(); fillDatalists();
   const dashSet=dashRows();
   const income=dashSet.filter(isIncomeT).reduce((s,e)=>s+e.amount,0);
   // Expense = cash expenses + credit purchases (+ any unrecognised type, which
   // is money out too). Settlements are deliberately excluded: they pay off
-  // credit that was already counted here.
+  // credit that was already counted here. Savings are excluded too (v3.0):
+  // money put away is not money spent.
   const expense=dashSet.filter(repIsOut).reduce((s,e)=>s+e.amount,0);
-  const net=income-expense;
+  const credit=dashSet.filter(isCreditT).reduce((s,e)=>s+e.amount,0);
+  const saving=dashSet.filter(isSavingT).reduce((s,e)=>s+e.amount,0);
+  const net=income-expense-saving;          // the diary's line: Balance = Income − (Savings + Expenses)
+  const nInc=dashSet.filter(isIncomeT).length, nExp=dashSet.filter(repIsOut).length, nSav=dashSet.filter(isSavingT).length;
+  const plural=(n,w)=>`${n} ${w}${n===1?'':'s'}`;
   document.getElementById('sumIncome').textContent=fmt(income);
+  document.getElementById('sumIncomeSub').textContent=nInc?plural(nInc,'receipt'):'nothing received yet';
   document.getElementById('sumExpense').textContent=fmt(expense);
+  document.getElementById('sumExpenseSub').textContent=credit?`incl. ${fmt(credit)} on credit`:(nExp?plural(nExp,'entry').replace('entrys','entries'):'nothing spent yet');
+  document.getElementById('sumSaving').textContent=fmt(saving);
+  document.getElementById('sumSavingSub').textContent=nSav?plural(nSav,'deposit'):'nothing put away yet';
   const netEl=document.getElementById('sumNet');
-  netEl.textContent=fmt(net); netEl.className='metric-value '+(net>=0?'positive':'negative');
-  document.getElementById('sumCount').textContent=dashSet.length;
+  netEl.textContent=fmtS(net); netEl.className='metric-value '+(net>=0?'positive':'negative');
+  // "Kept" = saved + left over, as a share of income — the standard savings rate.
+  document.getElementById('sumNetSub').textContent=income>0
+    ? `kept ${Math.max(-999,Math.round((income-expense)/income*100))}% of income · ${fmt(saving)} put away`
+    : 'Income − Expenses − Savings';
   document.getElementById('countBadge').textContent=list.length;
   // summary of the filtered rows — shown whenever a search term or type filter is active
   const fq=document.getElementById('filterSearch').value.trim(), fType=document.getElementById('filterType').value;
@@ -2225,14 +2308,17 @@ function render(){
   if(fq||fType!=='all'){
     const fInc=list.filter(isIncomeT).reduce((s,e)=>s+e.amount,0);
     const fExp=list.filter(repIsOut).reduce((s,e)=>s+e.amount,0);
+    const fSav=list.filter(isSavingT).reduce((s,e)=>s+e.amount,0);
     const fSet=list.filter(isSettleT).reduce((s,e)=>s+e.amount,0);
     // Net here = what's still owed after payments: income − expense + money already settled.
     // Settlements pay down credit that's already inside fExp, so adding them back gives the
     // live outstanding position (e.g. milk: 0 − 935 + 825 = −110). It only equals fExp when
     // nothing has been settled, so the figure stops merely echoing Expense.
-    const fNet=fInc-fExp+fSet;
+    const fNet=fInc-fExp-fSav+fSet;
     const parts=[]; if(fq) parts.push(`&ldquo;${esc(fq)}&rdquo;`);
-    if(fType!=='all') parts.push({income:'Income only',expense:'Expense only',credit:'Credit only',settlement:'Settlements only'}[fType]||fType);
+    if(fType!=='all') parts.push({income:'Income only',expense:'Expense only',saving:'Savings only',credit:'Credit only',settlement:'Settlements only'}[fType]||fType);
+    document.getElementById('fsSavItem').style.display = fSav ? '' : 'none';
+    document.getElementById('fsSaving').textContent='−'+fmt(fSav);
     // Settled money is shown apart from spend so the two can never read as one total.
     document.getElementById('fsSettled').style.display = fSet ? '' : 'none';
     document.getElementById('fsSettledVal').textContent = fmt(fSet);
@@ -2262,7 +2348,7 @@ function render(){
     // table is already eight columns wide on a phone.
     const who=[e.paidBy,e.mode].filter(Boolean).join(' · ');
     return `
-    <tr class="${editingId===e.id?'row-editing':''}">
+    <tr class="tx-row ${editingId===e.id?'row-editing':''}" onclick="openDetail('${e.id}')" title="Tap for details">
       <td style="color:var(--text2)">${i+1}</td>
       <td class="dt-cell" style="color:var(--text2);font-size:12px"><div>${dt.date}</div>${dt.sub?`<div class="dt-sub">${dt.sub}</div>`:''}</td>
       <td><span class="pill ${e.type}">${(m=>`<i class="ti ${m.icon}"></i> ${m.label}`)(TYPE_META[e.type]||TYPE_META.expense)}</span></td>
@@ -2270,7 +2356,7 @@ function render(){
       <td class="dt-cell" title="${e.party}" style="color:var(--text2)">${e.party}${who?`<div class="dt-sub">${esc(who)}</div>`:''}</td>
       <td style="text-align:right" class="amt-${e.type}">${(TYPE_META[e.type]||TYPE_META.expense).sign}${fmt(e.amount)}</td>
       <td style="color:var(--text2);font-size:12px;font-style:italic" title="${e.note||''}">${e.note||'—'}</td>
-      <td><div class="action-cell">
+      <td><div class="action-cell" onclick="event.stopPropagation()">
         <button class="action-btn edit" onclick="startEdit('${e.id}')" title="Edit"><i class="ti ti-pencil"></i></button>
         <button class="action-btn del"  onclick="deleteEntry('${e.id}')" title="Delete"><i class="ti ti-trash"></i></button>
       </div></td>
@@ -2285,11 +2371,167 @@ function exportCSV(){
   sorted.forEach((e,i)=>rows.push([i+1,fmtDTLine(e),e.type,e.description,e.party,e.amount,e.paidBy||'',e.mode||'',e.note||'']));
   const income=entries.filter(isIncomeT).reduce((s,e)=>s+e.amount,0);
   const expense=entries.filter(repIsOut).reduce((s,e)=>s+e.amount,0);
-  rows.push([],[' ',' ',' ',' ','Total Income',income,''],[' ',' ',' ',' ','Total Expense',expense,''],[' ',' ',' ',' ','Net Balance',income-expense,'']);
+  const saving=entries.filter(isSavingT).reduce((s,e)=>s+e.amount,0);
+  rows.push([],[' ',' ',' ',' ','Total Income',income,''],[' ',' ',' ',' ','Total Expenses',expense,''],[' ',' ',' ',' ','Total Savings',saving,''],[' ',' ',' ',' ','Balance (Income − Expenses − Savings)',income-expense-saving,'']);
   const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'\"')}"` ).join(',')).join('\n');
   const a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
   a.download='personal_transactions.csv'; a.click();
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   v3.0 — QUICK ENTRY, AUTOCOMPLETE, TRANSACTION DETAIL, REPORT SHORTCUT
+   ──────────────────────────────────────────────────────────────────────────
+   Her diary's expense page is the same dozen lines month after month — fish,
+   milk, provisions, flowers, auto, the maid's salary, a recharge — and the
+   savings page is the same SSY / RD lines on the same dates. Typing them out
+   in full every time is the reason a ledger app gets abandoned. So:
+
+     • QUICK ENTRY — a strip of one-tap presets learned from her own entries
+       (most used in the last four months first). A tap fills type, description,
+       party, mode, who-paid and the LAST amount, then puts the cursor on the
+       amount. Nothing to set up, nothing stored: it is derived every render.
+     • AUTOCOMPLETE — description and party fields suggest what she has typed
+       before, so "Provisions" and "provision" stop becoming two categories.
+     • DETAIL — tapping a row opens every field of that entry, with Edit,
+       Duplicate and Delete. The row's two tiny icons stay for the mouse.
+     • REPORT — the dashboard's period chips gain a Report button that opens
+       the full report for the same window, like for like.
+   Nothing here runs at module-eval time (see the TDZ note on the v2.0 block).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+// A fresh install has nothing to learn from yet — the diary's own regulars,
+// used only until her real entries outnumber them.
+const QUICK_SEED = [
+  { type:'expense', description:'Milk',            party:'Milkman' },
+  { type:'expense', description:'Provisions',      party:'Provision store' },
+  { type:'expense', description:'Vegetables',      party:'Market' },
+  { type:'expense', description:'Fish',            party:'Market' },
+  { type:'expense', description:'Flowers',         party:'Flower shop' },
+  { type:'expense', description:'Fruits',          party:'Fruit shop' },
+  { type:'expense', description:'Auto',            party:'Auto' },
+  { type:'expense', description:'Maid salary',     party:'Maid' },
+  { type:'expense', description:'Mobile recharge', party:'Telecom' },
+  { type:'saving',  description:'SSY deposit',     party:'Bank' },
+  { type:'saving',  description:'RD instalment',   party:'Bank' },
+  { type:'income',  description:'Salary',          party:'Employer' }
+];
+const QUICK_MAX = 12;
+let QUICK = [];
+function _qkKey(e){ return (e.type||'expense') + '|' + String(e.description||'').trim().toLowerCase(); }
+function _qkCutoff(days){ const d = new Date(); d.setDate(d.getDate() - days); return d.toISOString().slice(0,10); }
+
+function quickPresets(){
+  const cutoff = _qkCutoff(120), m = new Map();
+  entries.forEach(e => {
+    if(!e.description || !String(e.description).trim()) return;
+    const k = _qkKey(e);
+    const r = m.get(k) || { type:e.type||'expense', description:String(e.description).trim(), n:0, recent:0, last:'', party:'', amount:0, mode:'', paidBy:'' };
+    r.n++; if((e.date||'') >= cutoff) r.recent++;
+    if((e.date||'') >= r.last){ r.last = e.date||''; r.party = e.party||''; r.amount = Number(e.amount)||0; r.mode = e.mode||''; r.paidBy = e.paidBy||''; }
+    m.set(k, r);
+  });
+  // Most used lately first, then most used ever, then most recent.
+  const list = [...m.values()].sort((a,b) => b.recent-a.recent || b.n-a.n || b.last.localeCompare(a.last)).slice(0, QUICK_MAX);
+  if(list.length < 6){
+    QUICK_SEED.forEach(s => { if(list.length < QUICK_MAX && !m.has(_qkKey(s))) list.push({ ...s, n:0, recent:0, last:'', amount:0, mode:'', paidBy:'' }); });
+  }
+  return list;
+}
+function renderQuick(){
+  const box = document.getElementById('quickStrip'); if(!box) return;
+  QUICK = quickPresets();
+  box.innerHTML = QUICK.map((q,i) => {
+    const meta = TYPE_META[q.type] || TYPE_META.expense;
+    const sub  = q.amount ? fmt(q.amount) + (q.n > 1 ? ` · ${q.n}×` : '') : meta.label;
+    return `<button type="button" class="qk t-${esc(q.type)}" onclick="quickFill(${i})" title="${esc(meta.label)}${q.party ? ' · ' + esc(q.party) : ''}${q.last ? ' · last ' + esc(fmtDate(q.last)) : ''}">
+      <span class="qk-name"><i class="ti ${meta.icon}"></i>${esc(q.description)}</span>
+      <span class="qk-sub">${esc(sub)}</span></button>`;
+  }).join('');
+}
+function quickFill(i){
+  const q = QUICK[i]; if(!q) return;
+  if(editingId) cancelEdit();
+  setType(TYPE_META[q.type] ? q.type : 'expense');
+  document.getElementById('fDate').value   = today();
+  document.getElementById('fDesc').value   = q.description || '';
+  document.getElementById('fParty').value  = q.party || '';
+  document.getElementById('fAmount').value = q.amount || '';
+  document.getElementById('fMode').value   = q.mode || '';
+  document.getElementById('fPaidBy').value = q.paidBy || localStorage.getItem(LS.lastPaidBy) || '';
+  document.getElementById('fNote').value   = '';
+  const a = document.getElementById('fAmount');
+  a.focus(); if(a.value) a.select();
+}
+
+// Description suggestions from her own history, newest first, one per distinct
+// value. (Party / paid-by / category lists are filled by the shared module.)
+function fillLedgerLists(){
+  const uniq = (pick, cap) => {
+    const seen = new Set(), out = [];
+    [...entries].sort((a,b) => (b.date||'').localeCompare(a.date||'')).forEach(e => {
+      const v = String(pick(e)||'').trim(); const k = v.toLowerCase();
+      if(!v || seen.has(k)) return; seen.add(k); out.push(v);
+    });
+    return out.slice(0, cap);
+  };
+  const dd = document.getElementById('dlDesc');
+  if(dd) dd.innerHTML = uniq(e => e.description, 80).map(v => `<option value="${esc(v)}">`).join('');
+}
+
+// ── transaction detail ────────────────────────────────────────────────────
+let detailId = null;
+function openDetail(id){
+  const e = entries.find(x => x.id === id); if(!e) return;
+  detailId = id;
+  const meta = TYPE_META[e.type] || TYPE_META.expense;
+  const plan = (typeof plans !== 'undefined' && Array.isArray(plans)) ? plans.find(p => p.txId === id) : null;
+  const f = (lbl, val, full) => val ? `<div class="dt-f${full ? ' full' : ''}"><span class="lg">${lbl}</span><div class="v">${val}</div></div>` : '';
+  document.getElementById('detailTitle').innerHTML = `<i class="ti ${meta.icon}"></i> ${meta.label}`;
+  document.getElementById('detailBody').innerHTML = `
+    <div class="fld-set">
+      <span class="lg">${esc(PARTY_LABEL[e.type] || 'Paid to')} · ${esc(e.party || '—')}</span>
+      <div style="font-size:15px;font-weight:600;color:var(--text)">${esc(e.description || '')}</div>
+      <div class="dt-amt amt-${esc(e.type)}">${meta.sign}${fmt(e.amount)}</div>
+      <div class="fld-hint">${esc(fmtDTLine(e))}</div>
+    </div>
+    <div class="dt-grid">
+      ${f('Type', `<span class="pill ${esc(e.type)}"><i class="ti ${meta.icon}"></i> ${meta.label}</span>`)}
+      ${f('Date', esc(fmtDate(e.date)))}
+      ${f('Paid by / received by', esc(e.paidBy || ''))}
+      ${f('Payment mode', esc(e.mode || ''))}
+      ${f('Note', esc(e.note || ''), true)}
+      ${plan ? f('Linked plan line', `${esc(plan.item || '')} · ${esc(monthLabel(plan.month))} · ${esc(plan.status || '')}`, true) : ''}
+      ${f('Reference', `<span style="font-family:monospace;font-size:11.5px;color:var(--text3)">${esc(e.id)}</span>`, true)}
+    </div>
+    ${TYPE_HINT[e.type] ? `<div class="fld-hint" style="margin-top:12px">${esc(TYPE_HINT[e.type])}</div>` : ''}`;
+  openSheet('detail');
+}
+function closeDetail(){ closeSheet('detail'); detailId = null; }
+function detailEdit(){ const id = detailId; closeDetail(); if(id) startEdit(id); }
+function detailDelete(){ const id = detailId; closeDetail(); if(id) deleteEntry(id); }
+function detailDuplicate(){
+  const e = entries.find(x => x.id === detailId); closeDetail(); if(!e) return;
+  if(editingId) cancelEdit();
+  setType(TYPE_META[e.type] ? e.type : 'expense');
+  document.getElementById('fDate').value   = today();
+  document.getElementById('fDesc').value   = e.description || '';
+  document.getElementById('fParty').value  = e.party || '';
+  document.getElementById('fAmount').value = e.amount || '';
+  document.getElementById('fMode').value   = e.mode || '';
+  document.getElementById('fPaidBy').value = e.paidBy || '';
+  document.getElementById('fNote').value   = '';
+  document.getElementById('formCard').scrollIntoView({ behavior:'smooth', block:'start' });
+  const a = document.getElementById('fAmount'); a.focus(); a.select();
+  showToast('Copied — check the amount, then save');
+}
+
+// The dashboard's chips and the report share one set of presets, so the
+// report can open on exactly the window the tiles are answering for.
+function openReportFor(k){
+  if(PERIOD_PRESETS.some(p => p.k === k)) repPreset = k;
+  openReport();
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -2856,7 +3098,7 @@ async function savePay(){
       // about the plan either, and one tap of Cancel undoes the whole thing.
       const res = await gasCall({
         action:'add', date,
-        type: isIn ? 'income' : 'expense',
+        type: isIn ? 'income' : ledgerTypeFor(p),
         description: p.item,
         party: p.party || (isIn ? 'Received' : 'Paid'),
         amount: amt,
@@ -2874,6 +3116,15 @@ async function savePay(){
     if(ok){ closePay(); showToast(isIn ? 'Recorded as received' : 'Recorded as paid'); }
   }catch(e){ if(!AUTH_LOST) showToast('Could not reach Google Drive', 'error'); }
   finally{ gateBusy('paySaveBtn', false, '', '<i class="ti ti-check"></i> Record it'); }
+}
+
+/* v3.0 — a Savings/RD or Gold/Chit instalment is money put AWAY, not spent.
+   An app whose ledger knows the 'saving' type gets it; one that does not keeps
+   writing 'expense' — so this block still reads the same in all three trackers. */
+function ledgerTypeFor(p){
+  const c = p.commitmentId ? commitments.find(x=>x.id===p.commitmentId) : null;
+  const asset = !!(c && KINDS[c.kind] && KINDS[c.kind].asset);
+  return (asset && typeof TYPE_META !== 'undefined' && TYPE_META.saving) ? 'saving' : 'expense';
 }
 
 /* The instalment stamp that goes into the ledger note — so the Sheet row on
@@ -3159,7 +3410,7 @@ function fillDatalists(){
    ══════════════════════════════════════════════════════════════════════════ */
 const _MONFULL=['January','February','March','April','May','June','July','August','September','October','November','December'];
 let lastReport=null, repTab='overview', repPreset='thisMonth';
-let repTypes={income:true,expense:true,credit:true,settlement:true};
+let repTypes={income:true,expense:true,saving:true,credit:true,settlement:true};   // v3.0: saving joins the filter
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 // ── date helpers (all dates are ISO yyyy-mm-dd strings; comparisons are string-safe) ──
@@ -3292,7 +3543,7 @@ function paintPresetChips(){
 }
 function setPreset(k){ repPreset=k; paintPresetChips(); }
 function paintTypeChips(){
-  const meta=[['income','Income'],['expense','Expense (paid)'],['credit','Credit (unpaid)'],['settlement','Settlements']];
+  const meta=[['income','Income'],['expense','Expense (paid)'],['saving','Savings'],['credit','Credit (unpaid)'],['settlement','Settlements']];
   document.getElementById('rTypeChips').innerHTML=meta.map(([k,l])=>
     `<button class="chip${repTypes[k]?' on-'+k:''}" onclick="repToggleType('${k}')"><i class="ti ${TYPE_META[k].icon}"></i> ${l}</button>`).join('');
 }
@@ -3305,19 +3556,20 @@ function repToggleType(k){
 // One-tap views. "Money out" is the cash view (paid + settled); "Everything" is
 // every type; "Unpaid credit" isolates what has been taken but not yet paid for.
 function repQuickView(v){
-  repTypes = v==='in'  ? {income:true,expense:false,credit:false,settlement:false}
-           : v==='out' ? {income:false,expense:true,credit:true,settlement:true}
-           : v==='due' ? {income:false,expense:false,credit:true,settlement:true}
-           :             {income:true,expense:true,credit:true,settlement:true};
+  // "Money out" is the cash view, and a deposit leaves the wallet too — so saving rides with it.
+  repTypes = v==='in'  ? {income:true,expense:false,saving:false,credit:false,settlement:false}
+           : v==='out' ? {income:false,expense:true,saving:true,credit:true,settlement:true}
+           : v==='due' ? {income:false,expense:false,saving:false,credit:true,settlement:true}
+           :             {income:true,expense:true,saving:true,credit:true,settlement:true};
   paintTypeChips(); paintQuickChips();
   if(repShowing()) generateReport();
 }
 function paintQuickChips(){
   const on=k=>repTypes[k];
-  const set={ all:on('income')&&on('expense')&&on('credit')&&on('settlement'),
-              in:on('income')&&!on('expense')&&!on('credit')&&!on('settlement'),
-              out:!on('income')&&on('expense')&&on('credit')&&on('settlement'),
-              due:!on('income')&&!on('expense')&&on('credit')&&on('settlement') };
+  const set={ all:on('income')&&on('expense')&&on('saving')&&on('credit')&&on('settlement'),
+              in:on('income')&&!on('expense')&&!on('saving')&&!on('credit')&&!on('settlement'),
+              out:!on('income')&&on('expense')&&on('saving')&&on('credit')&&on('settlement'),
+              due:!on('income')&&!on('expense')&&!on('saving')&&on('credit')&&on('settlement') };
   [['rQuickAll','all'],['rQuickIn','in'],['rQuickOut','out'],['rQuickDue','due']]
     .forEach(([id,k])=>{ const el=document.getElementById(id); if(el) el.className='chip'+(set[k]?' on':''); });
 }
@@ -3417,15 +3669,17 @@ function analyse(rows,p){
   const cashExp=rows.filter(repIsCashOut);
   const credits=rows.filter(isCreditT);
   const settles=rows.filter(isSettleT);
+  const savings=rows.filter(isSavingT);                        // v3.0 — put away, not spent
   const expenses=rows.filter(repIsOut);                        // accrual spend
   const sum=a=>a.reduce((s,e)=>s+(Number(e.amount)||0),0);
-  const tInc=sum(incomes), tCash=sum(cashExp), tCredit=sum(credits), tSet=sum(settles);
+  const tInc=sum(incomes), tCash=sum(cashExp), tCredit=sum(credits), tSet=sum(settles), tSav=sum(savings);
   const tExp=tCash+tCredit;              // accrual expenditure
-  const cashOut=tCash+tSet;              // money that actually left
+  const cashOut=tCash+tSet+tSav;         // money that actually left (deposits leave the wallet too)
   const days=Math.max(1,_daysBetween(p.from,p.to)+1);
   return {
-    p, rows, incomes, expenses, cashExp, credits, settles,
-    tInc, tExp, tCash, tCredit, tSet, cashOut,
+    p, rows, incomes, expenses, cashExp, credits, settles, savings,
+    tInc, tExp, tCash, tCredit, tSet, tSav, cashOut,
+    balance:tInc-tExp-tSav,               // the diary's line: Income − (Savings + Expenses)
     net:tInc-tExp, cashNet:tInc-cashOut, days,
     savingsRate:_pct(tInc-tExp,tInc), expRatio:_pct(tExp,tInc),
     avgDayIn:tInc/days, avgDayOut:tExp/days,
@@ -3680,9 +3934,11 @@ function paneOverview(A,C){
   r.push(`<div class="kpi-grid">`
     +kpi('good','<i class="ti ti-arrow-down-circle"></i> Money In',fmt(A.tInc),'k-good',`${A.incomes.length} entr${A.incomes.length===1?'y':'ies'}`)
     +kpi('bad','<i class="ti ti-arrow-up-circle"></i> Expenditure (accrual)',fmt(A.tExp),'k-bad',`paid ${fmt(A.tCash)} + credit ${fmt(A.tCredit)}`)
-    +kpi(A.net>=0?'neutral':'bad','<i class="ti ti-scale"></i> Net Savings',fmt(A.net),A.net>=0?'k-cy':'k-bad','income − accrual expenditure')
+    +kpi('save','<i class="ti ti-pig-money"></i> Put into Savings',fmt(A.tSav),'k-save',`${A.savings.length} deposit${A.savings.length===1?'':'s'} · RD, SSY, chit, gold`)
+    +kpi(A.balance>=0?'neutral':'bad','<i class="ti ti-wallet"></i> Balance (left to spend)',fmtS(A.balance),A.balance>=0?'k-cy':'k-bad','income − expenses − savings')
+    +kpi(A.net>=0?'neutral':'bad','<i class="ti ti-scale"></i> Net Savings',fmtS(A.net),A.net>=0?'k-cy':'k-bad','income − expenditure: put away + left over')
     +kpi(A.savingsRate>=20?'good':A.savingsRate>=0?'warn':'bad','<i class="ti ti-percentage"></i> Savings Rate',A.tInc?fmtPct(A.savingsRate):'—',A.savingsRate>=20?'k-good':A.savingsRate>=0?'k-warn':'k-bad','share of income kept')
-    +kpi('warn','<i class="ti ti-wallet"></i> Cash Outflow',fmt(A.cashOut),'k-warn',`paid ${fmt(A.tCash)} + settled ${fmt(A.tSet)}`)
+    +kpi('warn','<i class="ti ti-cash-banknote-off"></i> Cash Outflow',fmt(A.cashOut),'k-warn',`paid ${fmt(A.tCash)} + settled ${fmt(A.tSet)} + saved ${fmt(A.tSav)}`)
     +kpi(A.cashNet>=0?'good':'bad','<i class="ti ti-cash"></i> Net Cash Flow',fmt(A.cashNet),A.cashNet>=0?'k-good':'k-bad','what the wallet actually saw')
     +kpi('neutral','<i class="ti ti-divide"></i> Expense-to-Income',A.tInc?fmtPct(A.expRatio):'—','k-cy',A.expRatio<=100?'living within income':'spending above income')
     +kpi('neutral','<i class="ti ti-calendar-dollar"></i> Avg / Day',fmt(A.avgDayOut),'k-bad',`over ${A.days} day${A.days===1?'':'s'} · in ${fmt(A.avgDayIn)}`)
@@ -3696,6 +3952,7 @@ function paneOverview(A,C){
   if(C){
     const rowsC=[
       ['Money in',A.tInc,C.tInc],['Expenditure (accrual)',A.tExp,C.tExp],
+      ['Put into savings',A.tSav,C.tSav],['Balance (left to spend)',A.balance,C.balance],
       ['— paid on the spot',A.tCash,C.tCash],['— taken on credit',A.tCredit,C.tCredit],
       ['Settlements paid',A.tSet,C.tSet],['Cash outflow',A.cashOut,C.cashOut],
       ['Net savings',A.net,C.net],['Entries',A.rows.length,C.rows.length]
@@ -3703,7 +3960,7 @@ function paneOverview(A,C){
     r.push(`<div class="rep-section-title" style="color:var(--cyan)"><i class="ti ti-arrows-left-right"></i> Compared with ${esc(C.p.label)}</div>`
       +`<div class="rep-scroll"><table class="rep-table"><thead><tr><th>Measure</th><th class="num">${esc(A.p.label)}</th><th class="num">${esc(C.p.label)}</th><th class="num">Change</th><th class="num">%</th></tr></thead><tbody>`
       +rowsC.map(([l,a,b])=>{ const isCount=l==='Entries';
-        return `<tr><td>${l}</td><td class="num">${isCount?a:fmt(a)}</td><td class="num">${isCount?b:fmt(b)}</td>`
+        return `<tr><td>${l}</td><td class="num">${isCount?a:fmtS(a)}</td><td class="num">${isCount?b:fmtS(b)}</td>`
           +`<td class="num">${isCount?(a-b>=0?'+':'−')+Math.abs(a-b):(a-b>=0?'+':'−')+fmt(Math.abs(a-b))}</td><td class="num">${delta(a,b)}</td></tr>`; }).join('')
       +`</tbody></table></div>`
       +`<div class="rep-note">Like-for-like: the previous window is the same number of days (${C.days}) ending the day before this one starts. On “Expenditure”, ▲ means you spent more.</div>`);
@@ -4215,9 +4472,24 @@ function savingsAnalysis(p){
   };
 }
 
+/* v3.0 — the deposits she typed straight into the ledger, grouped by what
+   they were. Shown above the schemes so the two views of "put away" sit
+   together; a plan line ticked off writes here too, so it is one total. */
+function ledgerSavingsBlock(A){
+  if(!A.savings.length) return '';
+  const m=new Map();
+  A.savings.forEach(e=>{ const k=String(e.description||'').trim().toLowerCase()||'(untitled)';
+    const r=m.get(k)||{name:String(e.description||'').trim()||'(untitled)',total:0,n:0,last:''};
+    r.total+=Number(e.amount)||0; r.n++; if((e.date||'')>r.last) r.last=e.date||''; m.set(k,r); });
+  const rows=[...m.values()].sort((a,b)=>b.total-a.total);
+  return `<div class="rep-section-title" style="color:var(--save-text)"><i class="ti ti-pig-money"></i> Deposits recorded in the ledger — ${fmt(A.tSav)}</div>
+  <div class="rep-scroll"><table class="rep-table" style="min-width:420px"><thead><tr><th>What</th><th class="num">Deposits</th><th class="num">Total</th><th>Last</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr><td>${esc(r.name)}</td><td class="num">${r.n}</td><td class="num k-save" style="font-weight:700">${fmt(r.total)}</td><td style="color:var(--text3)">${fmtDate(r.last)}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
 function paneSavings(A){
   const S = savingsAnalysis(A.p);
-  if(!S.rows.length) return `<div class="rep-empty"><i class="ti ti-pig-money"></i>
+  if(!S.rows.length) return ledgerSavingsBlock(A) + `<div class="rep-empty"><i class="ti ti-pig-money"></i>
     <b style="color:var(--text)">No savings or schemes recorded.</b><br>
     <span style="color:var(--text3);line-height:1.7">Add them in the <b>Commitments</b> section — a recurring deposit, a gold scheme, a chit.<br>
     Each one then keeps its own instalment count, its running total and its finishing date.</span></div>`;
@@ -4255,7 +4527,7 @@ function paneSavings(A){
   </table></div>`);
 
   r.push(`<div class="rep-note"><b>Paid in total</b> includes whatever was already paid before this app was set up — the opening figure recorded on each scheme — plus every instalment ticked off here since.</div>`);
-  return r.join('');
+  return ledgerSavingsBlock(A) + r.join('');
 }
 
 /* ── LOANS & LIABILITIES ────────────────────────────────────────────────── */
@@ -4597,6 +4869,8 @@ function printReport(){
     <div class="cards">
       ${card('Money In',M(A.tInc),GRN)}
       ${card('Expenditure (accrual)',M(A.tExp),RED)}
+      ${card('Put into Savings',M(A.tSav),'#5b21b6')}
+      ${card('Balance (left to spend)',M(A.balance),A.balance>=0?CY:RED)}
       ${card('Net Savings',M(A.net),A.net>=0?CY:RED)}
       ${card('Savings Rate',A.tInc?P(A.savingsRate):'—',A.savingsRate>=20?GRN:A.savingsRate>=0?AMB:RED)}
       ${card('Cash Outflow',M(A.cashOut),AMB)}
@@ -4634,7 +4908,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v2.1</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.0</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -4690,7 +4964,9 @@ function downloadReportCSV(){
     ['  of which paid on the spot', A.tCash],
     ['  of which taken on credit', A.tCredit],
     ['Settlements paid (clearing earlier credit)', A.tSet],
-    ['Cash outflow (paid + settled)', A.cashOut],
+    ['Put into savings (RD, SSY, chit, gold)', A.tSav],
+    ['Balance - left to spend (income - expenses - savings)', A.balance],
+    ['Cash outflow (paid + settled + saved)', A.cashOut],
     ['Net savings (income - accrual expenditure)', A.net],
     ['Net cash flow (income - cash outflow)', A.cashNet],
     ['Savings rate %', A.savingsRate.toFixed(2)],
