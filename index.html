@@ -729,7 +729,17 @@ tbody tr.tx-row{cursor:pointer}
   .hero-name{font-size:calc(20px*var(--ts))}.hero-sub{font-size:calc(14px*var(--ts))}.hero-clock{font-size:calc(14px*var(--ts))}
   .dash-period .dp-label{font-size:calc(12px*var(--ts))}.dp-range{font-size:calc(12.5px*var(--ts))}.dash-period .mini-btn{font-size:calc(13.5px*var(--ts))}
   .chip{font-size:calc(14px*var(--ts));padding:7px 13px}
-  .metric-label{font-size:calc(13px*var(--ts))}.metric-value{font-size:min(calc(24px*var(--ts)),5.8vw)}.metric-sub{font-size:calc(12.5px*var(--ts))}
+  .metric-label{font-size:calc(13px*var(--ts))}.metric-value{font-size:min(calc(24px*var(--ts)),5.8vw)}
+  .vn-btn{font-size:min(calc(12.5px*var(--ts)),3.6vw)}
+  /* v3.6 — accessibility sizes (Huge / Maximum): one tile per row so the
+     amount itself can grow, one type button per row so labels never wrap. */
+  html[data-ts="huge"] .summary-grid,html[data-ts="max"] .summary-grid{grid-template-columns:1fr}
+  html[data-ts="huge"] .metric-value,html[data-ts="max"] .metric-value{font-size:min(calc(24px*var(--ts)),11vw)}
+  html[data-ts="huge"] .metric-sub,html[data-ts="max"] .metric-sub{white-space:normal}
+  html[data-ts="huge"] .type-toggle,html[data-ts="max"] .type-toggle{grid-template-columns:1fr}
+  html[data-ts="huge"] .type-toggle .type-btn:last-child:nth-child(odd),html[data-ts="max"] .type-toggle .type-btn:last-child:nth-child(odd){grid-column:auto}
+  html[data-ts="huge"] .btn-row,html[data-ts="max"] .btn-row{flex-wrap:wrap}
+  html[data-ts="huge"] .qk,html[data-ts="max"] .qk{max-width:none}.metric-sub{font-size:calc(12.5px*var(--ts))}
   .status-txt{font-size:calc(14px*var(--ts))}.s-btn{font-size:calc(13px*var(--ts))}
   .section-title{font-size:calc(16px*var(--ts))}.count-badge{font-size:calc(12px*var(--ts))}
   .quick-lbl{font-size:calc(12px*var(--ts))}.qk{min-width:116px;max-width:170px}.qk-name{font-size:calc(15px*var(--ts))}.qk-sub{font-size:calc(12.5px*var(--ts))}
@@ -746,7 +756,6 @@ tbody tr.tx-row{cursor:pointer}
   .rep-note{font-size:calc(13px*var(--ts))}.rep-legend{font-size:calc(12.5px*var(--ts))}.rc-legend{font-size:calc(12px*var(--ts))}.tag{font-size:calc(12px*var(--ts))}.ins{font-size:calc(14px*var(--ts))}.cmp-row{font-size:calc(13.5px*var(--ts))}
   .rc-grid .form-group label{font-size:calc(13px*var(--ts))}.rc-grid input,.rc-grid select{font-size:calc(15px*var(--ts))}.rep-empty{font-size:calc(14px*var(--ts))}.rep-diag{font-size:calc(14px*var(--ts))}.rep-diag .fixbtn{font-size:calc(13px*var(--ts))}
   .gate-title{font-size:calc(18px*var(--ts))}.gate-h{font-size:calc(16px*var(--ts))}.gate-sub{font-size:calc(13px*var(--ts))}.gate-p,.gate-msg{font-size:calc(14px*var(--ts))}.gate-help{font-size:calc(13px*var(--ts))}.gate-link{font-size:calc(13.5px*var(--ts))}
-  .vn-btn{font-size:calc(12.5px*var(--ts))}
   .pane-h{font-size:calc(15px*var(--ts))}.pane-sub{font-size:calc(13px*var(--ts))}.mini-btn{font-size:calc(13.5px*var(--ts))}.needs-backend{font-size:calc(14px*var(--ts))}.offline-note{font-size:calc(13.5px*var(--ts))}
   .month-bar select{font-size:calc(15px*var(--ts))}.month-bar .mb-label small{font-size:calc(12px*var(--ts))}
   .plan-group-h{font-size:calc(12.5px*var(--ts))}.plan-group-h span:last-child{font-size:calc(13px*var(--ts))}
@@ -768,7 +777,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.5</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.6</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1083,7 +1092,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v3.5 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v3.6 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1107,6 +1116,8 @@ tbody tr.tx-row{cursor:pointer}
       <button class="chip" data-k="default" onclick="setTextSize('default')">Default</button>
       <button class="chip" data-k="large" onclick="setTextSize('large')">Large</button>
       <button class="chip" data-k="xl" onclick="setTextSize('xl')">Extra large</button>
+      <button class="chip" data-k="huge" onclick="setTextSize('huge')">Huge</button>
+      <button class="chip" data-k="max" onclick="setTextSize('max')">Maximum</button>
     </div>
   </div>
   <button class="drawer-item" onclick="toggleTheme();closeDrawer()"><i class="ti ti-sun"></i> Toggle Dark / Light Mode</button>
@@ -1122,7 +1133,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.5 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.6 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1187,7 +1198,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.5</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.6</div>
       </div>
     </div>
 
@@ -1705,11 +1716,14 @@ let deferredPrompt = null;
 // ── THEME ──
 /* v3.5 — Text size. Three steps, like every mainstream app's setting; kept
    per device. Large (18px body) is the phone default. */
-const TEXT_SIZES = { default:1, large:1.125, xl:1.25 };
-const TEXT_SIZE_LABEL = { default:'Default', large:'Large', xl:'Extra large' };
+/* v3.6 — Huge / Maximum are accessibility sizes (Android's own scale reaches
+   1.75–2×); at those two the layout goes single-column, see the CSS. */
+const TEXT_SIZES = { default:1, large:1.125, xl:1.25, huge:1.5, max:1.75 };
+const TEXT_SIZE_LABEL = { default:'Default', large:'Large', xl:'Extra large', huge:'Huge', max:'Maximum' };
 function applyTextSize(k){
   if(!TEXT_SIZES[k]) k = 'large';
   document.documentElement.style.setProperty('--ts', TEXT_SIZES[k]);
+  document.documentElement.dataset.ts = k;
   document.querySelectorAll('#tsChips .chip').forEach(b => b.classList.toggle('on', b.dataset.k === k));
   return k;
 }
@@ -5042,7 +5056,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.5</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.6</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
