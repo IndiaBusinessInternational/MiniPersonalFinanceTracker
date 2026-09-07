@@ -723,7 +723,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.0</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.1</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -907,6 +907,14 @@ tbody tr.tx-row{cursor:pointer}
           <option value="Other">Other</option>
         </select>
       </div>
+      <!-- v3.1 — one Category per entry, as every money app keeps. It is
+           GUESSED from the description (her last choice for the same thing,
+           else the report's rules) so it is rarely typed; she can overrule it. -->
+      <div class="form-group">
+        <label for="fCat">Category <span style="color:var(--text3);font-weight:400">— guessed, change if wrong</span></label>
+        <input type="text" id="fCat" list="dlCat" autocomplete="off" placeholder="e.g. Groceries & Provisions" oninput="this.dataset.auto=''">
+        <div id="catBackendNote" style="display:none;font-size:11px;color:var(--warning-text);margin-top:5px;line-height:1.4"><i class="ti ti-alert-triangle"></i> Your Apps Script is the older version — the category will be guessed but not saved until you paste <b>GAS.gs</b> and deploy a <b>New version</b>.</div>
+      </div>
       <div class="form-group full">
         <label for="fNote">Note (optional)</label>
         <input type="text" id="fNote" placeholder="e.g. pending ₹200, on hold, term 2...">
@@ -1030,7 +1038,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v3.0 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v3.1 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1121,7 +1129,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.0</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.1</div>
       </div>
     </div>
 
@@ -1935,6 +1943,7 @@ function setType(t){
     });
   document.getElementById('partyLabel').textContent = PARTY_LABEL[t] || 'Paid to';
   document.getElementById('typeHint').textContent   = TYPE_HINT[t] || '';
+  if(typeof suggestCategory === 'function') suggestCategory(false);   // side (in/out) changes the rule set
 }
 function today(){ return new Date().toISOString().split('T')[0]; }
 document.getElementById('fDate').value = today();
@@ -2004,6 +2013,7 @@ async function loadAll(){
       const hasPlans = Array.isArray(data.commitments) && Array.isArray(data.plans);
       if(hasPlans){ commitments = data.commitments; plans = data.plans; }
       setBackendOK(hasPlans);
+      setCatBackend(Array.isArray(data.features) && data.features.indexOf('category') >= 0);   // v3.1 / GAS 2.1
       cacheEntries();                                   // next cold open paints instantly
       setOffline(false);
       setStatus(true,'Connected — Google Drive');
@@ -2033,6 +2043,7 @@ function startEdit(id){
   document.getElementById('fNote').value   = e.note||'';
   document.getElementById('fPaidBy').value = e.paidBy||'';
   document.getElementById('fMode').value   = e.mode||'';
+  const _fc = document.getElementById('fCat'); _fc.value = e.category||''; _fc.dataset.auto = '';
   setType(e.type||'income');
   document.getElementById('editBanner').style.display  = 'flex';
   document.getElementById('quickWrap').style.display   = 'none';
@@ -2045,7 +2056,8 @@ function startEdit(id){
 }
 function cancelEdit(){
   editingId = null;
-  ['fDesc','fParty','fAmount','fNote','fPaidBy'].forEach(id=>document.getElementById(id).value='');
+  ['fDesc','fParty','fAmount','fNote','fPaidBy','fCat'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fCat').dataset.auto = '';
   document.getElementById('fMode').value = '';
   document.getElementById('fDate').value = today();
   setType('income');
@@ -2064,7 +2076,8 @@ async function saveEntry(){
         party=document.getElementById('fParty').value.trim(), amount=parseFloat(document.getElementById('fAmount').value),
         note=document.getElementById('fNote').value.trim(),
         paidBy=document.getElementById('fPaidBy').value.trim(),
-        mode=document.getElementById('fMode').value;
+        mode=document.getElementById('fMode').value,
+        category=document.getElementById('fCat').value.trim();
   if(!date||!desc||!party||!amount||amount<=0){ showToast('Fill date, description, party & amount','error'); return; }
   if(paidBy) localStorage.setItem(LS.lastPaidBy, paidBy);
   const btn=document.getElementById('btnSave');
@@ -2075,8 +2088,8 @@ async function saveEntry(){
   const prevCount  = entries.length;
   try{
     const params = editingId
-      ? {action:'update', id:editingId, date, type:txType, description:desc, party, amount, note, paidBy, mode}
-      : {action:'add', date, type:txType, description:desc, party, amount, note, paidBy, mode};
+      ? {action:'update', id:editingId, date, type:txType, description:desc, party, amount, note, paidBy, mode, category}
+      : {action:'add', date, type:txType, description:desc, party, amount, note, paidBy, mode, category};
     const res = await gasCall(params);
     if(res.status==='ok'){
       showToast(wasEditing ? 'Updated in Google Drive!' : 'Saved to Google Drive!');
@@ -2153,7 +2166,7 @@ function filtered(){
         q=document.getElementById('filterSearch').value.toLowerCase();
   let list=entries.filter(e=>{
     if(type!=='all'&&e.type!==type) return false;
-    if(q&&!`${e.description}${e.party}${e.note}`.toLowerCase().includes(q)) return false;
+    if(q&&!`${e.description}${e.party}${e.note}${categoryOf(e)}`.toLowerCase().includes(q)) return false;
     return true;
   });
   // tie-break same-date rows by creation time (createdAt, else the timestamp baked into the ID)
@@ -2352,7 +2365,7 @@ function render(){
       <td style="color:var(--text2)">${i+1}</td>
       <td class="dt-cell" style="color:var(--text2);font-size:12px"><div>${dt.date}</div>${dt.sub?`<div class="dt-sub">${dt.sub}</div>`:''}</td>
       <td><span class="pill ${e.type}">${(m=>`<i class="ti ${m.icon}"></i> ${m.label}`)(TYPE_META[e.type]||TYPE_META.expense)}</span></td>
-      <td title="${e.description}">${e.description}</td>
+      <td title="${e.description}">${e.description}<div class="dt-sub">${esc(categoryOf(e))}</div></td>
       <td class="dt-cell" title="${e.party}" style="color:var(--text2)">${e.party}${who?`<div class="dt-sub">${esc(who)}</div>`:''}</td>
       <td style="text-align:right" class="amt-${e.type}">${(TYPE_META[e.type]||TYPE_META.expense).sign}${fmt(e.amount)}</td>
       <td style="color:var(--text2);font-size:12px;font-style:italic" title="${e.note||''}">${e.note||'—'}</td>
@@ -2367,12 +2380,12 @@ function render(){
 function exportCSV(){
   if(!entries.length){ showToast('No data to export','error'); return; }
   const sorted=[...entries].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-  const rows=[['#','Date & Time','Type','Description','Party','Amount','Paid by','Mode','Note']];
-  sorted.forEach((e,i)=>rows.push([i+1,fmtDTLine(e),e.type,e.description,e.party,e.amount,e.paidBy||'',e.mode||'',e.note||'']));
+  const rows=[['#','Date & Time','Type','Description','Category','Party','Amount','Paid by','Mode','Note']];
+  sorted.forEach((e,i)=>rows.push([i+1,fmtDTLine(e),e.type,e.description,categoryOf(e),e.party,e.amount,e.paidBy||'',e.mode||'',e.note||'']));
   const income=entries.filter(isIncomeT).reduce((s,e)=>s+e.amount,0);
   const expense=entries.filter(repIsOut).reduce((s,e)=>s+e.amount,0);
   const saving=entries.filter(isSavingT).reduce((s,e)=>s+e.amount,0);
-  rows.push([],[' ',' ',' ',' ','Total Income',income,''],[' ',' ',' ',' ','Total Expenses',expense,''],[' ',' ',' ',' ','Total Savings',saving,''],[' ',' ',' ',' ','Balance (Income − Expenses − Savings)',income-expense-saving,'']);
+  rows.push([],[' ',' ',' ',' ',' ','Total Income',income,''],[' ',' ',' ',' ',' ','Total Expenses',expense,''],[' ',' ',' ',' ',' ','Total Savings',saving,''],[' ',' ',' ',' ',' ','Balance (Income − Expenses − Savings)',income-expense-saving,'']);
   const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'\"')}"` ).join(',')).join('\n');
   const a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
@@ -2429,7 +2442,7 @@ function quickPresets(){
     const k = _qkKey(e);
     const r = m.get(k) || { type:e.type||'expense', description:String(e.description).trim(), n:0, recent:0, last:'', party:'', amount:0, mode:'', paidBy:'' };
     r.n++; if((e.date||'') >= cutoff) r.recent++;
-    if((e.date||'') >= r.last){ r.last = e.date||''; r.party = e.party||''; r.amount = Number(e.amount)||0; r.mode = e.mode||''; r.paidBy = e.paidBy||''; }
+    if((e.date||'') >= r.last){ r.last = e.date||''; r.party = e.party||''; r.amount = Number(e.amount)||0; r.mode = e.mode||''; r.paidBy = e.paidBy||''; r.category = e.category||''; }
     m.set(k, r);
   });
   // Most used lately first, then most used ever, then most recent.
@@ -2461,8 +2474,39 @@ function quickFill(i){
   document.getElementById('fMode').value   = q.mode || '';
   document.getElementById('fPaidBy').value = q.paidBy || localStorage.getItem(LS.lastPaidBy) || '';
   document.getElementById('fNote').value   = '';
+  const _fc = document.getElementById('fCat'); _fc.value = q.category || ''; _fc.dataset.auto = ''; if(!_fc.value) suggestCategory(true);
   const a = document.getElementById('fAmount');
   a.focus(); if(a.value) a.select();
+}
+
+/* v3.1 — the category is guessed, never demanded. Her last choice for the same
+   description wins; failing that the report's rules; she can overrule it, and
+   a value she typed herself is never overwritten (dataset.auto is cleared on
+   input). Runs when the description or party changes. */
+function guessCategory(desc, party, type){
+  const key = String(desc||'').trim().toLowerCase();
+  if(key){
+    const prev = [...entries].filter(e => e.category && String(e.description||'').trim().toLowerCase() === key)
+                             .sort((a,b) => (b.date||'').localeCompare(a.date||''))[0];
+    if(prev) return String(prev.category).trim();
+  }
+  return categoryOf({ type, description: desc, party, note: '' });
+}
+function suggestCategory(force){
+  const fc = document.getElementById('fCat'); if(!fc) return;
+  if(!force && fc.value && fc.dataset.auto !== '1') return;      // she typed it — leave it alone
+  const desc = document.getElementById('fDesc').value, party = document.getElementById('fParty').value;
+  if(!String(desc).trim()){ if(fc.dataset.auto === '1'){ fc.value = ''; fc.dataset.auto = ''; } return; }
+  fc.value = guessCategory(desc, party, txType); fc.dataset.auto = '1';
+}
+document.getElementById('fDesc').addEventListener('change', () => suggestCategory(false));
+document.getElementById('fParty').addEventListener('change', () => suggestCategory(false));
+
+// Does her deployment store the category yet? (GAS v2.1 lists it in features.)
+let CAT_BACKEND = true;
+function setCatBackend(ok){
+  CAT_BACKEND = !!ok;
+  const n = document.getElementById('catBackendNote'); if(n) n.style.display = ok ? 'none' : 'block';
 }
 
 // Description suggestions from her own history, newest first, one per distinct
@@ -2499,6 +2543,7 @@ function openDetail(id){
     <div class="dt-grid">
       ${f('Type', `<span class="pill ${esc(e.type)}"><i class="ti ${meta.icon}"></i> ${meta.label}</span>`)}
       ${f('Date', esc(fmtDate(e.date)))}
+      ${f('Category', esc(categoryOf(e)) + (e.category ? '' : ' <span style="color:var(--text3);font-size:11px">(guessed)</span>'))}
       ${f('Paid by / received by', esc(e.paidBy || ''))}
       ${f('Payment mode', esc(e.mode || ''))}
       ${f('Note', esc(e.note || ''), true)}
@@ -2522,6 +2567,7 @@ function detailDuplicate(){
   document.getElementById('fMode').value   = e.mode || '';
   document.getElementById('fPaidBy').value = e.paidBy || '';
   document.getElementById('fNote').value   = '';
+  const _fc = document.getElementById('fCat'); _fc.value = categoryOf(e); _fc.dataset.auto = '';
   document.getElementById('formCard').scrollIntoView({ behavior:'smooth', block:'start' });
   const a = document.getElementById('fAmount'); a.focus(); a.select();
   showToast('Copied — check the amount, then save');
@@ -3103,7 +3149,8 @@ async function savePay(){
         party: p.party || (isIn ? 'Received' : 'Paid'),
         amount: amt,
         note: [note, p.commitmentId ? commitmentNoteFor(p) : ''].filter(Boolean).join(' · '),
-        paidBy, mode
+        paidBy, mode,
+        category: p.category || ''            // ignored by a backend without the column
       }, 2, 30000);
       if(res && res.status==='ok') txId = res.id || '';
       else { showToast(backendMsg(res), 'error'); gateBusy('paySaveBtn', false, '', '<i class="ti ti-check"></i> Record it'); return; }
@@ -3478,13 +3525,15 @@ const CAT_RULES=[
 const FIXED_CATS=new Set(['Electricity & Utilities','Telecom & Internet','Milk & Dairy','Loan, EMI & Insurance','Education','Rent Paid','Tax & Government']);
 
 function categoryOf(e){
+  if(e && e.category && String(e.category).trim()) return String(e.category).trim();   // v3.1 — what she chose wins
+  if(isSavingT(e)) return 'Savings & Deposits';                                          // a deposit is not an expense of any kind
   const side=isIncomeT(e)?'in':'out';
   const hay=`${e.description||''} ${e.party||''} ${e.note||''}`;
   for(const r of CAT_RULES){ if(r.side===side && r.re.test(hay)) return r.cat; }
   return side==='in'?'Business & Other Income':'Other Expenses';
 }
 function allCategories(){
-  const s=new Set(); entries.forEach(e=>s.add(categoryOf(e)));
+  const s=new Set(['Savings & Deposits']); CAT_RULES.forEach(r=>s.add(r.cat)); entries.forEach(e=>s.add(categoryOf(e)));
   return [...s].sort();
 }
 
@@ -4908,7 +4957,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.0</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.1</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }

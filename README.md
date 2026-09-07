@@ -239,6 +239,17 @@ paste-and-redeploy she has to do — see [SETUP.md](SETUP.md).
 
 ## Version
 
+**v3.1** — 7 September 2026. A **Category** on every ledger entry (the CEO's
+call, over my note that the reports already grouped by description). It is
+guessed, never demanded: her last category for the same description wins,
+else the report's rules; a value she typed is never overwritten. Shown under
+the description in the table, searchable, in the CSV, in the detail sheet,
+and the reports prefer the stored value over the guess. Quick entry learns
+it; a plan line ticked off carries its own category into the ledger entry.
+**Requires re-pasting `GAS.gs` (v2.1) and redeploying as a New version** —
+it appends a `Category` column to `Transactions` on first run. Until then
+the form says so under the field and the category is guessed but not saved.
+
 **v3.0** — 7 September 2026. Built from the diary's own line, *Balance = Income −
 (Savings + Expenses)*. A fifth transaction type, **Savings**, for money put away
 (RD, SSY, chit, gold): it leaves the wallet but is not spent, so it is neither an

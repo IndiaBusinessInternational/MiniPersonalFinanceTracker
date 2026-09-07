@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Mini Personal Finance Tracker — Google Apps Script backend  v2.0
+   Mini Personal Finance Tracker — Google Apps Script backend  v2.1
    For: N. Sowdhamini Sasimurugan
    ───────────────────────────────────────────────────────────────────────────
    This script is BOUND to her own Google Sheet, in her own Google account.
@@ -37,10 +37,10 @@
    ═════════════════════════════════════════════════════════════════════════ */
 
 const APP_NAME    = 'MPFT';                 // identifies this backend to the app
-const APP_VERSION = '2.0';
+const APP_VERSION = '2.1';
 // Lets the app detect what this backend can do, so a page newer than the
 // deployment can say "update your Apps Script" instead of failing oddly.
-const FEATURES    = ['profile', 'plans', 'commitments', 'paidby'];
+const FEATURES    = ['profile', 'plans', 'commitments', 'paidby', 'category'];   // v2.1: Category column on Transactions
 
 const SHEET_NAME  = 'Transactions';
 /* PaidBy and Mode are appended AFTER CreatedAt rather than inserted in the
@@ -48,7 +48,7 @@ const SHEET_NAME  = 'Transactions';
    formula or a filter she has set up by hand in the Sheet still points at the
    same thing. Order in the Sheet is not the order in the form. */
 const HEADERS     = ['ID', 'Date', 'Type', 'Description', 'Party', 'Amount', 'Note', 'CreatedAt',
-                     'PaidBy', 'Mode'];
+                     'PaidBy', 'Mode', 'Category'];      // v2.1: Category appended, same rule
 
 const COMMIT_SHEET = 'Commitments';
 const COMMIT_HDRS  = ['ID', 'Name', 'Kind', 'Category', 'Party', 'Amount', 'DueDay', 'Freq',
@@ -315,7 +315,7 @@ function styleHeader(sh, n) {
 
 function getSheet() {
   return getNamedSheet(SHEET_NAME, HEADERS,
-                       [130, 100, 90, 240, 170, 100, 210, 150, 110, 100]);
+                       [130, 100, 90, 240, 170, 100, 210, 150, 110, 100, 170]);
 }
 
 function sheetUrl() {
@@ -482,7 +482,8 @@ function readTransactions(tz) {
         note:        r[6] || '',
         createdAt:   r[7] || '',
         paidBy:      str(r[8]),
-        mode:        str(r[9])
+        mode:        str(r[9]),
+        category:    str(r[10])
       };
     });
 }
@@ -575,7 +576,8 @@ function addTransaction(p) {
       p.note || '',
       stamp(),
       p.paidBy || '',
-      p.mode || ''
+      p.mode || '',
+      p.category || ''
     ]);
     SpreadsheetApp.flush();
     return { status: 'ok', id: id, message: 'Added successfully.' };
@@ -606,7 +608,7 @@ function updateTransaction(p) {
           num(p.amount),
           p.note || ''
         ]]);
-        sh.getRange(i + 1, 9, 1, 2).setValues([[p.paidBy || '', p.mode || '']]);
+        sh.getRange(i + 1, 9, 1, 3).setValues([[p.paidBy || '', p.mode || '', p.category || '']]);
         SpreadsheetApp.flush();
         return { status: 'ok', message: 'Updated: ' + p.id };
       }
