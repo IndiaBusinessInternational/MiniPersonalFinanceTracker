@@ -723,7 +723,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.2</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.3</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1038,7 +1038,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v3.2 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v3.3 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1067,7 +1067,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.2 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.3 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1132,7 +1132,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.2</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.3</div>
       </div>
     </div>
 
@@ -4972,7 +4972,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.2</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.3</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }

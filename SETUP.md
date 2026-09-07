@@ -177,6 +177,28 @@ balance. The app shows it less every instalment ticked off here. If the bank's
 number moves for another reason — interest, a part-payment made elsewhere —
 type the bank's current figure into the loan and it re-bases from there.
 
+## Hosting it in another account (how it is set up since 7 September 2026)
+
+The backend does not have to live in her Google account. Since 7 Sep 2026 it
+runs as a project in the **CEO's** account, so he can paste updates himself.
+The steps are the same as above with three differences:
+
+1. **Create the Sheet in that account** (any name), copy its ID from the URL —
+   the long string between `/d/` and `/edit`.
+2. If the script project was created from **script.google.com → New project**
+   (standalone) rather than from the Sheet's **Extensions → Apps Script**,
+   add a third Script Property: **`SHEET_ID`** = that ID. A bound project
+   needs nothing extra. Run **`checkSetup`** once from the editor: the log
+   says "Bound to a Sheet: yes" or "no — using SHEET_ID …".
+3. Deploy as before: **Execute as: Me** (the hosting account), **Who has
+   access: Anyone**. Copy the `/exec` URL and paste it into the app's Connect
+   screen **on each of her devices** — the URL is remembered per device.
+   The password she types is still `APP_PASSWORD` in this project.
+
+If she had already recorded entries in a Sheet of her own, copy the
+`Transactions`, `Commitments`, `Plans` and `Settings` tabs into the new Sheet
+before switching the URL; the app shows whatever the connected backend holds.
+
 ## Day-to-day notes
 
 - **Changing the password**: edit `APP_PASSWORD` in Script Properties. Devices

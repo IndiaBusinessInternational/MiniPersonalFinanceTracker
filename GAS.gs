@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Mini Personal Finance Tracker — Google Apps Script backend  v3.2
+   Mini Personal Finance Tracker — Google Apps Script backend  v3.3
    (the backend carries the SAME version number as the web app — 7 Sep 2026)
    For: N. Sowdhamini Sasimurugan
    ───────────────────────────────────────────────────────────────────────────
@@ -10,6 +10,12 @@
      Apps Script editor → ⚙ Project Settings → Script Properties → Add
         Property : APP_PASSWORD     Value : <the password she will type>
         Property : APP_USER         Value : Sowdhamini        (optional)
+        Property : SHEET_ID         Value : <the Sheet's ID from its URL>
+                   — ONLY when this script is NOT bound to the Sheet, i.e. it
+                   was created as a standalone project (script.google.com →
+                   New project) rather than from the Sheet's Extensions menu.
+                   v3.3: the script works either way; hosting it in another
+                   Google account (the CEO's, 7 Sep 2026) is supported.
 
    Then: Deploy → New deployment → Web app
         Execute as        : Me (her own account)
@@ -38,7 +44,7 @@
    ═════════════════════════════════════════════════════════════════════════ */
 
 const APP_NAME    = 'MPFT';                 // identifies this backend to the app
-const APP_VERSION = '3.2';   // kept in step with the web app's badge
+const APP_VERSION = '3.3';   // kept in step with the web app's badge
 // Lets the app detect what this backend can do, so a page newer than the
 // deployment can say "update your Apps Script" instead of failing oddly.
 const FEATURES    = ['profile', 'plans', 'commitments', 'paidby', 'category'];   // v3.1: Category column on Transactions
@@ -265,6 +271,7 @@ function logout(token) {
    whether the password is in place without ever printing it. */
 function checkSetup() {
   const pw = scriptPassword();
+  Logger.log('Bound to a Sheet : ' + (SpreadsheetApp.getActiveSpreadsheet() ? 'yes' : 'no — using SHEET_ID ' + (PropertiesService.getScriptProperties().getProperty('SHEET_ID') || 'NOT SET')));
   Logger.log('APP_PASSWORD : ' + (pw ? 'set (' + pw.length + ' characters)' : 'NOT SET — add it in Project Settings'));
   Logger.log('APP_USER     : ' + scriptUser());
   Logger.log('Sheet        : ' + sheetUrl());
@@ -286,8 +293,23 @@ function signOutAllDevices() {
    gets the same frozen header row, the same styling, and — the part that
    matters on an upgrade — the same "append any header this version added"
    migration. Columns are only ever appended, never renumbered.             */
+/* v3.3 — the Sheet, whether this script is bound to it (created from the
+   Sheet's Extensions menu) or standalone (created at script.google.com, in
+   which case Script Property SHEET_ID names it). Cached per execution. */
+let _book = null;
+function book() {
+  if (_book) return _book;
+  _book = SpreadsheetApp.getActiveSpreadsheet();
+  if (!_book) {
+    const id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
+    if (!id) throw new Error('This script is not bound to a Sheet and SHEET_ID is not set — add it in Project Settings → Script Properties.');
+    _book = SpreadsheetApp.openById(id);
+  }
+  return _book;
+}
+
 function getNamedSheet(name, headers, widths) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = book();
   let sh = ss.getSheetByName(name);
   if (!sh) {
     sh = ss.insertSheet(name);
@@ -320,11 +342,11 @@ function getSheet() {
 }
 
 function sheetUrl() {
-  try { return SpreadsheetApp.getActiveSpreadsheet().getUrl(); } catch (e) { return ''; }
+  try { return book().getUrl(); } catch (e) { return ''; }
 }
 
 function sheetTZ() {
-  try { return SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone() || 'Asia/Kolkata'; }
+  try { return book().getSpreadsheetTimeZone() || 'Asia/Kolkata'; }
   catch (e) { return 'Asia/Kolkata'; }
 }
 
@@ -367,7 +389,7 @@ const bool = function (v) {
    A second, hidden sheet. It is hidden rather than deleted-and-recreated so
    she can still find it if she ever needs to clear a bad value by hand. */
 function getSettingsSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = book();
   let sh = ss.getSheetByName(SETTINGS_SHEET);
   if (!sh) {
     sh = ss.insertSheet(SETTINGS_SHEET);
