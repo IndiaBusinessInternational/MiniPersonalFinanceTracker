@@ -1,5 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Mini Personal Finance Tracker — Google Apps Script backend  v2.1
+   Mini Personal Finance Tracker — Google Apps Script backend  v3.2
+   (the backend carries the SAME version number as the web app — 7 Sep 2026)
    For: N. Sowdhamini Sasimurugan
    ───────────────────────────────────────────────────────────────────────────
    This script is BOUND to her own Google Sheet, in her own Google account.
@@ -37,10 +38,10 @@
    ═════════════════════════════════════════════════════════════════════════ */
 
 const APP_NAME    = 'MPFT';                 // identifies this backend to the app
-const APP_VERSION = '2.1';
+const APP_VERSION = '3.2';   // kept in step with the web app's badge
 // Lets the app detect what this backend can do, so a page newer than the
 // deployment can say "update your Apps Script" instead of failing oddly.
-const FEATURES    = ['profile', 'plans', 'commitments', 'paidby', 'category'];   // v2.1: Category column on Transactions
+const FEATURES    = ['profile', 'plans', 'commitments', 'paidby', 'category'];   // v3.1: Category column on Transactions
 
 const SHEET_NAME  = 'Transactions';
 /* PaidBy and Mode are appended AFTER CreatedAt rather than inserted in the
@@ -48,7 +49,7 @@ const SHEET_NAME  = 'Transactions';
    formula or a filter she has set up by hand in the Sheet still points at the
    same thing. Order in the Sheet is not the order in the form. */
 const HEADERS     = ['ID', 'Date', 'Type', 'Description', 'Party', 'Amount', 'Note', 'CreatedAt',
-                     'PaidBy', 'Mode', 'Category'];      // v2.1: Category appended, same rule
+                     'PaidBy', 'Mode', 'Category'];      // v3.1: Category appended, same rule
 
 const COMMIT_SHEET = 'Commitments';
 const COMMIT_HDRS  = ['ID', 'Name', 'Kind', 'Category', 'Party', 'Amount', 'DueDay', 'Freq',

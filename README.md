@@ -239,6 +239,12 @@ paste-and-redeploy she has to do — see [SETUP.md](SETUP.md).
 
 ## Version
 
+**v3.2** — 7 September 2026. **The backend carries the same version number as
+the app** (`APP_VERSION` in `GAS.gs` = the badge), for easy noting. The
+drawer's About line shows both — *App v3.2 · Backend v3.2 ✓ in step* — and the
+status bar names the connected backend's version. A bare number mismatch is
+only a note; a missing feature is what raises the amber prompts.
+
 **v3.1** — 7 September 2026. A **Category** on every ledger entry (the CEO's
 call, over my note that the reports already grouped by description). It is
 guessed, never demanded: her last category for the same description wins,
@@ -246,7 +252,7 @@ else the report's rules; a value she typed is never overwritten. Shown under
 the description in the table, searchable, in the CSV, in the detail sheet,
 and the reports prefer the stored value over the guess. Quick entry learns
 it; a plan line ticked off carries its own category into the ledger entry.
-**Requires re-pasting `GAS.gs` (v2.1) and redeploying as a New version** —
+**Requires re-pasting `GAS.gs` and redeploying as a New version** —
 it appends a `Category` column to `Transactions` on first run. Until then
 the form says so under the field and the category is guessed but not saved.
 
