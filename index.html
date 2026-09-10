@@ -767,6 +767,65 @@ tbody tr.tx-row{cursor:pointer}
   .ins-hero-sub{font-size:calc(13px*var(--ts))}.ins-why div{font-size:calc(14px*var(--ts))}.ins-steps-h{font-size:calc(13.5px*var(--ts))}.ins-steps li{font-size:calc(14px*var(--ts))}.ins-key{font-size:calc(13px*var(--ts))}.ins-note{font-size:calc(13px*var(--ts))}.ins-done{font-size:calc(14px*var(--ts))}
   .pane-empty{font-size:calc(14px*var(--ts))}.pane-empty b{font-size:calc(16px*var(--ts))}
 }
+/* ══ v5.8 — VOICE ENTRY ═══════════════════════════════════════════════════
+   The mic screen, and the check screen that stands between a dictated entry
+   and the books. Sizes go through var(--ts) so the Text size setting reaches
+   them like everything else.                                              */
+.voice-cta{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.vc-btn{flex:1 1 auto;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border:1px solid var(--cyan);border-radius:var(--radius);background:rgba(0,197,255,.08);color:var(--cyan);font-family:var(--font);font-size:calc(13.5px*var(--ts));font-weight:700;cursor:pointer}
+.vc-btn:hover{background:rgba(0,197,255,.17)}
+.vc-btn i{font-size:calc(19px*var(--ts))}
+.vc-hint{flex:0 1 auto;max-width:48%;font-size:calc(11.5px*var(--ts));color:var(--text3);line-height:1.5}
+@media(max-width:700px){.vc-hint{display:none}}
+.mic-zone{text-align:center;padding:4px 0 6px}
+.mic-btn{width:96px;height:96px;border-radius:50%;border:2px solid var(--cyan);background:rgba(0,197,255,.08);color:var(--cyan);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:40px;transition:transform .14s,background .14s}
+.mic-btn:active{transform:scale(.96)}
+.mic-btn.live{background:var(--cyan);color:#000;animation:micPulse 1.5s infinite}
+.mic-btn:disabled{opacity:.4;cursor:not-allowed;animation:none}
+@keyframes micPulse{0%{box-shadow:0 0 0 0 rgba(0,197,255,.5)}70%{box-shadow:0 0 0 20px rgba(0,197,255,0)}100%{box-shadow:0 0 0 0 rgba(0,197,255,0)}}
+.mic-state{margin-top:12px;font-size:calc(14px*var(--ts));font-weight:700;color:var(--text)}
+.mic-sub{margin-top:5px;font-size:calc(12px*var(--ts));color:var(--text3);line-height:1.55}
+.v-heard{margin-top:14px;min-height:46px;padding:12px 13px;border:1px dashed var(--border2);border-radius:var(--radius);background:var(--bg3);font-size:calc(14px*var(--ts));line-height:1.65;color:var(--text);text-align:left;word-break:break-word}
+.v-heard.empty{color:var(--text3);font-style:italic}
+.v-heard .interim{color:var(--text3)}
+.v-lbl{font-size:calc(10px*var(--ts));text-transform:uppercase;letter-spacing:.07em;color:var(--text3);font-weight:700;margin:14px 0 6px;display:block}
+.v-ex{display:block;width:100%;text-align:left;margin-top:6px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text2);font-family:var(--font);font-size:calc(12.5px*var(--ts));line-height:1.55;cursor:pointer}
+.v-ex:hover{border-color:var(--cyan);color:var(--cyan)}
+.v-ex b{color:var(--text);font-weight:600}
+.v-err{margin-top:13px;padding:11px 12px;border:1px solid var(--danger-border);background:var(--danger-bg);color:var(--danger-text);border-radius:var(--radius);font-size:calc(12.5px*var(--ts));line-height:1.55;text-align:left}
+.v-sum{border:1px solid var(--cyan);border-radius:var(--radius);padding:12px 13px;background:rgba(0,197,255,.06);margin-bottom:13px}
+.v-sum-line{font-size:calc(15px*var(--ts));font-weight:600;color:var(--text);line-height:1.55}
+.v-words{margin-top:6px;font-size:calc(12px*var(--ts));color:var(--text2);line-height:1.5;font-style:italic}
+.v-raw{margin-bottom:13px;padding:10px 12px;border:1px dashed var(--border2);border-radius:var(--radius);background:var(--bg3);font-size:calc(12.5px*var(--ts));color:var(--text2);line-height:1.6}
+.v-raw b{color:var(--text);font-weight:600}
+.v-flag{margin-bottom:11px;padding:10px 12px;border-radius:var(--radius);font-size:calc(12.5px*var(--ts));line-height:1.55;display:flex;gap:8px;align-items:flex-start}
+.v-flag i{font-size:calc(15px*var(--ts));flex-shrink:0;margin-top:1px}
+.v-flag.warn{border:1px solid var(--warning-border);background:var(--warning-bg);color:var(--warning-text)}
+.v-flag.bad{border:1px solid var(--danger-border);background:var(--danger-bg);color:var(--danger-text)}
+.v-flag.good{border:1px solid var(--success-border);background:var(--success-bg);color:var(--success-text)}
+.v-src{display:flex;align-items:flex-start;gap:5px;font-size:calc(10.5px*var(--ts));color:var(--text3);line-height:1.45;margin-top:3px}
+.v-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;background:var(--text3)}
+.v-dot.ok{background:var(--success-text)}
+.v-dot.guess{background:var(--warning-text)}
+.v-dot.miss{background:var(--danger-text)}
+.v-dot.edit{background:var(--cyan)}
+.v-alt{margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.v-alt .lbl{font-size:calc(10.5px*var(--ts));color:var(--text3)}
+.fld input.miss,.fld textarea.miss{border-color:var(--danger-text)}
+.v-listen{margin-bottom:11px;padding:10px 12px;border:1px solid var(--cyan);border-radius:var(--radius);background:rgba(0,197,255,.08);color:var(--cyan);font-size:calc(12.5px*var(--ts));line-height:1.55;display:flex;gap:9px;align-items:center}
+.v-listen b{font-weight:700}
+.v-listen-dot{width:9px;height:9px;border-radius:50%;background:var(--cyan);flex-shrink:0;animation:micPulse 1.5s infinite}
+.v-queue{margin-bottom:12px;padding:9px 12px;border:1px solid var(--info-border);background:var(--info-bg);color:var(--info-text);border-radius:var(--radius);font-size:calc(12.5px*var(--ts));font-weight:600}
+.v-unsupported{padding:22px 16px;text-align:center;color:var(--text2);font-size:calc(13px*var(--ts));line-height:1.7}
+.v-unsupported i{font-size:38px;display:block;margin-bottom:12px;color:var(--text3)}
+/* Phone sizes for the voice screens. Its own media block, declared last, so
+   this whole CSS section is one movable piece across the three apps. */
+@media(max-width:820px){
+  .mic-btn{width:104px;height:104px;font-size:calc(42px*var(--ts))}
+  .v-heard{font-size:calc(15px*var(--ts))}
+  .v-sum-line{font-size:calc(16px*var(--ts))}
+}
+/* ══ end VOICE ENTRY CSS ═══════════════════════════════════════════════ */
 </style>
 </head>
 <body>
@@ -777,7 +836,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.7</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.8</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -891,6 +950,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="status-actions">
       <button class="s-btn rep-btn" onclick="openReport()"><i class="ti ti-report-money"></i> Report</button>
       <button class="s-btn" onclick="loadAll()"><i class="ti ti-refresh"></i> Sync</button>
+      <button class="s-btn" onclick="openVoice()"><i class="ti ti-microphone"></i> Voice Entry</button>
       <a class="s-btn" id="sheetLink" href="#" target="_blank" rel="noopener" style="display:none"><i class="ti ti-external-link"></i> Sheet</a>
       <button class="s-btn" onclick="exportCSV()"><i class="ti ti-download"></i> CSV</button>
     </div>
@@ -906,6 +966,11 @@ tbody tr.tx-row{cursor:pointer}
       <button class="edit-cancel-btn" onclick="cancelEdit()"><i class="ti ti-x"></i> Cancel</button>
     </div>
     <!-- v3.0 QUICK ENTRY — learned from her own ledger; nothing to set up -->
+    <!-- VOICE ENTRY (v5.8) — speak it, check it on screen, then it saves. -->
+    <div class="voice-cta" id="voiceCta">
+      <button type="button" class="vc-btn" onclick="openVoice()"><i class="ti ti-microphone"></i> Speak the entry</button>
+      <span class="vc-hint">Say it in one line — &ldquo;Paid 120 rupees for milk to Milkman by cash&rdquo;. Nothing is saved until you check it.</span>
+    </div>
     <div id="quickWrap">
       <div class="quick-lbl"><i class="ti ti-bolt"></i> Quick entry <span class="plain">— tap one, check the amount, save</span></div>
       <div class="quick-strip" id="quickStrip"></div>
@@ -1092,7 +1157,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v3.7 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v3.8 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1104,6 +1169,7 @@ tbody tr.tx-row{cursor:pointer}
   </div>
   <div class="drawer-section-label">App</div>
   <button class="drawer-item" onclick="closeDrawer();openReport()"><i class="ti ti-report-money"></i> Financial Analysis</button>
+  <button class="drawer-item" onclick="closeDrawer();openVoice()"><i class="ti ti-microphone"></i> Add entry by voice</button>
   <button class="drawer-item" onclick="loadAll();closeDrawer()"><i class="ti ti-refresh"></i> Sync with Google Drive</button>
   <button class="drawer-item" onclick="exportCSV();closeDrawer()"><i class="ti ti-download"></i> Export CSV</button>
   <a class="drawer-item" id="sheetLinkDrawer" href="#" target="_blank" rel="noopener" style="display:none" onclick="closeDrawer()"><i class="ti ti-external-link"></i> Open Google Sheet</a>
@@ -1120,6 +1186,21 @@ tbody tr.tx-row{cursor:pointer}
       <button class="chip" data-k="max" onclick="setTextSize('max')">Maximum</button>
     </div>
   </div>
+  <!-- Voice entry (v5.8). The language is what the recogniser is told to
+       expect — getting it wrong is the single biggest cause of a bad
+       transcript, so it is a setting and not a guess. Read-back is on by
+       default; hands-free "say save" is opt-in, because a stray "yes" in the
+       room must never be able to write a row on its own. -->
+  <div class="drawer-item" style="cursor:default;flex-direction:column;align-items:flex-start;gap:8px">
+    <span><i class="ti ti-microphone"></i> Voice entry</span>
+    <div class="chip-row" id="vLangChips">
+      <button class="chip" data-k="en-IN" onclick="voiceSetLang('en-IN')">English (India)</button>
+      <button class="chip" data-k="en-GB" onclick="voiceSetLang('en-GB')">English (UK)</button>
+      <button class="chip" data-k="ta-IN" onclick="voiceSetLang('ta-IN')">தமிழ்</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="vReadChk" onchange="voiceSetRead(this.checked)"> <span>Read the entry back aloud before saving</span></label>
+    <label class="chk"><input type="checkbox" id="vConfChk" onchange="voiceSetConf(this.checked)"> <span>Hands-free: say &ldquo;save&rdquo; to record it<br><span style="color:var(--text3);font-size:11px">The entry is still shown and read back first, and it never listens for &ldquo;save&rdquo; while a warning is on screen.</span></span></label>
+  </div>
   <button class="drawer-item" onclick="toggleTheme();closeDrawer()"><i class="ti ti-sun"></i> Toggle Dark / Light Mode</button>
   <!-- Always shown. beforeinstallprompt never fires on iOS, so gating this on
        it left the whole iPhone install path invisible. -->
@@ -1133,7 +1214,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.7 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.8 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1198,7 +1279,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.7</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.8</div>
       </div>
     </div>
 
@@ -1585,6 +1666,35 @@ tbody tr.tx-row{cursor:pointer}
     <button class="mini-btn danger" onclick="detailDelete()"><i class="ti ti-trash"></i> Delete</button>
     <button class="mini-btn" onclick="detailDuplicate()" title="Start a new entry with these details"><i class="ti ti-copy"></i> Duplicate</button>
     <button class="btn-save" onclick="detailEdit()"><i class="ti ti-pencil"></i> Edit</button>
+  </div>
+</div>
+
+<!-- ═══ VOICE ENTRY (v5.8) — speak · check · confirm ═══════════════════════
+     Two screens in one sheet: the microphone, then the check. The check
+     screen is not skippable and Save stays disabled until every required
+     field is filled, so a mis-heard word can never reach the Sheet unseen. -->
+<div class="sheet-overlay" id="voiceOverlay" onclick="closeVoice()"></div>
+<div class="sheet-modal wide" id="voiceModal" role="dialog" aria-modal="true" aria-labelledby="voiceTitle">
+  <div class="sheet-hdr">
+    <span class="sheet-hdr-title" id="voiceTitle"><i class="ti ti-microphone"></i> Voice Entry</span>
+    <button class="drawer-close" onclick="closeVoice()" aria-label="Close"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="sheet-body">
+    <div id="vStepListen">
+      <div class="mic-zone">
+        <button class="mic-btn" id="vMicBtn" onclick="voiceToggle()" aria-label="Start listening"><i class="ti ti-microphone"></i></button>
+        <div class="mic-state" id="vState">Tap the microphone and say the entry</div>
+        <div class="mic-sub" id="vSub">One sentence is enough &mdash; what happened, how much, and with whom.</div>
+      </div>
+      <div class="v-heard empty" id="vHeard">Nothing heard yet.</div>
+      <div id="vErr"></div>
+      <span class="v-lbl" id="vExLbl">Ways to say it</span>
+      <div id="vExamples"></div>
+    </div>
+    <div id="vStepCheck" style="display:none"></div>
+  </div>
+  <div class="sheet-foot" id="vFoot">
+    <button class="mini-btn" onclick="closeVoice()">Cancel</button>
   </div>
 </div>
 
@@ -2166,7 +2276,8 @@ async function saveEntry(){
         paidBy=document.getElementById('fPaidBy').value.trim(),
         mode=document.getElementById('fMode').value,
         category=document.getElementById('fCat').value.trim();
-  if(!date||!desc||!party||!amount||amount<=0){ showToast('Fill date, description, party & amount','error'); return; }
+  if(!date||!desc||!party||!amount||amount<=0){ showToast('Fill date, description, party & amount','error'); return;  false; }
+  let ok = false;
   if(paidBy) localStorage.setItem(LS.lastPaidBy, paidBy);
   const btn=document.getElementById('btnSave');
   btn.disabled=true;
@@ -2180,6 +2291,7 @@ async function saveEntry(){
       : {action:'add', date, type:txType, description:desc, party, amount, note, paidBy, mode, category};
     const res = await gasCall(params);
     if(res.status==='ok'){
+      ok = true;
       showToast(wasEditing ? 'Updated in Google Drive!' : 'Saved to Google Drive!');
       cancelEdit(); await loadAll();
     } else {
@@ -2209,6 +2321,7 @@ async function saveEntry(){
       } catch(_){ /* still unreachable — keep polling */ }
     }
     if(verified === true){
+      ok = true;
       showToast((wasEditing ? 'Updated' : 'Saved') + ' ✓ (confirmed in Google Drive)');
       if(latest) entries = latest;
       cancelEdit(); render();
@@ -2222,6 +2335,9 @@ async function saveEntry(){
     btn.disabled=false;                                          // always re-enable, even if a branch above throws
     btn.innerHTML='<i class="ti ti-device-floppy"></i> <span id="btnSaveLabel">'+(editingId?'Update in Google Drive':'Save to Google Drive')+'</span>';
   }
+  // Voice entry needs to know whether the row actually landed before it moves
+  // on to the next dictated entry — every other caller ignores this.
+  return ok;
 }
 
 async function deleteEntry(id){
@@ -5058,7 +5174,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.7</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.8</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -5592,6 +5708,7 @@ async function syncProfileIfStale(remoteAt){
 // Escape closes the topmost thing that is open.
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;
+  if(document.getElementById('voiceModal').classList.contains('open')){ closeVoice(); return; }
   if(document.getElementById('payModal').classList.contains('open')) closePay();
   else if(document.getElementById('plModal').classList.contains('open')) closePlanLine();
   else if(document.getElementById('commitModal').classList.contains('open')) closeCommit();
@@ -5632,6 +5749,1245 @@ function boot(){
   }
 }
 boot();
+
+/* ── ADAPTER ─ this app spells one helper differently ────────────────
+   The shared voice block calls isoOf(); here the same function is _iso.
+   Everything else it needs (entries, TYPE_META, PARTY_LABEL, guessCategory,
+   today, _mk, fmt, fmtDate, esc, showToast, openSheet/closeSheet, setType,
+   cancelEdit, saveEntry) is spelled identically in all three apps. */
+const isoOf = _iso;
+
+/* ══════════════════════════════════════════════════════════════════════════
+   v5.8 — VOICE ENTRY
+   ──────────────────────────────────────────────────────────────────────────
+   Dictation is two guesses stacked: what sound was said, and what those words
+   meant. Neither is ever certain — "fifteen thousand" and "fifty thousand"
+   are one phoneme apart — so this follows the rule every payments app
+   follows: SPEAK → PARSE → SHOW → CONFIRM. Nothing dictated reaches the
+   Sheet on the recogniser's word alone.
+
+   What makes the saved row correct, in order of how much work each does:
+     1. The check screen cannot be skipped, and Save stays DISABLED until
+        date, description, party and amount are all valid.
+     2. The transcript is shown verbatim, and every field says where it came
+        from — heard / matched to your books / assumed / edited by hand.
+     3. The amount is repeated IN WORDS. A mis-heard digit is invisible in
+        figures and obvious in words; that is why cheques have carried both
+        for three hundred years.
+     4. The recogniser's other guesses are kept. If the top one parses badly,
+        alternatives 2-5 are offered as one-tap chips.
+     5. Names snap to the party list already in the books (fuzzy), so
+        "flip cart" becomes Flipkart rather than a 55th party spelling.
+     6. Before saving: a duplicate check (same date + party + amount already
+        booked) and an outlier check (more than 3× anything ever recorded for
+        that party) — the two ways a mis-heard amount actually shows itself.
+     7. Confirm fills the ordinary form and calls saveEntry(), so the
+        cold-start verification, the re-entrancy guard and the category
+        handling are exactly the typed path. There is no second write route.
+
+   Dates are read day-first ([[sheets-date-locale-swap]]); text handling is
+   \p{L}\p{M}-based so a Tamil transcript is never quietly stripped.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const V_LS = { lang:'ibift_voice_lang', read:'ibift_voice_read', conf:'ibift_voice_confirm' };
+let vLang      = localStorage.getItem(V_LS.lang) || 'en-IN';
+let vReadBack  = localStorage.getItem(V_LS.read) !== '0';     // on unless turned off
+/* Hands-free saving (CEO, 10 Sep 2026): on unless turned off. It is still a
+   deliberate confirmation — it only arms AFTER the entry has been read back
+   aloud, it never arms while a warning is showing (a duplicate or an amount
+   out of proportion has to be looked at), and only a word from a fixed list
+   counts as an answer. */
+let vVoiceConf = localStorage.getItem(V_LS.conf) !== '0';
+let vConfTries = 0;
+const VoiceAPI = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+const voiceSupported = () => !!VoiceAPI;
+
+let vRec = null, vListening = false, vPhase = 'entry';   // entry | fix | confirm
+let vAltParts = {}, vInterim = '', vErrShown = false;
+let vSilenceT = null, vCapT = null;
+let vDraft = null, vAllAlts = [], vAltUsed = 0, vQueue = [], vQueueAt = 0;
+
+function voiceSetLang(k){ vLang = k; localStorage.setItem(V_LS.lang, k); voicePaintPrefs();
+  showToast('Voice language: ' + (k === 'ta-IN' ? 'தமிழ் (Tamil)' : (k === 'en-GB' ? 'English (UK)' : 'English (India)'))); }
+function voiceSetRead(on){ vReadBack = !!on; localStorage.setItem(V_LS.read, on ? '1' : '0'); }
+function voiceSetConf(on){ vVoiceConf = !!on; localStorage.setItem(V_LS.conf, on ? '1' : '0');
+  showToast(on ? 'Hands-free: say "save" after the read-back' : 'Saving now needs a tap'); }
+function voicePaintPrefs(){
+  document.querySelectorAll('#vLangChips .chip').forEach(b => b.classList.toggle('on', b.dataset.k === vLang));
+  const r = document.getElementById('vReadChk'); if(r) r.checked = vReadBack;
+  const c = document.getElementById('vConfChk'); if(c) c.checked = vVoiceConf;
+}
+
+/* ── words to numbers ────────────────────────────────────────────────────
+   Indian scale words included, because that is how the amounts are said
+   here: "one lakh twenty thousand", "1.5 lakh", "twenty five hundred". */
+const V_NUM = { zero:0,oh:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,
+  ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,
+  twenty:20,thirty:30,forty:40,fourty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90 };
+const V_SCALE = { hundred:100,hundreds:100,thousand:1000,thousands:1000,k:1000,
+  lakh:100000,lakhs:100000,lac:100000,lacs:100000,lakhs_:100000,
+  million:1000000,millions:1000000,crore:10000000,crores:10000000,cr:10000000 };
+/* A number followed by one of these is a quantity, not money. */
+const V_UNITS = new Set(['kg','kgs','kilo','kilos','gram','grams','gm','litre','litres','liter','ml',
+  'piece','pieces','pcs','nos','no','number','numbers','unit','units','box','boxes','packet','packets',
+  'pack','packs','bag','bags','dozen','percent','metre','metres','meter','feet','foot','inch','inches',
+  'times','am','pm','oclock','degree','kmpl','km']);
+const V_CUR = new Set(['rupees','rupee','rs','inr','rupay','bucks','amount','worth','only','ரூபாய்','ரூ']);
+
+const vIsDigits = t => /^\d+(?:\.\d+)?$/.test(t);
+function vNumTokVal(t){
+  if(vIsDigits(t)) return Number(t);
+  const m = /^(\d+(?:\.\d+)?)k$/.exec(t); if(m) return Number(m[1]) * 1000;
+  return null;
+}
+const vIsNumTok = t => vNumTokVal(t) !== null || V_NUM[t] !== undefined || V_SCALE[t] !== undefined;
+
+function vRunValue(toks){
+  if(!toks.length) return null;
+  // "two five zero zero" — digits read out one by one. Only when there is no
+  // scale word and at least three of them, so "twenty five" is untouched.
+  const allDigits = toks.every(t => (vIsDigits(t) && t.length === 1) || (V_NUM[t] !== undefined && V_NUM[t] < 10));
+  if(allDigits && toks.length >= 3){
+    return Number(toks.map(t => vIsDigits(t) ? t : String(V_NUM[t])).join(''));
+  }
+  let total = 0, cur = 0, any = false, i = 0;
+  while(i < toks.length){
+    const t = toks[i];
+    if(t === 'and'){ i++; continue; }
+    if(t === 'point' || t === 'decimal'){
+      let ds = '', j = i + 1;
+      while(j < toks.length){
+        const u = toks[j];
+        if(vIsDigits(u) && u.indexOf('.') < 0){ ds += u; j++; }
+        else if(V_NUM[u] !== undefined && V_NUM[u] < 10){ ds += V_NUM[u]; j++; }
+        else break;
+      }
+      if(ds){ cur += Number('0.' + ds); any = true; i = j; continue; }
+      i++; continue;
+    }
+    const nv = vNumTokVal(t);
+    if(nv !== null){ if(nv >= 1000 && !cur){ total += nv; } else { cur += nv; } any = true; i++; continue; }
+    if(V_NUM[t] !== undefined){ cur += V_NUM[t]; any = true; i++; continue; }
+    const s = V_SCALE[t];
+    if(s !== undefined){
+      any = true;
+      if(s >= 1000){ total += (cur || 1) * s; cur = 0; }
+      else { cur = (cur || 1) * s; }
+      i++; continue;
+    }
+    i++;
+  }
+  const v = total + cur;
+  return any && v > 0 ? Math.round(v * 100) / 100 : null;
+}
+function vOrd(t){
+  const m = /^(\d{1,2})(?:st|nd|rd|th)?$/.exec(t);
+  if(m){ const n = +m[1]; return (n >= 1 && n <= 31) ? n : null; }
+  if(V_NUM[t] !== undefined && V_NUM[t] >= 1 && V_NUM[t] <= 31) return V_NUM[t];
+  return null;
+}
+
+/* ── amount in words (Indian system) — the cheque safeguard ───────────── */
+const V_W1 = ['','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve',
+  'thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+const V_W10 = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+function vW2(n){ return n < 20 ? V_W1[n] : (V_W10[Math.floor(n/10)] + (n % 10 ? ' ' + V_W1[n % 10] : '')); }
+function vW3(n){ const h = Math.floor(n/100), r = n % 100;
+  return (h ? V_W1[h] + ' hundred' + (r ? ' ' : '') : '') + (r ? vW2(r) : ''); }
+function vWords(amount){
+  let n = Math.round((Number(amount) || 0) * 100);
+  const ps = n % 100; n = Math.floor(n / 100);
+  if(!n && !ps) return 'Nothing';
+  const parts = [];
+  const cr = Math.floor(n / 10000000); n %= 10000000;
+  const la = Math.floor(n / 100000);   n %= 100000;
+  const th = Math.floor(n / 1000);     n %= 1000;
+  if(cr) parts.push(vW2(cr > 99 ? 0 : cr) || vW3(cr), 'crore');
+  if(la) parts.push(vW2(la), 'lakh');
+  if(th) parts.push(vW2(th), 'thousand');
+  if(n)  parts.push(vW3(n));
+  let s = parts.join(' ').replace(/\s+/g, ' ').trim();
+  s = s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Zero';
+  const rupeeWord = (s === 'One' && !ps) ? ' rupee' : ' rupees';
+  return s + rupeeWord + (ps ? ' and ' + vW2(ps) + (ps === 1 ? ' paisa' : ' paise') : '') + ' only';
+}
+
+/* ── fuzzy matching against what is already in the books ───────────────── */
+function vKey(s){ return String(s == null ? '' : s).toLowerCase().replace(/[^\p{L}\p{M}\p{N}]+/gu, ' ').trim().replace(/\s+/g, ' '); }
+function vLev(a, b){
+  const m = a.length, n = b.length;
+  if(!m) return n; if(!n) return m;
+  let prev = Array.from({length:n+1}, (_, i) => i), cur = new Array(n+1);
+  for(let i = 1; i <= m; i++){
+    cur[0] = i;
+    for(let j = 1; j <= n; j++){
+      cur[j] = Math.min(prev[j] + 1, cur[j-1] + 1, prev[j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+    }
+    const t = prev; prev = cur; cur = t;
+  }
+  return prev[n];
+}
+function vScore(a, b){
+  a = vKey(a); b = vKey(b);
+  if(!a || !b) return 0;
+  if(a === b) return 1;
+  const A = a.replace(/ /g, ''), B = b.replace(/ /g, '');
+  if(A === B) return 0.98;                                   // "flip kart" = "flipkart"
+  if(A.length >= 4 && B.length >= 4 && (A.includes(B) || B.includes(A))) return 0.9;
+  /* Consonant skeleton — how a recogniser actually fails on Indian brand
+     names: the vowels move ("misho" for Meesho, "amazan" for Amazon) while
+     the consonants hold. Only trusted from three consonants up, so short
+     names such as coir / courier can never collide this way. */
+  const skel = x => x.replace(/[aeiou]/g, '').replace(/(.)\1+/g, '$1');
+  const SA = skel(A), SB = skel(B);
+  if(SA.length >= 3 && SA === SB) return 0.86;
+  return 1 - vLev(A, B) / Math.max(A.length, B.length);
+}
+function vBest(text, list, min){
+  min = min || 0.78;
+  let best = null;
+  (list || []).forEach(v => {
+    const s = vScore(text, v);
+    // Ties go to the SHORTEST candidate: "payout" fits "Amazon Payout" and
+    // "Amazon COD Payout" equally, and the shorter one assumes less.
+    if(!best || s > best.score || (s === best.score && String(v).length < String(best.value).length)) best = { value:v, score:s };
+  });
+  return best && best.score >= min ? best : null;
+}
+/* The tokeniser lower-cases everything, which would turn TNEB into "Tneb" and
+   SBI into "Sbi" on a party that is new to the books. The original spelling
+   is still in the transcript, so put it back word by word. */
+function vCaseMap(raw){
+  const m = new Map();
+  String(raw == null ? '' : raw).split(/[^\p{L}\p{M}\p{N}&.]+/u).forEach(w => {
+    const k = w.toLowerCase(); if(w && !m.has(k)) m.set(k, w);
+  });
+  return m;
+}
+function vRecase(phrase, map, titleAll){
+  return String(phrase || '').split(/\s+/).filter(Boolean).map((w, i) => {
+    const o = map && map.get(w);
+    if(o && /[A-Z]/.test(o.slice(1))) return o;                       // TNEB, SBI, GPay
+    if(o && /^[A-Z]/.test(o)) return (titleAll || i === 0) ? o : o;
+    return (titleAll || i === 0) ? w.charAt(0).toUpperCase() + w.slice(1) : w;
+  }).join(' ');
+}
+function vParties(){
+  const s = new Set();
+  entries.forEach(e => { if(e.party) s.add(String(e.party).trim()); });
+  (typeof commitments !== 'undefined' ? commitments : []).forEach(c => { if(c.party) s.add(String(c.party).trim()); });
+  (typeof plans !== 'undefined' ? plans : []).forEach(p => { if(p.party) s.add(String(p.party).trim()); });
+  return [...s].filter(Boolean);
+}
+function vPayers(){
+  const s = new Set(['self']);
+  entries.forEach(e => { if(e.paidBy) s.add(String(e.paidBy).trim()); });
+  (typeof plans !== 'undefined' ? plans : []).forEach(p => { if(p.paidBy) s.add(String(p.paidBy).trim()); });
+  return [...s].filter(Boolean);
+}
+function vDescList(){
+  const seen = new Set(), out = [];
+  [...entries].sort((a, b) => (b.date || '').localeCompare(a.date || '')).forEach(e => {
+    const v = String(e.description || '').trim(), k = v.toLowerCase();
+    if(v && !seen.has(k)){ seen.add(k); out.push(v); }
+  });
+  return out.slice(0, 400);
+}
+
+/* ── tokeniser ────────────────────────────────────────────────────────────
+   Unicode-aware on purpose: an [a-z] cleanup would keep the English filler
+   and throw away a Tamil transcript entirely. */
+function vNorm(raw){
+  return String(raw == null ? '' : raw)
+    .replace(/[₹]/g, ' rupees ')
+    .replace(/(\d)[,](?=\d)/g, '$1')
+    .replace(/(\d)[,](?=\d)/g, '$1')
+    .replace(/\/-/g, ' rupees ')
+    .toLowerCase();
+}
+function vTok(s){
+  const out = [];
+  vNorm(s).replace(/[^\p{L}\p{M}\p{N}.\-\/]+/gu, ' ').split(/\s+/).forEach(w => {
+    w = w.replace(/^[.\-\/]+/, '').replace(/[.\-\/]+$/, '');
+    if(w) out.push(w);
+  });
+  return out;
+}
+function vNew(raw){ const toks = vTok(raw); return { raw, toks, used: toks.map(() => false), caseMap: vCaseMap(raw) }; }
+function vTake(st, i, n){ for(let k = i; k < i + n; k++) if(k >= 0 && k < st.used.length) st.used[k] = true; }
+function vSpan(st, i, n){ return st.toks.slice(i, i + n).join(' '); }
+function vRest(st){ return st.toks.filter((t, i) => !st.used[i]); }
+function vFind(st, words){
+  outer:
+  for(let i = 0; i <= st.toks.length - words.length; i++){
+    for(let k = 0; k < words.length; k++){ if(st.used[i+k] || st.toks[i+k] !== words[k]) continue outer; }
+    return i;
+  }
+  return -1;
+}
+function vFindSeq(st, phrase){ return vFind(st, phrase.split(' ')); }
+
+/* ── payment mode ─────────────────────────────────────────────────────────
+   Run FIRST: it takes "credit card" off the table before the type reader can
+   read the word "credit" as a credit purchase. */
+const V_MODES = [
+  ['google pay','GPay'],['g pay','GPay'],['gpay','GPay'],['phone pe','GPay'],['phonepe','GPay'],
+  ['paytm','GPay'],['upi','GPay'],['bhim','GPay'],['qr code','GPay'],['scanner','GPay'],['scan','GPay'],
+  ['net banking','Bank'],['netbanking','Bank'],['bank transfer','Bank'],['neft','Bank'],['imps','Bank'],['rtgs','Bank'],
+  ['credit card','Card'],['debit card','Card'],['atm card','Card'],
+  ['auto debit','Auto-debit'],['autodebit','Auto-debit'],['standing instruction','Auto-debit'],['ecs','Auto-debit'],['nach','Auto-debit'],['mandate','Auto-debit'],
+  ['cheque','Cheque'],
+  ['cash','Cash'],['card','Card'],['bank','Bank'],['check','Cheque'],['ரொக்கம்','Cash']
+];
+const V_GENERIC_MODE = new Set(['cash','card','bank','check','scan']);
+const V_MODE_PREP = new Set(['by','via','through','using','in','with','mode','on']);
+function vGrabMode(st){
+  for(const [phrase, val] of V_MODES){
+    const words = phrase.split(' ');
+    const i = vFind(st, words); if(i < 0) continue;
+    const pi = i - 1, prev = pi >= 0 ? st.toks[pi] : '';
+    const hasPrep = pi >= 0 && !st.used[pi] && V_MODE_PREP.has(prev);
+    if(V_GENERIC_MODE.has(phrase) && !hasPrep) continue;     // "check the amount" is not a cheque
+    const span = (hasPrep ? prev + ' ' : '') + vSpan(st, i, words.length);
+    vTake(st, i, words.length);
+    if(hasPrep) st.used[pi] = true;
+    return { value: val, span };
+  }
+  return null;
+}
+
+/* ── who paid / received ─────────────────────────────────────────────────
+   Only accepted when it matches somebody already in the books (or means
+   "self"). Inventing a payer from a mis-heard word helps nobody. */
+const V_SELF = new Set(['self','myself','me','my','own','i','ceo']);
+function vGrabPaidBy(st){
+  const payers = vPayers();
+  for(let i = 0; i < st.toks.length; i++){
+    if(st.used[i] || (st.toks[i] !== 'by' && st.toks[i] !== 'through')) continue;
+    for(const n of [2, 1]){
+      let ok = true; const cand = [];
+      for(let k = 1; k <= n; k++){ const j = i + k; if(j >= st.toks.length || st.used[j]){ ok = false; break; } cand.push(st.toks[j]); }
+      if(!ok) continue;
+      const phrase = cand.join(' ');
+      if(V_SELF.has(phrase)){ vTake(st, i, n + 1); return { value:'self', span:'by ' + phrase, k:'heard' }; }
+      const m = vBest(phrase, payers, 0.82);
+      if(m){ vTake(st, i, n + 1); return { value:m.value, span:'by ' + phrase, k: vKey(phrase) === vKey(m.value) ? 'heard' : 'matched' }; }
+    }
+  }
+  return null;
+}
+
+/* ── date ─────────────────────────────────────────────────────────────────
+   Numeric forms are read DAY-first: 05-09-2026 is 5 September, never 9 May.
+   Run before the amount, so "on the 5th" is a date and not five rupees. */
+const V_MONTHS = { january:1,jan:1,february:2,feb:2,march:3,mar:3,april:4,apr:4,may:5,june:6,jun:6,
+  july:7,jul:7,august:8,aug:8,september:9,sept:9,sep:9,october:10,oct:10,november:11,nov:11,december:12,dec:12 };
+const V_DOW = { sunday:0,monday:1,tuesday:2,wednesday:3,thursday:4,friday:5,saturday:6,
+  sun:0,mon:1,tue:2,tues:2,wed:3,thu:4,thur:4,thurs:4,fri:5,sat:6 };
+function vShiftIso(n){ const d = new Date(); d.setDate(d.getDate() + n); return isoOf(d); }
+function vGrabDate(st){
+  let i = vFindSeq(st, 'day before yesterday'); if(i >= 0){ vTake(st, i, 3); return { value:vShiftIso(-2), span:'day before yesterday', k:'heard' }; }
+  i = vFindSeq(st, 'yesterday'); if(i >= 0){ vTake(st, i, 1); return { value:vShiftIso(-1), span:'yesterday', k:'heard' }; }
+  i = vFindSeq(st, 'today');     if(i >= 0){ vTake(st, i, 1); return { value:vShiftIso(0),  span:'today', k:'heard' }; }
+  i = vFindSeq(st, 'tomorrow');  if(i >= 0){ vTake(st, i, 1); return { value:vShiftIso(1),  span:'tomorrow', k:'heard' }; }
+
+  // "three days ago" / "2 days back"
+  for(let j = 0; j < st.toks.length; j++){
+    if(st.used[j] || (st.toks[j] !== 'ago' && st.toks[j] !== 'back')) continue;
+    const u = st.toks[j-1] || '', n = st.toks[j-2] || '';
+    if((u === 'days' || u === 'day') && vIsNumTok(n)){
+      const v = vRunValue([n]);
+      if(v && v <= 400){ vTake(st, j - 2, 3); return { value:vShiftIso(-Math.round(v)), span:n + ' ' + u + ' ' + st.toks[j], k:'heard' }; }
+    }
+  }
+  // dd/mm/yyyy or dd-mm-yy — day first
+  for(let j = 0; j < st.toks.length; j++){
+    if(st.used[j]) continue;
+    const m = /^(\d{1,2})[\/-](\d{1,2})(?:[\/-](\d{2,4}))?$/.exec(st.toks[j]); if(!m) continue;
+    const d = +m[1], mo = +m[2]; let y = m[3] ? +m[3] : new Date().getFullYear();
+    if(y < 100) y += 2000;
+    if(d >= 1 && d <= 31 && mo >= 1 && mo <= 12){
+      vTake(st, j, 1);
+      return { value:_mk(y, mo, d), span:st.toks[j], k:'heard' };
+    }
+  }
+  // "5 September", "September 5", "5th of September 2026"
+  for(let j = 0; j < st.toks.length; j++){
+    if(st.used[j]) continue;
+    const mo = V_MONTHS[st.toks[j]]; if(!mo) continue;
+    const take = [j];
+    let bi = j - 1;
+    if(bi >= 0 && !st.used[bi] && st.toks[bi] === 'of') bi--;
+    const dB = bi >= 0 && !st.used[bi] ? vOrd(st.toks[bi]) : null;
+    const dA = (j + 1) < st.toks.length && !st.used[j+1] ? vOrd(st.toks[j+1]) : null;
+    let day = null;
+    if(dB){ day = dB; take.push(bi); if(bi !== j - 1) take.push(j - 1); }
+    else if(dA){ day = dA; take.push(j + 1); }
+    if(!day) continue;                                  // a bare "may" or "march" is a word
+    let y = new Date().getFullYear(), assumedYear = true;
+    const yi = Math.max.apply(null, take) + 1;
+    if(yi < st.toks.length && !st.used[yi] && /^\d{4}$/.test(st.toks[yi])){ y = +st.toks[yi]; take.push(yi); assumedYear = false; }
+    let iso = _mk(y, mo, day);
+    if(assumedYear && iso > vShiftIso(30)) iso = _mk(y - 1, mo, day);
+    take.forEach(k => { st.used[k] = true; });
+    return { value:iso, span:take.sort((a,b)=>a-b).map(k => st.toks[k]).join(' '), k:'heard', assumedYear };
+  }
+  // "last Monday" / "on Friday"
+  for(let j = 0; j < st.toks.length; j++){
+    if(st.used[j]) continue;
+    const dw = V_DOW[st.toks[j]]; if(dw === undefined) continue;
+    const prev = j > 0 ? st.toks[j-1] : '';
+    if(prev !== 'last' && prev !== 'on' && st.toks[j].length <= 3) continue;   // "sat" alone is too weak
+    const now = new Date(); let back = (now.getDay() - dw + 7) % 7; if(back === 0) back = 7;
+    const take = (prev === 'last' || prev === 'on') ? 2 : 1;
+    vTake(st, take === 2 ? j - 1 : j, take);
+    return { value:vShiftIso(-back), span:(take === 2 ? prev + ' ' : '') + st.toks[j], k:'heard' };
+  }
+  // "on the 5th" — this month, or last month if that has not happened yet
+  for(let j = 0; j < st.toks.length; j++){
+    if(st.used[j] || st.toks[j] !== 'on') continue;
+    let k = j + 1;
+    if(k < st.toks.length && st.toks[k] === 'the') k++;
+    if(k >= st.toks.length || st.used[k]) continue;
+    if(!/^\d{1,2}(?:st|nd|rd|th)$/.test(st.toks[k])) continue;     // bare digits stay money
+    const day = vOrd(st.toks[k]); if(!day) continue;
+    const now = new Date();
+    let iso = _mk(now.getFullYear(), now.getMonth() + 1, day);
+    if(iso > today()){ const p = new Date(now.getFullYear(), now.getMonth() - 1, 1); iso = _mk(p.getFullYear(), p.getMonth() + 1, day); }
+    for(let z = j; z <= k; z++) st.used[z] = true;
+    return { value:iso, span:st.toks.slice(j, k + 1).join(' '), k:'heard' };
+  }
+  return null;
+}
+
+/* ── amount ───────────────────────────────────────────────────────────────
+   Every number run left in the sentence is a candidate. One marked by
+   "rupees"/"Rs" wins; several candidates and none marked means the reading
+   is not certain, which the check screen then says out loud. */
+function vGrabAmount(st){
+  const cands = [];
+  let i = 0;
+  while(i < st.toks.length){
+    if(st.used[i] || !vIsNumTok(st.toks[i])){ i++; continue; }
+    let j = i; const run = [];
+    while(j < st.toks.length && !st.used[j]){
+      const t = st.toks[j];
+      if(vIsNumTok(t)){ run.push(t); j++; continue; }
+      const bridge = (t === 'point' || t === 'decimal') ||
+        /* "and" joins one number ("one lakh AND fifty thousand"), but it also
+           separates two ("500 AND 2000 to the courier"). It only continues a
+           number when the grammar says so: after a scale word, or before a
+           spoken word rather than a bare figure. Without this, two amounts
+           quietly add up into one wrong total. */
+        (t === 'and' && j + 1 < st.toks.length && !st.used[j+1] && vIsNumTok(st.toks[j+1]) &&
+          (V_SCALE[st.toks[j-1]] !== undefined || V_NUM[st.toks[j+1]] !== undefined || V_SCALE[st.toks[j+1]] !== undefined));
+      if(bridge && j + 1 < st.toks.length && !st.used[j+1] && vIsNumTok(st.toks[j+1])){ run.push(t); j++; continue; }
+      break;
+    }
+    const nextTok = st.toks[j] || '', prevTok = i > 0 ? st.toks[i-1] : '';
+    let val = vRunValue(run), paiseTaken = 0;
+    if(val !== null && nextTok === 'paise'){
+      const ai = run.lastIndexOf('and');
+      if(ai > 0){ const rs = vRunValue(run.slice(0, ai)), ps = vRunValue(run.slice(ai + 1));
+        if(rs !== null && ps !== null && ps < 100){ val = rs + ps / 100; paiseTaken = 1; } }
+      else if(val < 100){ val = val / 100; paiseTaken = 1; }
+    }
+    if(val !== null && val > 0 && !V_UNITS.has(nextTok)){
+      cands.push({ val, i, n: j - i + paiseTaken, marked: V_CUR.has(prevTok) || V_CUR.has(nextTok), span: run.join(' ') });
+    }
+    i = j > i ? j : i + 1;
+  }
+  if(!cands.length) return null;
+  const marked = cands.filter(c => c.marked);
+  const pool = (marked.length ? marked : cands).slice().sort((a, b) => b.val - a.val);
+  const pick = pool[0];
+  vTake(st, pick.i, pick.n);
+  if(V_CUR.has(st.toks[pick.i - 1] || '')) st.used[pick.i - 1] = true;
+  let after = pick.i + pick.n;
+  if(V_CUR.has(st.toks[after] || '')){ st.used[after] = true; after++; }
+  /* "485 rupees 31 paise" — the paise are a tail of the SAME amount, not a
+     second one. Folded in here so they neither vanish nor sit in the
+     description as a stray number. */
+  const tail = [];
+  let z = after;
+  while(z < st.toks.length && !st.used[z] && vIsNumTok(st.toks[z])){ tail.push(st.toks[z]); z++; }
+  let paiseAdded = 0;
+  if(tail.length && st.toks[z] === 'paise'){
+    const pv = vRunValue(tail);
+    if(pv !== null && pv < 100){ paiseAdded = pv / 100; for(let q = after; q <= z; q++) st.used[q] = true; }
+  }
+  const others = cands.filter(c => c !== pick && !(paiseAdded && c.i >= after && c.i < z));
+  if(paiseAdded){ pick.val = Math.round((pick.val + paiseAdded) * 100) / 100; pick.span += ' ' + tail.join(' ') + ' paise'; }
+  const alts = [...new Set(others.map(c => c.val))].slice(0, 4);
+  /* Only ONE number in the whole sentence is the strong case — there is
+     nothing it could be confused with. More than one, and the reading is a
+     choice, which the check screen has to say out loud. */
+  return { value:pick.val, span:pick.span, k: others.length ? 'guess' : 'heard',
+           sure: !others.length, alts };
+}
+
+/* ── what kind of entry ───────────────────────────────────────────────────
+   Order is the logic: a settlement is not an expense again, and "on credit"
+   is not the same word as "credited". Verbs are consumed so they do not end
+   up in the description; nouns ("payout", "purchase") are left in it. */
+const V_TYPE_PHRASES = [
+  ['settlement','paid off',1],['settlement','cleared the due',1],['settlement','due cleared',1],['settlement','balance cleared',1],
+  ['settlement','settled',1],['settlement','settling',1],['settlement','settle',1],['settlement','settlement',0],['settlement','cleared',1],['settlement','அடைத்தேன்',1],['settlement','தீர்த்தேன்',1],
+  ['credit','on credit',1],['credit','in credit',1],['credit','credit purchase',0],['credit','not paid yet',1],['credit','not yet paid',1],
+  ['credit','without paying',1],['credit','unpaid',1],['credit','to be paid',1],['credit','payable',1],['credit','owe',1],['credit','owed',1],['credit','borrowed',1],['credit','udhar',1],['credit','கடன்',1],['credit','பாக்கி',1],
+  ['saving','deposited',1],['saving','invested',1],['saving','saved',1],
+  ['saving','fixed deposit',0],['saving','recurring deposit',0],['saving','mutual fund',0],['saving','deposit',0],
+  ['saving','investment',0],['saving','savings',0],['saving','chit',0],['saving','ppf',0],['saving','sip',0],['saving','சேமிப்பு',0],
+  ['income','received',1],['income','receipt',0],['income','credited',1],['income','payout',0],
+  ['income','income',0],['income','earned',1],['income','got',1],['income','sold',1],['income','sale',0],['income','sales',0],
+  ['income','revenue',0],['income','collection',0],['income','வரவு',0],['income','கிடைத்தது',1],['income','விற்பனை',0],
+  ['expense','purchased',1],['expense','purchase',0],['expense','bought',1],['expense','spent',1],['expense','expense',0],
+  ['expense','paid',1],['expense','pay',1],['expense','payment',0],['expense','gave',1],['expense','given',1],
+  ['expense','bill',0],['expense','charges',0],['expense','cost',0],['expense','செலவு',0],['expense','கொடுத்தேன்',1],['expense','வாங்கினேன்',1]
+];
+function vGrabType(st){
+  const flat = st.toks.filter((t, i) => !st.used[i]).join(' ');
+  // "settlement received from Amazon" is a receipt, not a settlement paid.
+  const incomeMarker = /(^|\s)(received|credited|payout|got|collected)(\s|$)/.test(flat);
+  for(const [type, phrase, consume] of V_TYPE_PHRASES){
+    if(type === 'settlement' && incomeMarker) continue;
+    const words = phrase.split(' ');
+    const i = vFind(st, words); if(i < 0) continue;
+    if(consume) vTake(st, i, words.length);
+    /* Take out the OTHER wordings of the same type as well, but only the
+       verbs and the multi-word names — "into SBI fixed deposit" must not
+       leave a party called "Sbi Fixed Deposit". Single nouns (bill, payout,
+       purchase) stay, because they are usually the description itself. */
+    const spans = [phrase];
+    V_TYPE_PHRASES.forEach(([t2, p2, c2]) => {
+      if(t2 !== type || p2 === phrase) return;
+      const w2 = p2.split(' ');
+      if(!c2 && w2.length < 2) return;
+      const j = vFind(st, w2); if(j < 0) return;
+      vTake(st, j, w2.length); spans.push(p2);
+    });
+    return { value:type, span:phrase, spans, k:'heard' };
+  }
+  return null;
+}
+/* Nothing said? Then what this description or party has ALWAYS been in these
+   books beats a coin toss. */
+function vTypeFromHistory(desc, party){
+  const dk = vKey(desc), pk = vKey(party);
+  const pick = list => {
+    const counts = {};
+    list.forEach(e => { const t = TYPE_META[e.type] ? e.type : 'expense'; counts[t] = (counts[t] || 0) + 1; });
+    const best = Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0];
+    return best && counts[best] >= Math.max(1, list.length * 0.6) ? best : null;
+  };
+  if(dk){ const l = entries.filter(e => vKey(e.description) === dk); if(l.length) { const t = pick(l); if(t) return { value:t, why:'always the type for "' + String(desc).trim() + '" in your books' }; } }
+  if(pk){ const l = entries.filter(e => vKey(e.party) === pk); if(l.length >= 2){ const t = pick(l); if(t) return { value:t, why:'the usual type for ' + String(party).trim() }; } }
+  return null;
+}
+
+/* ── party ───────────────────────────────────────────────────────────────
+   "from" for money in, "to"/"at" for money out — then snapped to a name
+   already in the books so the party analysis does not gain a new spelling. */
+const V_STOP = new Set(['for','on','by','in','at','with','note','and','to','from','through','via','using',
+  'was','is','the','a','an','of','account','rupees','rupee','rs','today','yesterday','tomorrow','paise']);
+function vCapture(st, at){
+  const out = [], idx = [];
+  let k = at + 1;
+  while(k < st.toks.length && st.toks[k] === 'the') k++;
+  while(k < st.toks.length && out.length < 4){
+    const t = st.toks[k];
+    if(st.used[k] || V_STOP.has(t) || vIsNumTok(t) || V_CUR.has(t)) break;
+    out.push(t); idx.push(k); k++;
+  }
+  return { words: out, idx };
+}
+function vGrabParty(st, type){
+  const parties = vParties();
+  const preps = (type === 'income') ? ['from','of'] : ['to','into','at','for'];
+  const order = preps.concat(['from','to','into','at']);
+  for(const p of order){
+    for(let i = 0; i < st.toks.length; i++){
+      if(st.used[i] || st.toks[i] !== p) continue;
+      const cap = vCapture(st, i); if(!cap.words.length) continue;
+      /* Longest first, then shorter: "into SBI fixed deposit" must find SBI
+         and leave "fixed deposit" to the description, not invent a party
+         called "Sbi Fixed Deposit". */
+      let best = null, bestLen = 0;
+      for(let n = cap.words.length; n >= 1; n--){
+        const m = vBest(cap.words.slice(0, n).join(' '), parties, 0.78);
+        if(m && (!best || m.score > best.score)){ best = m; bestLen = n; }
+      }
+      const useLen = best ? bestLen : cap.words.length;
+      const phrase = cap.words.slice(0, useLen).join(' ');
+      st.used[i] = true; cap.idx.slice(0, useLen).forEach(k => { st.used[k] = true; });
+      if(best) return { value:best.value, span:p + ' ' + phrase, k: vKey(phrase) === vKey(best.value) ? 'heard' : 'matched' };
+      return { value:vRecase(phrase, st.caseMap, true), span:p + ' ' + phrase, k:'heard', isNew:true };
+    }
+  }
+  // No preposition — but a name from the books may simply be sitting in the
+  // sentence ("Amazon payout 5000"). Found, not consumed: it belongs to the
+  // description too.
+  const idxs = st.toks.map((t, i) => i).filter(i => !st.used[i]);
+  let hit = null;
+  for(let w = 3; w >= 1; w--){
+    for(let a = 0; a + w <= idxs.length; a++){
+      const seq = idxs.slice(a, a + w);
+      if(seq[w-1] - seq[0] !== w - 1) continue;                 // must be side by side
+      const phrase = seq.map(k => st.toks[k]).join(' ');
+      if(phrase.replace(/\s/g, '').length < 4) continue;
+      const m = vBest(phrase, parties, 0.82);                   // "misho" is Meesho
+      if(m && (!hit || m.score > hit.score)) hit = { value:m.value, phrase, score:m.score };
+    }
+  }
+  if(hit) return { value:hit.value, span:hit.phrase, k: vKey(hit.phrase) === vKey(hit.value) ? 'heard' : 'matched' };
+  return null;
+}
+function vTitle(s){
+  return String(s || '').split(/\s+/).filter(Boolean)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+/* ── description — whatever is left, snapped to a wording already used ─── */
+const V_FILLER = new Set(['add','record','enter','entry','make','new','please','kindly','i','we','have',
+  'has','had','was','were','is','am','the','a','an','my','our','it','this','that','also','and','then',
+  'of','for','to','from','on','in','at','with','by','rupees','rupee','rs','only','okay','ok','so','just','note','towards','as','amount']);
+/* A wording that carries a month or a year ("Staff Salary May 2026- Aswin")
+   must never be pulled onto a new entry that did not say it — that files a
+   September payment under May. */
+const V_DATEY = /(^|\s)(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s*'?\d{2,4}|\b(19|20)\d{2}\b|\b\d{1,2}[\/-]\d{1,2}\b/i;
+function vDescOf(st, party){
+  let w = vRest(st).filter(t => !['add','record','entry','please','kindly'].includes(t));
+  while(w.length && V_FILLER.has(w[0])) w.shift();
+  while(w.length && V_FILLER.has(w[w.length-1])) w.pop();
+  const phrase = w.join(' ').trim();
+  if(!phrase) return null;
+  const saidDate = V_DATEY.test(phrase);
+  const usable = list => saidDate ? list : list.filter(v => !V_DATEY.test(v));
+  /* Snap to a wording already used WITH THIS PARTY first. A bare "payout"
+     matches every marketplace description in the books equally well, and
+     without the party it once snapped an Amazon receipt to "Meesho Payout". */
+  if(party){
+    const mine = [];
+    const seen = new Set();
+    [...entries].filter(e => vKey(e.party) === vKey(party))
+      .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+      .forEach(e => { const v = String(e.description || '').trim(); const k = v.toLowerCase();
+        if(v && !seen.has(k)){ seen.add(k); mine.push(v); } });
+    const mm = vBest(phrase, usable(mine), 0.8);
+    if(mm) return { value:mm.value, span:phrase, k: vKey(phrase) === vKey(mm.value) ? 'heard' : 'matched' };
+  }
+  const m = vBest(phrase, usable(vDescList()), 0.84);
+  if(m) return { value:m.value, span:phrase, k: vKey(phrase) === vKey(m.value) ? 'heard' : 'matched' };
+  return { value: vRecase(phrase, st.caseMap, false), span:phrase, k:'heard' };
+}
+
+/* ── the parse ───────────────────────────────────────────────────────────── */
+function voiceParse(raw){
+  const st = vNew(raw);
+  const d = { raw:String(raw || '').trim(), src:{}, amountAlts:[] };
+
+  // note first — everything after "note" is a note, not a field
+  let ni = vFindSeq(st, 'note'); if(ni < 0) ni = vFindSeq(st, 'remark');
+  if(ni >= 0 && ni + 1 < st.toks.length){
+    const rest = [];
+    for(let k = ni + 1; k < st.toks.length; k++){ if(!st.used[k]){ rest.push(st.toks[k]); st.used[k] = true; } }
+    st.used[ni] = true;
+    if(rest.length){
+      const nt = rest.join(' ');
+      d.note = nt.charAt(0).toUpperCase() + nt.slice(1);
+      d.src.note = { k:'heard', txt:'heard "' + nt + '"' };
+    }
+  }
+
+  const mode   = vGrabMode(st);
+  const paidBy = vGrabPaidBy(st);
+  const date   = vGrabDate(st);
+  const amount = vGrabAmount(st);
+  const type   = vGrabType(st);
+  const party  = vGrabParty(st, type ? type.value : 'expense');
+  const desc   = vDescOf(st, party ? party.value : '');
+
+  d.mode   = mode ? mode.value : '';
+  d.paidBy = paidBy ? paidBy.value : '';
+  d.date   = date ? date.value : today();
+  d.amount = amount ? amount.value : 0;
+  d.amountAlts = amount ? amount.alts : [];
+  d.party  = party ? party.value : '';
+  d.desc   = desc ? desc.value : '';
+
+  if(type){ d.type = type.value; d.src.type = { k:'heard', txt:'heard "' + type.span + '"' }; }
+  else {
+    const h = vTypeFromHistory(d.desc, d.party);
+    if(h){ d.type = h.value; d.src.type = { k:'guess', txt: h.why }; }
+    else { d.type = 'expense'; d.src.type = { k:'guess', txt:'not stated — assumed Expense. Change it if wrong.' }; }
+  }
+  if(!TYPE_META[d.type]) d.type = 'expense';
+
+  // A description still missing: what this party is usually for, then the
+  // wording that named the type ("fixed deposit"), then the category.
+  if(!d.desc && d.party){
+    const prev = [...entries].filter(e => vKey(e.party) === vKey(d.party) && e.description && !V_DATEY.test(e.description))
+                             .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+    if(prev){ d.desc = String(prev.description).trim(); d.src.desc = { k:'guess', txt:'not said — your last entry for ' + d.party }; }
+  }
+  if(!d.desc && type && type.spans && type.spans.length){
+    const longest = type.spans.slice().sort((a, b) => b.length - a.length)[0];
+    d.desc = longest.charAt(0).toUpperCase() + longest.slice(1);
+    d.src.desc = { k:'guess', txt:'taken from "' + longest + '" — check it says enough' };
+  }
+
+  d.src.amount = amount
+    ? { k: amount.k, txt: (amount.k === 'heard' ? 'heard "' : 'read from "') + amount.span + '"' + (amount.alts.length ? ' — other numbers were said too' : '') }
+    : { k:'missing', txt:'no amount heard — type it in' };
+  d.src.date = date
+    ? { k:'heard', txt:'heard "' + date.span + '"' + (date.assumedYear ? ' — year not said, assumed ' + d.date.slice(0, 4) : '') }
+    : { k:'guess', txt:'not said — today' };
+  d.src.party = party
+    ? { k: party.k, txt: party.k === 'matched' ? 'heard "' + party.span + '" → matched to ' + party.value + ' in your books'
+        : (party.isNew ? 'heard "' + party.span + '" — a new party, not in your books yet' : 'heard "' + party.span + '"') }
+    : { k:'missing', txt:'no party heard — who was it with?' };
+  if(!d.src.desc) d.src.desc = desc
+    ? { k: desc.k, txt: desc.k === 'matched' ? 'heard "' + desc.span + '" → matched to "' + desc.value + '"' : 'heard "' + desc.span + '"' }
+    : { k:'missing', txt:'nothing left to use as a description' };
+  d.src.mode   = mode   ? { k:'heard', txt:'heard "' + mode.span + '"' }   : { k:'guess', txt:'not said — optional' };
+  d.src.paidBy = paidBy ? { k:paidBy.k, txt:'heard "' + paidBy.span + '"' } : { k:'guess', txt:'not said — optional' };
+
+  d.category = guessCategory(d.desc, d.party, d.type);
+  d.catAuto  = true;
+  d.src.category = { k:'guess', txt:'guessed from the description — change it if wrong' };
+  if(!d.note){ d.note = ''; d.src.note = { k:'guess', txt:'not said — optional' }; }
+  d.leftover = vRest(st).join(' ');
+  return d;
+}
+/* How well did this transcript parse? Used to choose between the
+   recogniser's alternatives — the reading that yields a real entry wins. */
+function voiceScore(d){
+  if(!d) return -1;
+  let s = 0;
+  if(d.amount > 0) s += 4;
+  if(d.src.amount && d.src.amount.k === 'heard') s += 2;
+  if(d.party) s += 2;
+  if(d.src.party && d.src.party.k === 'matched') s += 1;
+  if(d.desc) s += 2;
+  if(d.src.type && d.src.type.k === 'heard') s += 2;
+  if(d.src.date && d.src.date.k === 'heard') s += 1;
+  return s;
+}
+
+/* ── the checks that stand between a draft and the books ─────────────────── */
+function voiceBlocks(d){
+  const b = [];
+  if(!(Number(d.amount) > 0)) b.push('an amount');
+  if(!String(d.desc || '').trim()) b.push('a description');
+  if(!String(d.party || '').trim()) b.push('a party');
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(d.date || ''))) b.push('a valid date');
+  return b;
+}
+function voiceWarnings(d){
+  const out = [];
+  if(!(Number(d.amount) > 0)) return out;
+  const dup = entries.find(e => String(e.date || '').slice(0, 10) === d.date
+    && Math.round((Number(e.amount) || 0) * 100) === Math.round(Number(d.amount) * 100)
+    && vKey(e.party) === vKey(d.party));
+  if(dup) out.push('An entry with the same date, party and amount is already in the books &mdash; <b>' +
+    esc(dup.description || '') + '</b>. Saving this makes two.');
+  /* A mis-heard scale word ("lakh" for "thousand") shows itself as a figure
+     out of all proportion to the books — against this party first, and then
+     against every entry ever made. */
+  const hist = entries.filter(e => vKey(e.party) === vKey(d.party)).map(e => Number(e.amount) || 0).filter(v => v > 0);
+  let flagged = false;
+  if(hist.length >= 2){
+    const mx = Math.max.apply(null, hist);
+    if(Number(d.amount) > mx * 3){ flagged = true;
+      out.push('That is more than three times the largest amount ever recorded for ' +
+        esc(d.party) + ' (' + fmt(mx) + '). Check the figure was heard right.'); }
+  }
+  if(!flagged){
+    const all = entries.map(e => Number(e.amount) || 0).filter(v => v > 0);
+    if(all.length >= 5){
+      const mxAll = Math.max.apply(null, all);
+      if(Number(d.amount) > mxAll * 3) out.push('That is more than three times the largest amount anywhere in the books (' +
+        fmt(mxAll) + '). Check the figure was heard right.');
+    }
+  }
+  if(d.date > today()) out.push('That date is in the future.');
+  if(d.amountAlts && d.amountAlts.length) out.push('More than one number was said. Check the amount below.');
+  if(d.src.party && d.src.party.k === 'heard' && d.party && !vBest(d.party, vParties(), 0.9))
+    out.push('<b>' + esc(d.party) + '</b> is not a party in your books yet &mdash; it will be added as a new one.');
+  return out;
+}
+
+/* ── the sentence, on screen and read aloud ─────────────────────────────── */
+function voiceSentence(d, spoken){
+  const meta = TYPE_META[d.type] || TYPE_META.expense;
+  const rel  = d.type === 'income' ? 'from' : (d.type === 'saving' ? 'into' : 'to');
+  const amt  = spoken ? vWords(d.amount).replace(/ only$/, '') : fmt(d.amount || 0);
+  let s = meta.label + ' of ' + amt + ' ' + rel + ' ' + (d.party || '—');
+  if(d.desc) s += ' for ' + d.desc;
+  s += ', dated ' + fmtDate(d.date);
+  if(d.mode)   s += ', by ' + d.mode;
+  if(d.paidBy) s += ', handled by ' + d.paidBy;
+  return s + '.';
+}
+function voiceSpeak(text, after){
+  try{
+    if(!window.speechSynthesis){ if(after) after(); return; }
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = vLang.indexOf('ta') === 0 ? 'ta-IN' : 'en-IN';
+    u.rate = 1; u.pitch = 1;
+    u.onend = () => { if(after) after(); };
+    u.onerror = () => { if(after) after(); };
+    speechSynthesis.speak(u);
+  } catch(_){ if(after) after(); }
+}
+
+/* ── microphone ─────────────────────────────────────────────────────────── */
+const V_ERRS = {
+  'not-allowed':'The microphone is blocked for this site. Allow it in the browser address bar (the padlock &rarr; Microphone &rarr; Allow), then try again.',
+  'service-not-allowed':'The microphone is blocked for this site. Allow it in the browser settings, then try again.',
+  'audio-capture':'No microphone was found. Plug one in, or use the phone.',
+  'network':'Speech recognition needs an internet connection — it could not reach the service.',
+  'no-speech':'Nothing was heard. Tap the microphone and speak a little closer to it.',
+  'aborted':''
+};
+function voiceStop(){
+  if(vSilenceT){ clearTimeout(vSilenceT); vSilenceT = null; }
+  if(vCapT){ clearTimeout(vCapT); vCapT = null; }
+  try{ if(vRec) vRec.stop(); } catch(_){}
+}
+function voiceBumpSilence(){
+  if(vSilenceT) clearTimeout(vSilenceT);
+  vSilenceT = setTimeout(() => { voiceStop(); }, 2300);
+}
+function voiceToggle(){ if(vListening) voiceStop(); else voiceStart('entry'); }
+function voiceStart(phase){
+  if(!voiceSupported()){ voiceUnsupported(); return; }
+  if(vListening) return;
+  vPhase = phase || 'entry';
+  vAltParts = {}; vInterim = ''; vErrShown = false;
+  document.getElementById('vErr').innerHTML = '';
+  try{
+    vRec = new VoiceAPI();
+    vRec.lang = vLang;
+    vRec.continuous = true;          // a pause mid-sentence must not end the entry
+    vRec.interimResults = true;
+    vRec.maxAlternatives = 5;        // kept: the 2nd guess is often the right one
+  } catch(e){ voiceUnsupported(); return; }
+
+  vRec.onstart = () => {
+    vListening = true;
+    voicePaintMic();
+    vCapT = setTimeout(() => voiceStop(), 30000);
+  };
+  vRec.onresult = ev => {
+    let interim = '';
+    for(let i = ev.resultIndex; i < ev.results.length; i++){
+      const res = ev.results[i];
+      if(res.isFinal){
+        const arr = [];
+        for(let a = 0; a < res.length && a < 5; a++) arr.push(res[a].transcript);
+        vAltParts[i] = arr;
+      } else interim += res[0].transcript;
+    }
+    vInterim = interim;
+    voicePaintHeard();
+    voiceBumpSilence();
+  };
+  vRec.onspeechend = () => voiceBumpSilence();
+  vRec.onerror = ev => {
+    const msg = V_ERRS[ev.error] !== undefined ? V_ERRS[ev.error] : ('Speech recognition stopped: ' + ev.error + '.');
+    if(msg){ document.getElementById('vErr').innerHTML = '<div class="v-err"><i class="ti ti-alert-triangle"></i> ' + msg + '</div>'; vErrShown = true; }
+  };
+  vRec.onend = () => {
+    vListening = false;
+    if(vSilenceT){ clearTimeout(vSilenceT); vSilenceT = null; }
+    if(vCapT){ clearTimeout(vCapT); vCapT = null; }
+    vInterim = '';
+    voicePaintMic(); voicePaintHeard();
+    const alts = voiceAltTexts();
+    if(!alts.length){
+      if(!vErrShown) document.getElementById('vErr').innerHTML =
+        '<div class="v-err"><i class="ti ti-ear-off"></i> Nothing was caught. Tap the microphone and say it again — one sentence, a little slower.</div>';
+      return;
+    }
+    if(vPhase === 'confirm') voiceHandleConfirmWord(alts[0]);
+    else if(vPhase === 'fix') voiceApplyCorrection(alts[0]);
+    else voiceHandleEntry(alts);
+  };
+  try{ vRec.start(); }
+  catch(e){ vListening = false; voicePaintMic();
+    document.getElementById('vErr').innerHTML = '<div class="v-err"><i class="ti ti-alert-triangle"></i> The microphone could not be started. Close any other tab that is listening and try again.</div>'; }
+}
+function voiceAltTexts(){
+  const idx = Object.keys(vAltParts).map(Number).sort((a, b) => a - b);
+  if(!idx.length) return [];
+  const depth = Math.min(5, Math.max.apply(null, idx.map(i => vAltParts[i].length)));
+  const out = [];
+  for(let a = 0; a < depth; a++){
+    out.push(idx.map(i => (vAltParts[i][a] || vAltParts[i][0] || '')).join(' ').replace(/\s+/g, ' ').trim());
+  }
+  return [...new Set(out)].filter(Boolean);
+}
+function voicePaintMic(){
+  voicePaintListenNote();
+  const b = document.getElementById('vMicBtn'); if(!b) return;
+  b.classList.toggle('live', vListening);
+  b.innerHTML = '<i class="ti ' + (vListening ? 'ti-player-stop-filled' : 'ti-microphone') + '"></i>';
+  const st = document.getElementById('vState'), sub = document.getElementById('vSub');
+  if(vListening){ st.textContent = 'Listening… tap to stop'; sub.textContent = 'It stops on its own a couple of seconds after you finish.'; }
+  else { st.textContent = 'Tap the microphone and say the entry';
+    sub.textContent = 'One sentence is enough — what happened, how much, and with whom.'; }
+}
+function voicePaintHeard(){
+  const el = document.getElementById('vHeard'); if(!el) return;
+  const finals = voiceAltTexts();
+  const text = (finals[0] || '') + (vInterim ? (finals[0] ? ' ' : '') + '<span class="interim">' + esc(vInterim) + '</span>' : '');
+  if(!finals[0] && !vInterim){ el.className = 'v-heard empty'; el.textContent = vListening ? 'Listening…' : 'Nothing heard yet.'; return; }
+  el.className = 'v-heard';
+  el.innerHTML = esc(finals[0] || '') + (vInterim ? ' <span class="interim">' + esc(vInterim) + '</span>' : '');
+}
+
+/* One utterance may hold more than one entry. Only split when BOTH halves
+   carry their own amount — otherwise "and" is just a word in a sentence. */
+function voiceSplit(text){
+  const parts = String(text).split(/\b(?:next entry|new entry|second entry|and then|also add|another entry)\b/i)
+    .map(s => s.trim()).filter(Boolean);
+  if(parts.length < 2) return [text];
+  const drafts = parts.map(p => voiceParse(p));
+  return drafts.every(d => d.amount > 0) ? parts : [text];
+}
+function voiceHandleEntry(alts){
+  vAllAlts = alts;
+  const parsed = alts.map(a => voiceParse(a));
+  let bestI = 0;
+  parsed.forEach((d, i) => { if(voiceScore(d) > voiceScore(parsed[bestI])) bestI = i; });
+  vAltUsed = bestI;
+  const chunks = voiceSplit(alts[bestI]);
+  vQueue = chunks.map(c => voiceParse(c));
+  vQueueAt = 0;
+  vDraft = vQueue[0];
+  voiceShowCheck();
+}
+function voiceUseAlt(i){
+  if(!vAllAlts[i]) return;
+  vAltUsed = i;
+  vQueue = voiceSplit(vAllAlts[i]).map(c => voiceParse(c));
+  vQueueAt = 0; vDraft = vQueue[0];
+  voiceShowCheck();
+  showToast('Re-read using another guess');
+}
+
+/* ── the check screen ───────────────────────────────────────────────────── */
+const V_MODE_OPTS = [['',"Not stated"],['Cash','Cash'],['GPay','GPay / UPI'],['Bank','Bank transfer'],
+  ['Card','Card'],['Cheque','Cheque'],['Auto-debit','Auto-debit / ECS'],['Other','Other']];
+function vSrcHTML(k){
+  const s = (vDraft && vDraft.src && vDraft.src[k]) || {};
+  const cls = s.k === 'heard' ? 'ok' : (s.k === 'missing' ? 'miss' : (s.k === 'edited' ? 'edit' : 'guess'));
+  return '<div class="v-src" id="vsrc-' + k + '"><span class="v-dot ' + cls + '"></span><span>' + esc(s.txt || '') + '</span></div>';
+}
+function voiceShowCheck(){
+  const d = vDraft; if(!d) return;
+  document.getElementById('vStepListen').style.display = 'none';
+  const box = document.getElementById('vStepCheck');
+  box.style.display = 'block';
+  const typeChips = ['income','expense','saving','credit','settlement'].map(t =>
+    '<button type="button" class="chip c-' + t + (d.type === t ? ' on' : '') + '" data-t="' + t + '" onclick="voiceSetType(\'' + t + '\')"><i class="ti ' +
+    TYPE_META[t].icon + '"></i> ' + TYPE_META[t].label + '</button>').join('');
+  const altChips = vAllAlts.length > 1
+    ? '<div class="v-alt"><span class="lbl">It may also have heard:</span>' +
+      vAllAlts.map((a, i) => i === vAltUsed ? '' : '<button type="button" class="chip" onclick="voiceUseAlt(' + i + ')">' + esc(a) + '</button>').join('') + '</div>'
+    : '';
+  const amtAlts = (d.amountAlts && d.amountAlts.length)
+    ? '<div class="v-alt"><span class="lbl">Other numbers said:</span>' +
+      d.amountAlts.map(v => '<button type="button" class="chip" onclick="voiceSetAmount(' + v + ')">' + fmt(v) + '</button>').join('') + '</div>'
+    : '';
+  box.innerHTML =
+    (vQueue.length > 1 ? '<div class="v-queue"><i class="ti ti-list-numbers"></i> Entry ' + (vQueueAt + 1) + ' of ' + vQueue.length + ' from what you said</div>' : '') +
+    '<div class="v-raw"><b>What I heard:</b> &ldquo;' + esc(d.raw) + '&rdquo;</div>' +
+    '<div class="v-sum"><span class="lg" style="font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);font-weight:700;display:block;margin-bottom:7px">This is what will be saved</span>' +
+      '<div class="v-sum-line" id="vSumLine"></div><div class="v-words" id="vSumWords"></div></div>' +
+    '<div id="vFlags"></div>' +
+    '<div class="v-listen" id="vListenNote" style="display:none"><span class="v-listen-dot"></span>' +
+      '<span>Listening for <b>&ldquo;save&rdquo;</b> &mdash; or say <b>cancel</b>. You can always tap the button instead.</span></div>' +
+    '<div class="fld-row one"><div class="fld"><label>Type</label><div class="chip-row" id="vTypeChips">' + typeChips + '</div>' + vSrcHTML('type') + '</div></div>' +
+    '<div class="fld-row">' +
+      '<div class="fld"><label for="vfDate">Date</label><input type="date" id="vfDate" value="' + esc(d.date) + '" oninput="voiceEdit(\'date\',this.value)">' + vSrcHTML('date') + '</div>' +
+      '<div class="fld"><label for="vfAmount">Amount (₹)</label><input type="number" id="vfAmount" min="0" inputmode="decimal" value="' + (d.amount || '') + '" oninput="voiceEdit(\'amount\',this.value)">' + vSrcHTML('amount') + amtAlts + '</div>' +
+    '</div>' +
+    '<div class="fld-row one"><div class="fld"><label for="vfDesc">Description / Particulars</label><input type="text" id="vfDesc" list="dlDesc" autocomplete="off" value="' + esc(d.desc) + '" oninput="voiceEdit(\'desc\',this.value)">' + vSrcHTML('desc') + '</div></div>' +
+    '<div class="fld-row">' +
+      '<div class="fld"><label for="vfParty" id="vfPartyLbl">' + esc(PARTY_LABEL[d.type] || 'Paid to') + '</label><input type="text" id="vfParty" list="dlParty" autocomplete="off" value="' + esc(d.party) + '" oninput="voiceEdit(\'party\',this.value)">' + vSrcHTML('party') + '</div>' +
+      '<div class="fld"><label for="vfPaidBy">Paid by / received by</label><input type="text" id="vfPaidBy" list="dlPaidBy" autocomplete="off" value="' + esc(d.paidBy) + '" oninput="voiceEdit(\'paidBy\',this.value)">' + vSrcHTML('paidBy') + '</div>' +
+    '</div>' +
+    '<div class="fld-row">' +
+      '<div class="fld"><label for="vfMode">Payment mode</label><select id="vfMode" onchange="voiceEdit(\'mode\',this.value)">' +
+        V_MODE_OPTS.map(o => '<option value="' + o[0] + '"' + (d.mode === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select>' + vSrcHTML('mode') + '</div>' +
+      '<div class="fld"><label for="vfCat">Category</label><input type="text" id="vfCat" list="dlCat" autocomplete="off" value="' + esc(d.category) + '" oninput="voiceEdit(\'category\',this.value)">' + vSrcHTML('category') + '</div>' +
+    '</div>' +
+    '<div class="fld-row one"><div class="fld"><label for="vfNote">Note</label><input type="text" id="vfNote" value="' + esc(d.note || '') + '" oninput="voiceEdit(\'note\',this.value)">' + vSrcHTML('note') + '</div></div>' +
+    altChips +
+    '<div class="fld-hint" style="margin-top:12px"><i class="ti ti-lock"></i> Nothing is written to the Google Sheet until you tap <b>Confirm &amp; Save</b>.</div>';
+  document.getElementById('vFoot').innerHTML =
+    '<button class="mini-btn" onclick="closeVoice()">Cancel</button>' +
+    '<button class="mini-btn" onclick="voiceAgain()"><i class="ti ti-microphone"></i> Say it again</button>' +
+    '<button class="mini-btn" onclick="voiceStartFix()" title="Say for example: amount 3000, or party Flipkart"><i class="ti ti-wand"></i> Fix by voice</button>' +
+    '<button class="mini-btn" onclick="voiceArmConfirm(false)" title="Listen for the word save"><i class="ti ti-microphone"></i> Say &ldquo;save&rdquo;</button>' +
+    '<button class="btn-save" id="vConfirmBtn" onclick="voiceConfirm()"><i class="ti ti-check"></i> Confirm &amp; Save</button>';
+  voicePaintSummary();
+  vConfTries = 0;
+  const canVoiceSave = vVoiceConf && !voiceBlocks(d).length && !voiceWarnings(d).length;
+  if(vReadBack){
+    voiceSpeak(voiceSentence(d, true) + (canVoiceSave ? ' Say save to record it, or cancel.' : ''), () => voiceArmConfirm(true));
+  } else if(canVoiceSave){
+    voiceArmConfirm(true);
+  }
+}
+/* Arm the "say save" listener. Auto is the run straight after the read-back;
+   the footer button is the manual one. */
+function voiceArmConfirm(auto){
+  const d = vDraft; if(!d) return;
+  if(!document.getElementById('voiceModal').classList.contains('open')) return;
+  if(auto && !vVoiceConf) return;
+  if(voiceBlocks(d).length){ if(!auto) showToast('Fill in what is missing first', 'error'); return; }
+  if(voiceWarnings(d).length){
+    if(!auto) showToast('There is a warning above — read it, then tap Confirm & Save', 'error');
+    return;                       // a flagged entry is never saved by voice
+  }
+  voiceStart('confirm');
+  voicePaintListenNote();
+}
+function voicePaintListenNote(){
+  const el = document.getElementById('vListenNote'); if(!el) return;
+  const on = vListening && vPhase === 'confirm';
+  el.style.display = on ? 'flex' : 'none';
+}
+function voicePaintSummary(){
+  const d = vDraft; if(!d) return;
+  const line = document.getElementById('vSumLine'); if(!line) return;
+  line.textContent = voiceSentence(d, false);
+  document.getElementById('vSumWords').textContent = d.amount > 0 ? vWords(d.amount) : '';
+  const blocks = voiceBlocks(d), warns = voiceWarnings(d);
+  document.getElementById('vFlags').innerHTML =
+    (blocks.length ? '<div class="v-flag bad"><i class="ti ti-alert-triangle"></i><span>Still needs ' + blocks.join(', ') +
+      '. Fill it in below — saving is off until then.</span></div>' : '') +
+    warns.map(w => '<div class="v-flag warn"><i class="ti ti-alert-circle"></i><span>' + w + '</span></div>').join('') +
+    (!blocks.length && !warns.length ? '<div class="v-flag good"><i class="ti ti-circle-check"></i><span>Everything needed is here. Read the line above once, then save.</span></div>' : '');
+  const btn = document.getElementById('vConfirmBtn');
+  if(btn) btn.disabled = blocks.length > 0;
+  ['vfAmount','vfDesc','vfParty','vfDate'].forEach(id => {
+    const el = document.getElementById(id); if(!el) return;
+    const bad = (id === 'vfAmount' && !(d.amount > 0)) || (id === 'vfDesc' && !d.desc) ||
+                (id === 'vfParty' && !d.party) || (id === 'vfDate' && !d.date);
+    el.classList.toggle('miss', !!bad);
+  });
+}
+function voiceMarkEdited(k, txt){
+  if(!vDraft) return;
+  vDraft.src[k] = { k:'edited', txt: txt || 'changed by hand' };
+  const el = document.getElementById('vsrc-' + k);
+  if(el) el.innerHTML = '<span class="v-dot edit"></span><span>' + esc(vDraft.src[k].txt) + '</span>';
+}
+function voiceEdit(k, v){
+  if(!vDraft) return;
+  if(k === 'amount') vDraft.amount = parseFloat(v) || 0;
+  else vDraft[k] = v;
+  if(k === 'category') vDraft.catAuto = false;
+  if((k === 'desc' || k === 'party') && vDraft.catAuto){
+    vDraft.category = guessCategory(vDraft.desc, vDraft.party, vDraft.type);
+    const c = document.getElementById('vfCat'); if(c) c.value = vDraft.category;
+  }
+  voiceMarkEdited(k);
+  voicePaintSummary();
+}
+function voiceSetAmount(v){
+  if(!vDraft) return;
+  vDraft.amount = Number(v) || 0;
+  const el = document.getElementById('vfAmount'); if(el) el.value = vDraft.amount;
+  voiceMarkEdited('amount', 'picked from the other numbers heard');
+  voicePaintSummary();
+}
+function voiceSetType(t){
+  if(!vDraft || !TYPE_META[t]) return;
+  vDraft.type = t;
+  document.querySelectorAll('#vTypeChips .chip').forEach(c => c.classList.toggle('on', c.dataset.t === t));
+  const lbl = document.getElementById('vfPartyLbl'); if(lbl) lbl.textContent = PARTY_LABEL[t] || 'Paid to';
+  if(vDraft.catAuto){
+    vDraft.category = guessCategory(vDraft.desc, vDraft.party, t);
+    const c = document.getElementById('vfCat'); if(c) c.value = vDraft.category;
+  }
+  voiceMarkEdited('type', 'chosen by hand');
+  voicePaintSummary();
+}
+
+/* ── correcting by voice ────────────────────────────────────────────────── */
+function voiceStartFix(){
+  showToast('Say what to change — “amount 3000”, “party Flipkart”, “make it income”');
+  voiceStart('fix');
+}
+function voiceApplyCorrection(raw){
+  if(!vDraft){ return; }
+  const t = vNorm(raw).trim();
+  if(!t){ showToast('Nothing heard', 'error'); return; }
+  const changed = [];
+  const tm = /\b(income|expense|expenses|saving|savings|deposit|credit|settlement)\b/.exec(t);
+  const after = re => { const m = re.exec(t); return m ? t.slice(m.index + m[0].length).trim() : null; };
+
+  const amtTxt = after(/\b(?:amount|rupees|rs|make it|change it to|it is)\s+(?=[\d\p{L}])/u);
+  const aSt = amtTxt ? vNew(amtTxt) : null;
+  const amt = aSt ? vGrabAmount(aSt) : null;
+  if(amt && amt.value > 0){ vDraft.amount = amt.value; changed.push('amount ' + fmt(amt.value)); voiceMarkEdited('amount', 'corrected by voice: "' + amt.span + '"'); }
+
+  const pTxt = after(/\b(?:party|vendor|supplier|customer|shop|name)\s+/);
+  if(pTxt){ const m = vBest(pTxt, vParties(), 0.72); const val = m ? m.value : vTitle(pTxt);
+    vDraft.party = val; changed.push('party ' + val); voiceMarkEdited('party', 'corrected by voice: "' + pTxt + '"'); }
+
+  const dTxt = after(/\b(?:description|particulars|details|item|for)\s+/);
+  if(dTxt && !pTxt){ const m = vBest(dTxt, vDescList(), 0.8); const val = m ? m.value : (dTxt.charAt(0).toUpperCase() + dTxt.slice(1));
+    vDraft.desc = val; changed.push('description ' + val); voiceMarkEdited('desc', 'corrected by voice: "' + dTxt + '"'); }
+
+  const nTxt = after(/\b(?:note|remark|remarks)\s+/);
+  if(nTxt){ vDraft.note = nTxt.charAt(0).toUpperCase() + nTxt.slice(1); changed.push('note'); voiceMarkEdited('note', 'corrected by voice'); }
+
+  const dateSt = vNew(t); const dv = vGrabDate(dateSt);
+  if(dv){ vDraft.date = dv.value; changed.push('date ' + fmtDate(dv.value)); voiceMarkEdited('date', 'corrected by voice: "' + dv.span + '"'); }
+
+  const modeSt = vNew(t); const mv = vGrabMode(modeSt);
+  if(mv){ vDraft.mode = mv.value; changed.push('mode ' + mv.value); voiceMarkEdited('mode', 'corrected by voice'); }
+
+  if(tm && !amtTxt){
+    const map = { income:'income', expense:'expense', expenses:'expense', saving:'saving', savings:'saving',
+                  deposit:'saving', credit:'credit', settlement:'settlement' };
+    const nt = map[tm[1]];
+    if(nt && nt !== vDraft.type){ vDraft.type = nt; changed.push('type ' + TYPE_META[nt].label); voiceMarkEdited('type', 'corrected by voice'); }
+  }
+  if(!changed.length){
+    showToast('Not understood. Try “amount 3000”, “party Flipkart”, “date yesterday” or “make it income”.', 'error');
+    return;
+  }
+  if(vDraft.catAuto) vDraft.category = guessCategory(vDraft.desc, vDraft.party, vDraft.type);
+  voiceShowCheckRefresh();
+  showToast('Changed: ' + changed.join(', '));
+}
+/* Re-paint the check screen from the draft without losing what is in it. */
+function voiceShowCheckRefresh(){
+  const keep = vDraft.src;
+  voiceShowCheck();
+  vDraft.src = keep;
+}
+/* The answer grammar is deliberately tiny and exact. A sentence that merely
+   CONTAINS "save" is not an answer — otherwise a remark across the room could
+   write a row. Two goes, then it stops listening and waits for a tap. */
+function voiceHandleConfirmWord(text){
+  const t = vKey(text);
+  if(/^(save|save it|yes|yeah|yep|ya|confirm|confirmed|correct|right|ok|okay|done|சேமி|சரி)$/.test(t)){
+    voiceConfirm(); return;
+  }
+  if(/^(no|nope|cancel|wrong|stop|edit|change|வேண்டாம்)$/.test(t)){
+    showToast('Not saved — change what is wrong, then say save again');
+    voicePaintListenNote(); return;
+  }
+  vConfTries++;
+  if(vConfTries < 2){
+    showToast('Say “save” to record it, or “cancel”');
+    voiceStart('confirm');
+  } else {
+    showToast('Still listening for a plain “save” — or just tap Confirm & Save');
+    voicePaintListenNote();
+  }
+}
+
+/* ── save ────────────────────────────────────────────────────────────────
+   Through the SAME saveEntry() the typed form uses. No second write path. */
+async function voiceConfirm(){
+  const d = vDraft; if(!d) return;
+  const blocks = voiceBlocks(d);
+  if(blocks.length){ showToast('Still needs ' + blocks.join(', '), 'error'); return; }
+  voiceStop();
+  const btn = document.getElementById('vConfirmBtn');
+  if(btn){ btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:6px"></div> Saving…'; }
+  if(editingId) cancelEdit();
+  setType(d.type);
+  document.getElementById('fDate').value   = d.date;
+  document.getElementById('fDesc').value   = d.desc;
+  document.getElementById('fParty').value  = d.party;
+  document.getElementById('fAmount').value = d.amount;
+  document.getElementById('fPaidBy').value = d.paidBy || '';
+  document.getElementById('fMode').value   = d.mode || '';
+  document.getElementById('fNote').value   = d.note || '';
+  const fc = document.getElementById('fCat'); fc.value = d.category || ''; fc.dataset.auto = '';
+  let ok = false;
+  try{ ok = await saveEntry(); } catch(e){ ok = false; }
+  if(!ok){
+    if(btn){ btn.disabled = false; btn.innerHTML = '<i class="ti ti-check"></i> Confirm &amp; Save'; }
+    showToast('Not saved — the entry is still here, try again', 'error');
+    return;
+  }
+  if(vReadBack) voiceSpeak('Saved.');
+  if(vQueueAt + 1 < vQueue.length){
+    vQueueAt++; vDraft = vQueue[vQueueAt];
+    voiceShowCheck();
+    showToast('Saved. Next entry from what you said.');
+    return;
+  }
+  closeVoice();
+}
+
+/* ── open / close ───────────────────────────────────────────────────────── */
+const V_EXAMPLES = [
+  ['Paid 120 rupees for milk to Milkman by cash', 'expense'],
+  ['Received 45,000 salary from Employer yesterday', 'income'],
+  ['Deposited two thousand RD instalment into Bank', 'saving'],
+  ['Provisions 850 on credit from Provision store', 'credit'],
+  ['Settled 850 to Provision store by GPay on the 5th', 'settlement']
+];
+function voiceExamples(){
+  const box = document.getElementById('vExamples'); if(!box) return;
+  box.innerHTML = V_EXAMPLES.map(([t, k]) =>
+    '<button type="button" class="v-ex" onclick="voiceTry(' + JSON.stringify(t).replace(/"/g, '&quot;') + ')">' +
+    '<b>' + esc(TYPE_META[k].label) + '</b> &mdash; &ldquo;' + esc(t) + '&rdquo;</button>').join('');
+}
+/* Run an example through the very same parser, so the check screen shown is
+   exactly what a real dictation produces. */
+function voiceTry(text){
+  vAllAlts = [text]; vAltUsed = 0;
+  vQueue = voiceSplit(text).map(c => voiceParse(c));
+  vQueueAt = 0; vDraft = vQueue[0];
+  voiceShowCheck();
+}
+function voiceUnsupported(){
+  document.getElementById('vStepListen').innerHTML =
+    '<div class="v-unsupported"><i class="ti ti-microphone-off"></i>' +
+    '<b style="color:var(--text);display:block;margin-bottom:8px;font-size:15px">This browser cannot listen</b>' +
+    'Voice entry uses the browser&rsquo;s own speech recognition, which is available in <b>Chrome</b>, <b>Edge</b> and <b>Safari</b> — on the phone as well.<br><br>' +
+    'On this device, type the entry in the form instead; everything else works exactly the same.</div>';
+  document.getElementById('vFoot').innerHTML = '<button class="mini-btn" onclick="closeVoice()">Close</button>';
+}
+function openVoice(){
+  vDraft = null; vQueue = []; vQueueAt = 0; vAllAlts = []; vAltUsed = 0;
+  vAltParts = {}; vInterim = ''; vErrShown = false;
+  document.getElementById('vStepCheck').style.display = 'none';
+  document.getElementById('vStepCheck').innerHTML = '';
+  document.getElementById('vStepListen').style.display = 'block';
+  document.getElementById('vErr').innerHTML = '';
+  document.getElementById('vFoot').innerHTML = '<button class="mini-btn" onclick="closeVoice()">Cancel</button>';
+  openSheet('voice');
+  if(!voiceSupported()){ voiceUnsupported(); return; }
+  voiceExamples(); voicePaintMic(); voicePaintHeard();
+  // Straight into listening: the button was already the tap that asked for it.
+  setTimeout(() => voiceStart('entry'), 220);
+}
+function closeVoice(){
+  voiceStop();
+  try{ if(window.speechSynthesis) speechSynthesis.cancel(); } catch(_){}
+  vListening = false;
+  closeSheet('voice');
+}
+if(!voiceSupported()){
+  const cta = document.getElementById('voiceCta');
+  if(cta) cta.querySelector('.vc-btn').title = 'Needs Chrome, Edge or Safari';
+}
+voicePaintPrefs();
 
 // ── SERVICE WORKER ──
 // An update that has installed cannot take over a page the old worker already

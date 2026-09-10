@@ -1,6 +1,8 @@
-# Mini Personal Finance Tracker
+# Mini Personal Finance Tracker v3.8
 
 **Live:** <https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/>
+
+**Voice entry (v3.8)** — speak one sentence, check it on screen, confirm (or say “save”). Same block as the two sibling trackers — see `ibi-finance-apps-shared-module`; nothing is written until Confirm & Save.
 
 A private household finance app for **N. Sowdhamini Sasimurugan** in three
 parts, matching the way her diary is actually kept:
