@@ -836,7 +836,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.8.1</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.8.2</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1157,7 +1157,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v3.8.1 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v3.8.2 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1214,7 +1214,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.8.1 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.8.2 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1279,7 +1279,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.8.1</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.8.2</div>
       </div>
     </div>
 
@@ -5174,7 +5174,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.8.1</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.8.2</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -5803,6 +5803,10 @@ const VoiceAPI = window.SpeechRecognition || window.webkitSpeechRecognition || n
 const voiceSupported = () => !!VoiceAPI;
 
 let vRec = null, vListening = false, vPhase = 'entry';   // entry | fix | confirm
+/* One listening session at a time. vSession stamps each one so a session that
+   ends late cannot drive the phase that replaced it; vPendingStart holds the
+   phase waiting for the microphone to be let go. */
+let vSession = 0, vPendingStart = null, vStartT = null, vRetrying = false;
 let vAltParts = {}, vInterim = '', vErrShown = false;
 let vSilenceT = null, vCapT = null;
 let vDraft = null, vAllAlts = [], vAltUsed = 0, vQueue = [], vQueueAt = 0;
@@ -6551,6 +6555,30 @@ const V_ERRS = {
   'no-speech':'Nothing was heard. Tap the microphone and speak a little closer to it.',
   'aborted':''
 };
+/* Put a message where the user is actually looking. The listen screen has a
+   red box; the check screen does not, and writing into that hidden box is why
+   a failed correction looked like nothing happening at all. */
+function voiceNote(msg){
+  const check = document.getElementById('vStepCheck');
+  const onCheck = check && check.style.display === 'block';
+  if(onCheck){ showToast(String(msg).replace(/<[^>]+>/g, '').replace(/&rarr;/g, '\u2192'), 'error'); return; }
+  const box = document.getElementById('vErr');
+  if(box) box.innerHTML = '<div class="v-err"><i class="ti ti-alert-triangle"></i> ' + msg + '</div>';
+}
+/* "Say it again" - drop this draft and go back to the microphone. */
+function voiceAgain(){
+  voiceStop();
+  try{ if(window.speechSynthesis) speechSynthesis.cancel(); } catch(_){}
+  vDraft = null; vQueue = []; vQueueAt = 0; vAllAlts = []; vAltUsed = 0;
+  vAltParts = {}; vInterim = ''; vErrShown = false;
+  const check = document.getElementById('vStepCheck');
+  check.style.display = 'none'; check.innerHTML = '';
+  document.getElementById('vStepListen').style.display = 'block';
+  document.getElementById('vErr').innerHTML = '';
+  document.getElementById('vFoot').innerHTML = '<button class="mini-btn" onclick="closeVoice()">Cancel</button>';
+  voicePaintMic(); voicePaintHeard();
+  voiceStart('entry');
+}
 function voiceStop(){
   if(vSilenceT){ clearTimeout(vSilenceT); vSilenceT = null; }
   if(vCapT){ clearTimeout(vCapT); vCapT = null; }
@@ -6563,8 +6591,28 @@ function voiceBumpSilence(){
 function voiceToggle(){ if(vListening) voiceStop(); else voiceStart('entry'); }
 function voiceStart(phase){
   if(!voiceSupported()){ voiceUnsupported(); return; }
-  if(vListening) return;
-  vPhase = phase || 'entry';
+  phase = phase || 'entry';
+  // Never let the app read the entry aloud into its own microphone.
+  try{ if(window.speechSynthesis) speechSynthesis.cancel(); } catch(_){}
+  /* Already listening? This must NOT be a silent return - that is exactly
+     what made "Fix by voice" and "Say save" look broken. After the read-back
+     the hands-free listener still holds the microphone, so the tap fell
+     through to a bare `return`. Stop that session, throw away what it heard,
+     and start the requested one the moment it lets go. */
+  if(vListening || vPendingStart){
+    vPendingStart = phase;
+    voiceStop();
+    if(vStartT) clearTimeout(vStartT);
+    vStartT = setTimeout(() => {                  // Android does not always fire onend
+      if(!vPendingStart) return;
+      const p = vPendingStart; vPendingStart = null; vListening = false;
+      voiceStart(p);
+    }, 1200);
+    return;
+  }
+  if(vStartT){ clearTimeout(vStartT); vStartT = null; }
+  const mySession = ++vSession;
+  vPhase = phase;
   vAltParts = {}; vInterim = ''; vErrShown = false;
   document.getElementById('vErr').innerHTML = '';
   try{
@@ -6576,11 +6624,13 @@ function voiceStart(phase){
   } catch(e){ voiceUnsupported(); return; }
 
   vRec.onstart = () => {
+    if(mySession !== vSession) return;
     vListening = true;
     voicePaintMic();
     vCapT = setTimeout(() => voiceStop(), 30000);
   };
   vRec.onresult = ev => {
+    if(mySession !== vSession) return;
     let interim = '';
     for(let i = ev.resultIndex; i < ev.results.length; i++){
       const res = ev.results[i];
@@ -6596,28 +6646,45 @@ function voiceStart(phase){
   };
   vRec.onspeechend = () => voiceBumpSilence();
   vRec.onerror = ev => {
+    if(mySession !== vSession) return;
     const msg = V_ERRS[ev.error] !== undefined ? V_ERRS[ev.error] : ('Speech recognition stopped: ' + ev.error + '.');
-    if(msg){ document.getElementById('vErr').innerHTML = '<div class="v-err"><i class="ti ti-alert-triangle"></i> ' + msg + '</div>'; vErrShown = true; }
+    if(msg){ voiceNote(msg); vErrShown = true; }
   };
   vRec.onend = () => {
+    if(mySession !== vSession) return;             // a stale session ending late
     vListening = false;
     if(vSilenceT){ clearTimeout(vSilenceT); vSilenceT = null; }
     if(vCapT){ clearTimeout(vCapT); vCapT = null; }
     vInterim = '';
     voicePaintMic(); voicePaintHeard();
+    if(vPendingStart){                             // another button asked for the microphone
+      const p = vPendingStart; vPendingStart = null;
+      if(vStartT){ clearTimeout(vStartT); vStartT = null; }
+      setTimeout(() => voiceStart(p), 150);
+      return;
+    }
     const alts = voiceAltTexts();
     if(!alts.length){
-      if(!vErrShown) document.getElementById('vErr').innerHTML =
-        '<div class="v-err"><i class="ti ti-ear-off"></i> Nothing was caught. Tap the microphone and say it again — one sentence, a little slower.</div>';
+      if(!vErrShown) voiceNote('Nothing was caught — tap and say it again, one sentence and a little slower.');
       return;
     }
     if(vPhase === 'confirm') voiceHandleConfirmWord(alts[0]);
     else if(vPhase === 'fix') voiceApplyCorrection(alts[0]);
     else voiceHandleEntry(alts);
   };
-  try{ vRec.start(); }
-  catch(e){ vListening = false; voicePaintMic();
-    document.getElementById('vErr').innerHTML = '<div class="v-err"><i class="ti ti-alert-triangle"></i> The microphone could not be started. Close any other tab that is listening and try again.</div>'; }
+  try{ vRec.start(); vRetrying = false; }
+  catch(e){
+    /* Android throws InvalidStateError when the previous session has not let
+       the microphone go yet. Retry once after a beat, then say so out loud
+       rather than leaving a button that appears to do nothing. */
+    vListening = false; voicePaintMic();
+    if(!vRetrying){
+      vRetrying = true;
+      setTimeout(() => { vRetrying = false; voiceStart(phase); }, 600);
+      return;
+    }
+    voiceNote('The microphone could not be started. Close any other tab that is listening, then try again.');
+  }
 }
 /* Fold the recogniser's final chunks into one sentence.
    ⚠ On Android Chrome a continuous session does NOT hand back one chunk per
@@ -6732,7 +6799,7 @@ function voiceShowCheck(){
       '<div class="v-sum-line" id="vSumLine"></div><div class="v-words" id="vSumWords"></div></div>' +
     '<div id="vFlags"></div>' +
     '<div class="v-listen" id="vListenNote" style="display:none"><span class="v-listen-dot"></span>' +
-      '<span>Listening for <b>&ldquo;save&rdquo;</b> &mdash; or say <b>cancel</b>. You can always tap the button instead.</span></div>' +
+      '<span class="v-listen-txt">Listening for <b>&ldquo;save&rdquo;</b> &mdash; or say <b>cancel</b>.</span></div>' +
     '<div class="fld-row one"><div class="fld"><label>Type</label><div class="chip-row" id="vTypeChips">' + typeChips + '</div>' + vSrcHTML('type') + '</div></div>' +
     '<div class="fld-row">' +
       '<div class="fld"><label for="vfDate">Date</label><input type="date" id="vfDate" value="' + esc(d.date) + '" oninput="voiceEdit(\'date\',this.value)">' + vSrcHTML('date') + '</div>' +
@@ -6777,13 +6844,19 @@ function voiceArmConfirm(auto){
     if(!auto) showToast('There is a warning above — read it, then tap Confirm & Save', 'error');
     return;                       // a flagged entry is never saved by voice
   }
+  if(vListening && vPhase === 'confirm'){ showToast('Already listening — just say “save”'); return; }
   voiceStart('confirm');
   voicePaintListenNote();
 }
 function voicePaintListenNote(){
   const el = document.getElementById('vListenNote'); if(!el) return;
-  const on = vListening && vPhase === 'confirm';
+  const on = vListening && (vPhase === 'confirm' || vPhase === 'fix');
   el.style.display = on ? 'flex' : 'none';
+  if(!on) return;
+  const t = el.querySelector('.v-listen-txt'); if(!t) return;
+  t.innerHTML = vPhase === 'fix'
+    ? 'Listening for a correction &mdash; say <b>&ldquo;amount 3000&rdquo;</b>, <b>&ldquo;party Flipkart&rdquo;</b>, <b>&ldquo;date yesterday&rdquo;</b> or <b>&ldquo;make it income&rdquo;</b>.'
+    : 'Listening for <b>&ldquo;save&rdquo;</b> &mdash; or say <b>cancel</b>. You can always tap the button instead.';
 }
 function voicePaintSummary(){
   const d = vDraft; if(!d) return;

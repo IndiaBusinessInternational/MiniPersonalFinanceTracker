@@ -1,4 +1,4 @@
-# Mini Personal Finance Tracker v3.8.1
+# Mini Personal Finance Tracker v3.8.2
 
 **Live:** <https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/>
 
