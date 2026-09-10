@@ -785,7 +785,7 @@ tbody tr.tx-row{cursor:pointer}
 @keyframes micPulse{0%{box-shadow:0 0 0 0 rgba(0,197,255,.5)}70%{box-shadow:0 0 0 20px rgba(0,197,255,0)}100%{box-shadow:0 0 0 0 rgba(0,197,255,0)}}
 .mic-state{margin-top:12px;font-size:calc(14px*var(--ts));font-weight:700;color:var(--text)}
 .mic-sub{margin-top:5px;font-size:calc(12px*var(--ts));color:var(--text3);line-height:1.55}
-.v-heard{margin-top:14px;min-height:46px;padding:12px 13px;border:1px dashed var(--border2);border-radius:var(--radius);background:var(--bg3);font-size:calc(14px*var(--ts));line-height:1.65;color:var(--text);text-align:left;word-break:break-word}
+.v-heard{margin-top:14px;min-height:46px;max-height:34vh;overflow-y:auto;padding:12px 13px;border:1px dashed var(--border2);border-radius:var(--radius);background:var(--bg3);font-size:calc(14px*var(--ts));line-height:1.65;color:var(--text);text-align:left;word-break:break-word}
 .v-heard.empty{color:var(--text3);font-style:italic}
 .v-heard .interim{color:var(--text3)}
 .v-lbl{font-size:calc(10px*var(--ts));text-transform:uppercase;letter-spacing:.07em;color:var(--text3);font-weight:700;margin:14px 0 6px;display:block}
@@ -836,7 +836,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.8</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.8.1</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1157,7 +1157,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v3.8 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v3.8.1 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1214,7 +1214,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.8 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.8.1 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1279,7 +1279,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.8</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.8.1</div>
       </div>
     </div>
 
@@ -5174,7 +5174,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.8</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.8.1</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -6619,13 +6619,36 @@ function voiceStart(phase){
   catch(e){ vListening = false; voicePaintMic();
     document.getElementById('vErr').innerHTML = '<div class="v-err"><i class="ti ti-alert-triangle"></i> The microphone could not be started. Close any other tab that is listening and try again.</div>'; }
 }
+/* Fold the recogniser's final chunks into one sentence.
+   ⚠ On Android Chrome a continuous session does NOT hand back one chunk per
+   phrase: it re-delivers the SAME utterance again and again, each time a
+   little longer, each at its own result index — "paid", "paid 50", "paid 50
+   rupees", "paid 50 rupees for". Joining those end to end produced the
+   reported "paid paid 50 paid 50 rupees …" runaway. So a chunk that merely
+   restates what we already have REPLACES it; only genuinely new speech is
+   appended. Desktop Chrome, which sends each phrase once, is unaffected. */
+function vJoinChunks(parts){
+  let out = '';
+  for(const raw of parts){
+    const p = String(raw == null ? '' : raw).trim();
+    if(!p) continue;
+    if(!out){ out = p; continue; }
+    const a = vKey(out), b = vKey(p);
+    if(!b || b === a) continue;          // same thing again
+    if(b.indexOf(a) === 0){ out = p; continue; }   // a longer retelling of it
+    if(a.indexOf(b) === 0) continue;               // a shorter one, arriving late
+    if(a.length >= b.length && a.slice(-b.length) === b) continue;   // already ends with it
+    out = out + ' ' + p;
+  }
+  return out.replace(/\s+/g, ' ').trim();
+}
 function voiceAltTexts(){
   const idx = Object.keys(vAltParts).map(Number).sort((a, b) => a - b);
   if(!idx.length) return [];
   const depth = Math.min(5, Math.max.apply(null, idx.map(i => vAltParts[i].length)));
   const out = [];
   for(let a = 0; a < depth; a++){
-    out.push(idx.map(i => (vAltParts[i][a] || vAltParts[i][0] || '')).join(' ').replace(/\s+/g, ' ').trim());
+    out.push(vJoinChunks(idx.map(i => (vAltParts[i][a] || vAltParts[i][0] || ''))));
   }
   return [...new Set(out)].filter(Boolean);
 }
