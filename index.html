@@ -836,7 +836,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.8.2</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.9</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1157,7 +1157,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v3.8.2 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v3.9 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1214,7 +1214,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.8.2 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.9 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1279,7 +1279,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.8.2</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.9</div>
       </div>
     </div>
 
@@ -5174,7 +5174,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.8.2</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.9</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -5789,7 +5789,12 @@ const isoOf = _iso;
    \p{L}\p{M}-based so a Tamil transcript is never quietly stripped.
    ══════════════════════════════════════════════════════════════════════════ */
 
-const V_LS = { lang:'ibift_voice_lang', read:'ibift_voice_read', conf:'ibift_voice_confirm' };
+/* ⚠ Mini and TSM are served from the SAME GitHub Pages origin, so a literal
+   key here would share the wife's voice settings and learned names with the
+   CEO's books. Each app's own LS prefix keeps them apart, and the block stays
+   byte-identical across all three. */
+const V_PFX = (typeof LS === 'object' && LS && LS.view) ? String(LS.view).replace(/view$/, '') : 'ibi_';
+const V_LS = { lang:V_PFX+'voice_lang', read:V_PFX+'voice_read', conf:V_PFX+'voice_confirm', lex:V_PFX+'voice_lex' };
 let vLang      = localStorage.getItem(V_LS.lang) || 'en-IN';
 let vReadBack  = localStorage.getItem(V_LS.read) !== '0';     // on unless turned off
 /* Hands-free saving (CEO, 10 Sep 2026): on unless turned off. It is still a
@@ -5975,6 +5980,45 @@ function vRecase(phrase, map, titleAll){
     if(o && /^[A-Z]/.test(o)) return (titleAll || i === 0) ? o : o;
     return (titleAll || i === 0) ? w.charAt(0).toUpperCase() + w.slice(1) : w;
   }).join(' ');
+}
+/* ── LEARNED NAMES ─────────────────────────────────────────
+   The recogniser offered "Japanese clips" for Chaminis Glitz — a name it has
+   never heard and never will. Nothing in string distance bridges that, and the
+   Web Speech API accepts no vocabulary from us. What it CAN do is not make the
+   same mistake twice: every correction is kept as heard → meant, and applied
+   before any fuzzy matching next time. */
+function vLexLoad(){
+  try{ return JSON.parse(localStorage.getItem(V_LS.lex) || '{}') || {}; } catch(_){ return {}; }
+}
+function vLexGet(kind, heard){
+  const k = kind + '|' + vKey(heard);
+  if(!vKey(heard)) return null;
+  const m = vLexLoad();
+  return (m[k] && m[k].v) ? m[k].v : null;
+}
+function vLexLearn(kind, heard, meant){
+  const hk = vKey(heard), mk = vKey(meant);
+  if(!hk || !mk || hk === mk || hk.length < 3) return;
+  try{
+    const m = vLexLoad(), k = kind + '|' + hk;
+    m[k] = { v:String(meant).trim(), n:((m[k] && m[k].n) || 0) + 1, at:today() };
+    const keys = Object.keys(m);
+    if(keys.length > 200){                       // keep it small; drop the oldest
+      keys.sort((a, b) => String(m[a].at || '').localeCompare(String(m[b].at || '')));
+      delete m[keys[0]];
+    }
+    localStorage.setItem(V_LS.lex, JSON.stringify(m));
+  } catch(_){ /* a full or blocked store must never break a save */ }
+}
+/* The names used most, for the one-tap chips shown when a party is new. */
+function vTopParties(n){
+  const c = new Map();
+  entries.forEach(e => {
+    const p = String(e.party || '').trim(); if(!p) return;
+    const k = vKey(p), r = c.get(k) || { v:p, n:0 };
+    r.n++; c.set(k, r);
+  });
+  return [...c.values()].sort((a, b) => b.n - a.n).slice(0, n).map(r => r.v);
 }
 function vParties(){
   const s = new Set();
@@ -6313,6 +6357,13 @@ function vGrabParty(st, type){
     for(let i = 0; i < st.toks.length; i++){
       if(st.used[i] || st.toks[i] !== p) continue;
       const cap = vCapture(st, i); if(!cap.words.length) continue;
+      /* A name this recogniser has mangled before? Then we already know what
+         it was meant to be, and no fuzzy matching is needed. */
+      const lx = vLexGet('party', cap.words.join(' '));
+      if(lx){
+        st.used[i] = true; cap.idx.forEach(k => { st.used[k] = true; });
+        return { value:lx, span:p + ' ' + cap.words.join(' '), k:'matched', learned:true };
+      }
       /* Longest first, then shorter: "into SBI fixed deposit" must find SBI
          and leave "fixed deposit" to the description, not invent a party
          called "Sbi Fixed Deposit". */
@@ -6339,11 +6390,14 @@ function vGrabParty(st, type){
       if(seq[w-1] - seq[0] !== w - 1) continue;                 // must be side by side
       const phrase = seq.map(k => st.toks[k]).join(' ');
       if(phrase.replace(/\s/g, '').length < 4) continue;
+      const lx = vLexGet('party', phrase);                      // a name learned from a correction
+      if(lx){ hit = { value:lx, phrase, score:1, learned:true }; continue; }
       const m = vBest(phrase, parties, 0.82);                   // "misho" is Meesho
       if(m && (!hit || m.score > hit.score)) hit = { value:m.value, phrase, score:m.score };
     }
   }
-  if(hit) return { value:hit.value, span:hit.phrase, k: vKey(hit.phrase) === vKey(hit.value) ? 'heard' : 'matched' };
+  if(hit) return { value:hit.value, span:hit.phrase, learned:hit.learned,
+                   k: vKey(hit.phrase) === vKey(hit.value) ? 'heard' : 'matched' };
   return null;
 }
 function vTitle(s){
@@ -6365,6 +6419,8 @@ function vDescOf(st, party){
   while(w.length && V_FILLER.has(w[w.length-1])) w.pop();
   const phrase = w.join(' ').trim();
   if(!phrase) return null;
+  const lx = vLexGet('desc', phrase);
+  if(lx) return { value:lx, span:phrase, k:'matched', learned:true };
   const saidDate = V_DATEY.test(phrase);
   const usable = list => saidDate ? list : list.filter(v => !V_DATEY.test(v));
   /* Snap to a wording already used WITH THIS PARTY first. A bare "payout"
@@ -6435,9 +6491,22 @@ function voiceParse(raw){
     if(prev){ d.desc = String(prev.description).trim(); d.src.desc = { k:'guess', txt:'not said — your last entry for ' + d.party }; }
   }
   if(!d.desc && type && type.spans && type.spans.length){
-    const longest = type.spans.slice().sort((a, b) => b.length - a.length)[0];
-    d.desc = longest.charAt(0).toUpperCase() + longest.slice(1);
-    d.src.desc = { k:'guess', txt:'taken from "' + longest + '" — check it says enough' };
+    /* Only a NOUN wording can stand in as a description — "fixed deposit"
+       says what it was for, "paid" says nothing. Using the verb turned
+       "paid 300 rupees to Japanese clips" into a description of "Paid". */
+    const nouns = type.spans.filter(sp => V_TYPE_PHRASES.some(r => r[1] === sp && !r[2]));
+    if(nouns.length){
+      const longest = nouns.slice().sort((a, b) => b.length - a.length)[0];
+      d.desc = longest.charAt(0).toUpperCase() + longest.slice(1);
+      d.src.desc = { k:'guess', txt:'taken from "' + longest + '" — check it says enough' };
+    }
+  }
+  /* Nothing was said about what it was for. Title the row by the name it was
+     paid to, the way a card statement titles a row by its merchant, and say
+     plainly that it was not spoken. */
+  if(!d.desc && d.party){
+    d.desc = d.party;
+    d.src.desc = { k:'guess', txt:'not said — using the party name; change it if it was for something else' };
   }
 
   d.src.amount = amount
@@ -6447,8 +6516,9 @@ function voiceParse(raw){
     ? { k:'heard', txt:'heard "' + date.span + '"' + (date.assumedYear ? ' — year not said, assumed ' + d.date.slice(0, 4) : '') }
     : { k:'guess', txt:'not said — today' };
   d.src.party = party
-    ? { k: party.k, txt: party.k === 'matched' ? 'heard "' + party.span + '" → matched to ' + party.value + ' in your books'
-        : (party.isNew ? 'heard "' + party.span + '" — a new party, not in your books yet' : 'heard "' + party.span + '"') }
+    ? { k: party.k, txt: party.learned ? 'heard "' + party.span + '" → ' + party.value + ', which is what you corrected it to before'
+        : (party.k === 'matched' ? 'heard "' + party.span + '" → matched to ' + party.value + ' in your books'
+        : (party.isNew ? 'heard "' + party.span + '" — a new party, not in your books yet' : 'heard "' + party.span + '"')) }
     : { k:'missing', txt:'no party heard — who was it with?' };
   if(!d.src.desc) d.src.desc = desc
     ? { k: desc.k, txt: desc.k === 'matched' ? 'heard "' + desc.span + '" → matched to "' + desc.value + '"' : 'heard "' + desc.span + '"' }
@@ -6460,6 +6530,12 @@ function voiceParse(raw){
   d.catAuto  = true;
   d.src.category = { k:'guess', txt:'guessed from the description — change it if wrong' };
   if(!d.note){ d.note = ''; d.src.note = { k:'guess', txt:'not said — optional' }; }
+  /* Kept so that a hand correction can teach the lexicon what this
+     recogniser calls that name. */
+  d.heard = {
+    party: party ? String(party.span).replace(/^(?:to|into|from|at|for|of)\s+/, '') : '',
+    desc:  desc  ? String(desc.span) : ''
+  };
   d.leftover = vRest(st).join(' ');
   return d;
 }
@@ -6471,7 +6547,10 @@ function voiceScore(d){
   if(d.amount > 0) s += 4;
   if(d.src.amount && d.src.amount.k === 'heard') s += 2;
   if(d.party) s += 2;
-  if(d.src.party && d.src.party.k === 'matched') s += 1;
+  /* Weighted heavily on purpose: when one reading of the audio names a party
+     that exists in the books and another invents one, the real name is almost
+     always what was said. */
+  if(d.party && vParties().some(p => vKey(p) === vKey(d.party))) s += 5;
   if(d.desc) s += 2;
   if(d.src.type && d.src.type.k === 'heard') s += 2;
   if(d.src.date && d.src.date.k === 'heard') s += 1;
@@ -6527,7 +6606,7 @@ function voiceSentence(d, spoken){
   const rel  = d.type === 'income' ? 'from' : (d.type === 'saving' ? 'into' : 'to');
   const amt  = spoken ? vWords(d.amount).replace(/ only$/, '') : fmt(d.amount || 0);
   let s = meta.label + ' of ' + amt + ' ' + rel + ' ' + (d.party || '—');
-  if(d.desc) s += ' for ' + d.desc;
+  if(d.desc && vKey(d.desc) !== vKey(d.party)) s += ' for ' + d.desc;   // never "to X for X"
   s += ', dated ' + fmtDate(d.date);
   if(d.mode)   s += ', by ' + d.mode;
   if(d.paidBy) s += ', handled by ' + d.paidBy;
@@ -6788,6 +6867,16 @@ function voiceShowCheck(){
     ? '<div class="v-alt"><span class="lbl">It may also have heard:</span>' +
       vAllAlts.map((a, i) => i === vAltUsed ? '' : '<button type="button" class="chip" onclick="voiceUseAlt(' + i + ')">' + esc(a) + '</button>').join('') + '</div>'
     : '';
+  /* An unfamiliar name is where this recogniser fails hardest — it offered
+     "Japanese clips" for Chaminis Glitz. So when the party is not one of
+     yours, put the names you use most one tap away; tapping one also teaches
+     it what those words meant. */
+  const known = vParties().some(p => vKey(p) === vKey(d.party));
+  const tops = known ? [] : vTopParties(6).filter(p => vKey(p) !== vKey(d.party));
+  const partyChips = tops.length
+    ? '<div class="v-alt"><span class="lbl">Or one of yours:</span>' +
+      tops.map(p => '<button type="button" class="chip" onclick="voiceSetParty(' + JSON.stringify(p).replace(/"/g, '&quot;') + ')">' + esc(p) + '</button>').join('') + '</div>'
+    : '';
   const amtAlts = (d.amountAlts && d.amountAlts.length)
     ? '<div class="v-alt"><span class="lbl">Other numbers said:</span>' +
       d.amountAlts.map(v => '<button type="button" class="chip" onclick="voiceSetAmount(' + v + ')">' + fmt(v) + '</button>').join('') + '</div>'
@@ -6807,7 +6896,7 @@ function voiceShowCheck(){
     '</div>' +
     '<div class="fld-row one"><div class="fld"><label for="vfDesc">Description / Particulars</label><input type="text" id="vfDesc" list="dlDesc" autocomplete="off" value="' + esc(d.desc) + '" oninput="voiceEdit(\'desc\',this.value)">' + vSrcHTML('desc') + '</div></div>' +
     '<div class="fld-row">' +
-      '<div class="fld"><label for="vfParty" id="vfPartyLbl">' + esc(PARTY_LABEL[d.type] || 'Paid to') + '</label><input type="text" id="vfParty" list="dlParty" autocomplete="off" value="' + esc(d.party) + '" oninput="voiceEdit(\'party\',this.value)">' + vSrcHTML('party') + '</div>' +
+      '<div class="fld"><label for="vfParty" id="vfPartyLbl">' + esc(PARTY_LABEL[d.type] || 'Paid to') + '</label><input type="text" id="vfParty" list="dlParty" autocomplete="off" value="' + esc(d.party) + '" oninput="voiceEdit(\'party\',this.value)">' + vSrcHTML('party') + partyChips + '</div>' +
       '<div class="fld"><label for="vfPaidBy">Paid by / received by</label><input type="text" id="vfPaidBy" list="dlPaidBy" autocomplete="off" value="' + esc(d.paidBy) + '" oninput="voiceEdit(\'paidBy\',this.value)">' + vSrcHTML('paidBy') + '</div>' +
     '</div>' +
     '<div class="fld-row">' +
@@ -6903,6 +6992,25 @@ function voiceSetAmount(v){
   voiceMarkEdited('amount', 'picked from the other numbers heard');
   voicePaintSummary();
 }
+/* Tapping one of your own party names. It also teaches the lexicon what the
+   recogniser called it, so the same mishearing resolves itself next time. */
+function voiceSetParty(name){
+  if(!vDraft) return;
+  const heard = vDraft.heard && vDraft.heard.party;
+  const descWasParty = vKey(vDraft.desc) === vKey(vDraft.party);
+  vDraft.party = name;
+  const el = document.getElementById('vfParty'); if(el) el.value = name;
+  if(descWasParty){                                   // the description was only echoing the party
+    vDraft.desc = name;
+    const de = document.getElementById('vfDesc'); if(de) de.value = name;
+  }
+  if(vDraft.catAuto){
+    vDraft.category = guessCategory(vDraft.desc, name, vDraft.type);
+    const c = document.getElementById('vfCat'); if(c) c.value = vDraft.category;
+  }
+  voiceMarkEdited('party', heard ? 'picked — "' + heard + '" will resolve to ' + name + ' next time' : 'picked from your parties');
+  voiceShowCheckRefresh();
+}
 function voiceSetType(t){
   if(!vDraft || !TYPE_META[t]) return;
   vDraft.type = t;
@@ -6921,44 +7029,78 @@ function voiceStartFix(){
   showToast('Say what to change — “amount 3000”, “party Flipkart”, “make it income”');
   voiceStart('fix');
 }
+const V_TYPE_WORD = { income:'income', expense:'expense', expenses:'expense', spending:'expense',
+  saving:'saving', savings:'saving', deposit:'saving', deposited:'saving',
+  credit:'credit', unpaid:'credit', settlement:'settlement', settled:'settlement' };
 function voiceApplyCorrection(raw){
-  if(!vDraft){ return; }
+  if(!vDraft) return;
   const t = vNorm(raw).trim();
-  if(!t){ showToast('Nothing heard', 'error'); return; }
+  if(!t){ showToast('Nothing was heard — tap Fix by voice and say it again', 'error'); return; }
   const changed = [];
-  const tm = /\b(income|expense|expenses|saving|savings|deposit|credit|settlement)\b/.exec(t);
-  const after = re => { const m = re.exec(t); return m ? t.slice(m.index + m[0].length).trim() : null; };
+  const anyTail   = re => { const m = re.exec(t); return m ? t.slice(m.index + m[0].length).trim() : null; };
+  const startTail = re => { const m = re.exec(t); return m ? t.slice(m[0].length).trim() : null; };
+  const amountIn  = txt => { const a = txt ? vGrabAmount(vNew(txt)) : null; return (a && a.value > 0) ? a : null; };
+  const typeIn    = txt => { const m = txt ? /\b(income|expenses|expense|spending|savings|saving|deposited|deposit|credit|unpaid|settlement|settled)\b/.exec(txt) : null;
+                             return m ? V_TYPE_WORD[m[1]] : null; };
+  const setType = (nt, why) => { if(!nt || nt === vDraft.type) return;
+    vDraft.type = nt; voiceMarkEdited('type', why); changed.push('type ' + TYPE_META[nt].label); };
+  const setAmount = (val, span, why) => { if(!(val > 0) || val === vDraft.amount) return;
+    vDraft.amount = val; voiceMarkEdited('amount', why || ('corrected by voice: "' + span + '"')); changed.push('amount ' + fmt(val)); };
+  const setParty = (txt, why) => { const m = vBest(txt, vParties(), 0.72);
+    const val = m ? m.value : vRecase(txt, vCaseMap(raw), true);
+    if(vKey(val) === vKey(vDraft.party)) return;
+    vDraft.party = val; voiceMarkEdited('party', why); changed.push('party ' + val); };
+  const setDesc = (txt, why) => { const m = vBest(txt, vDescList(), 0.8);
+    const val = m ? m.value : vRecase(txt, vCaseMap(raw), false);
+    if(vKey(val) === vKey(vDraft.desc)) return;
+    vDraft.desc = val; voiceMarkEdited('desc', why); changed.push('description ' + val); };
 
-  const amtTxt = after(/\b(?:amount|rupees|rs|make it|change it to|it is)\s+(?=[\d\p{L}])/u);
-  const aSt = amtTxt ? vNew(amtTxt) : null;
-  const amt = aSt ? vGrabAmount(aSt) : null;
-  if(amt && amt.value > 0){ vDraft.amount = amt.value; changed.push('amount ' + fmt(amt.value)); voiceMarkEdited('amount', 'corrected by voice: "' + amt.span + '"'); }
-
-  const pTxt = after(/\b(?:party|vendor|supplier|customer|shop|name)\s+/);
-  if(pTxt){ const m = vBest(pTxt, vParties(), 0.72); const val = m ? m.value : vTitle(pTxt);
-    vDraft.party = val; changed.push('party ' + val); voiceMarkEdited('party', 'corrected by voice: "' + pTxt + '"'); }
-
-  const dTxt = after(/\b(?:description|particulars|details|item|for)\s+/);
-  if(dTxt && !pTxt){ const m = vBest(dTxt, vDescList(), 0.8); const val = m ? m.value : (dTxt.charAt(0).toUpperCase() + dTxt.slice(1));
-    vDraft.desc = val; changed.push('description ' + val); voiceMarkEdited('desc', 'corrected by voice: "' + dTxt + '"'); }
-
-  const nTxt = after(/\b(?:note|remark|remarks)\s+/);
-  if(nTxt){ vDraft.note = nTxt.charAt(0).toUpperCase() + nTxt.slice(1); changed.push('note'); voiceMarkEdited('note', 'corrected by voice'); }
-
-  const dateSt = vNew(t); const dv = vGrabDate(dateSt);
-  if(dv){ vDraft.date = dv.value; changed.push('date ' + fmtDate(dv.value)); voiceMarkEdited('date', 'corrected by voice: "' + dv.span + '"'); }
-
-  const modeSt = vNew(t); const mv = vGrabMode(modeSt);
-  if(mv){ vDraft.mode = mv.value; changed.push('mode ' + mv.value); voiceMarkEdited('mode', 'corrected by voice'); }
-
-  if(tm && !amtTxt){
-    const map = { income:'income', expense:'expense', expenses:'expense', saving:'saving', savings:'saving',
-                  deposit:'saving', credit:'credit', settlement:'settlement' };
-    const nt = map[tm[1]];
-    if(nt && nt !== vDraft.type){ vDraft.type = nt; changed.push('type ' + TYPE_META[nt].label); voiceMarkEdited('type', 'corrected by voice'); }
+  /* "make it income" and "make it 3000" open the same way — what follows
+     decides which field is meant. Reading the phrase itself as an amount is
+     what made "make it income" come back "Not understood". */
+  const gen = startTail(/^(?:make it|change it to|change to|set it to|it is|it's|should be)\s+/);
+  if(gen){
+    const gt = typeIn(gen);
+    if(gt) setType(gt, 'corrected by voice: "' + gen + '"');
+    else { const ga = amountIn(gen); if(ga) setAmount(ga.value, ga.span); }
   }
+
+  const nTxt = anyTail(/\b(?:note|remark|remarks)\s+/);
+  if(nTxt){ vDraft.note = nTxt.charAt(0).toUpperCase() + nTxt.slice(1);
+    voiceMarkEdited('note', 'corrected by voice'); changed.push('note'); }
+
+  const pTxt = anyTail(/\b(?:party|vendor|supplier|customer|shop|payee)\s+/) || startTail(/^(?:to|from)\s+/);
+  if(pTxt) setParty(pTxt, 'corrected by voice: "' + pTxt + '"');
+
+  const dTxt = anyTail(/\b(?:description|particulars|details|item)\s+/) || startTail(/^(?:for|it was for)\s+/);
+  if(dTxt) setDesc(dTxt, 'corrected by voice: "' + dTxt + '"');
+
+  const aTxt = anyTail(/\b(?:amount|amount is|rupees|rs)\s+/);
+  let a = amountIn(aTxt);
+  if(!a && /^[\d\s.,]+$/.test(t)) a = amountIn(t);        // just a figure, said on its own
+  if(a) setAmount(a.value, a.span);
+
+  const dv = vGrabDate(vNew(t));
+  if(dv && dv.value !== vDraft.date){ vDraft.date = dv.value;
+    voiceMarkEdited('date', 'corrected by voice: "' + dv.span + '"'); changed.push('date ' + fmtDate(dv.value)); }
+
+  const mv = vGrabMode(vNew(t));
+  if(mv && mv.value !== vDraft.mode){ vDraft.mode = mv.value;
+    voiceMarkEdited('mode', 'corrected by voice'); changed.push('mode ' + mv.value); }
+
+  if(!gen && !pTxt && !dTxt) setType(typeIn(t), 'corrected by voice');
+
+  /* Cannot place it as a field? Then read it as a whole sentence. Saying the
+     entry again IS a correction, and must never come back "not understood". */
   if(!changed.length){
-    showToast('Not understood. Try “amount 3000”, “party Flipkart”, “date yesterday” or “make it income”.', 'error');
+    const alt = voiceParse(raw);
+    if(alt.amount > 0) setAmount(alt.amount, raw, 're-heard from "' + raw + '"');
+    if(alt.party) setParty(alt.party, 're-heard from "' + raw + '"');
+    if(alt.desc && alt.src.desc.k === 'heard') setDesc(alt.desc, 're-heard from "' + raw + '"');
+  }
+
+  if(!changed.length){
+    showToast('Heard “' + raw + '” — say a field and its value: “amount 3000”, “party Flipkart”, “date yesterday”, or “make it income”.', 'error');
     return;
   }
   if(vDraft.catAuto) vDraft.category = guessCategory(vDraft.desc, vDraft.party, vDraft.type);
@@ -7000,6 +7142,12 @@ async function voiceConfirm(){
   const blocks = voiceBlocks(d);
   if(blocks.length){ showToast('Still needs ' + blocks.join(', '), 'error'); return; }
   voiceStop();
+  /* Whatever was corrected between hearing and saving is exactly the mapping
+     worth keeping. */
+  if(d.heard){
+    if(d.heard.party && d.party) vLexLearn('party', d.heard.party, d.party);
+    if(d.heard.desc && d.desc)   vLexLearn('desc',  d.heard.desc,  d.desc);
+  }
   const btn = document.getElementById('vConfirmBtn');
   if(btn){ btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:6px"></div> Saving…'; }
   if(editingId) cancelEdit();
