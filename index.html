@@ -836,7 +836,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v3.9</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v4.0</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1157,7 +1157,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v3.9 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v4.0 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1214,7 +1214,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v3.9 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.0 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1279,7 +1279,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v3.9</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.0</div>
       </div>
     </div>
 
@@ -4173,6 +4173,7 @@ const REP_TABS=[
   {k:'budget',    label:'Budget',     icon:'ti-target'},        // v2.0 — plan vs actual
   {k:'savings',   label:'Savings',    icon:'ti-pig-money'},     // v2.0 — schemes & deposits
   {k:'liabilities',label:'Loans',     icon:'ti-building-bank'}, // v2.0 — what is owed
+  {k:'lists',     label:'Lists',      icon:'ti-receipt-2'},      // v4.0 — every entry under its head, with totals
   {k:'statement', label:'Statement',  icon:'ti-list-details'},
   {k:'trends',    label:'Trends',     icon:'ti-chart-line'},
   {k:'categories',label:'Categories', icon:'ti-category-2'},
@@ -4253,6 +4254,81 @@ function paneOverview(A,C){
     r.push(`<div class="rep-section-title" style="color:var(--cyan)"><i class="ti ti-chart-bar"></i> In vs out by ${B.grain}</div>`+chartIncExp(B.buckets));
   }
   return r.join('');
+}
+
+/* ══ v4.0 — LISTS: every entry under its own head, each head with its own total ══
+ *
+ * CEO, 16 Sep 2026: "In reports, I want all Expenses list with Totals at the end.
+ * Similarly, list of all Savings, Incomes and so on."
+ *
+ * This is the format her own diary already uses — a page per head (Income,
+ * Savings, Expenses) with the total ruled off at the bottom, and the Balance line
+ * underneath. Accounting packages call it a day book or a schedule; the Statement
+ * tab beside it is the other half of the pair, the same entries in one
+ * chronological run with a running cash balance. Both are standard; they answer
+ * different questions, so neither replaces the other.
+ *
+ * Every figure here comes from `analyse()`'s own arrays — no second reckoning, so
+ * a head total can never disagree with the tile above it. Heads are listed in the
+ * diary's order, and an empty head still prints (its absence is information: no
+ * income this month is a fact, not a blank).
+ */
+const LIST_HEADS=[
+  {k:'incomes', label:'Income',            icon:'ti-arrow-down-circle', col:'var(--success-text)', total:A=>A.tInc,  note:'Everything received in the period.'},
+  {k:'savings',  label:'Savings',          icon:'ti-pig-money',         col:'var(--save-text)',    total:A=>A.tSav,  note:'Put away into an RD, SSY, chit or gold scheme — never counted as an expense.'},
+  {k:'cashExp',  label:'Expenses',         icon:'ti-arrow-up-circle',   col:'var(--danger-text)',  total:A=>A.tCash, note:'Paid on the spot.'},
+  {k:'credits',  label:'Credit purchases', icon:'ti-clock-dollar',      col:'var(--warning-text)', total:A=>A.tCredit,note:'Taken now, not paid yet. Counted as spend on the day it was taken.'},
+  {k:'settles',  label:'Settlements',      icon:'ti-checkbox',          col:'var(--info-text)',    total:A=>A.tSet,  note:'Clearing what was already owed — not spend again, the credit entry already counted it.'}
+];
+
+function listSection(A,h){
+  const rows=(A[h.k]||[]).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  const tot=h.total(A);
+  const head=`<div class="rep-section-title" style="margin-top:16px"><i class="ti ${h.icon}" style="color:${h.col}"></i> ${h.label}
+    <span style="font-weight:400;color:var(--text3);font-size:11.5px">— ${rows.length} entr${rows.length===1?'y':'ies'}</span></div>
+    <div class="rep-note">${h.note}</div>`;
+  if(!rows.length) return head+`<div class="rep-empty" style="padding:10px 0">Nothing under this head in the period.</div>`;
+  /* ⚠ THREE columns, not five. The five-column version (Date · Particulars · Party ·
+   * Category · Amount) needed a 560px table, so on her 375px phone the AMOUNT — and
+   * with it every total, the entire point of this tab — sat off the right edge behind
+   * a horizontal scroll. Party and category ride as a sub-line under the description
+   * instead, which is how a bank app or Money Manager lists a statement on a phone,
+   * and the amount is never the thing that scrolls away. See [[mobile-first-every-web-app]]. */
+  const body=rows.map(e=>{
+    const dt=fmtDTParts(e);
+    const cat=categoryOf(e), who=e.party||'';
+    const sub=[who,cat].filter(Boolean).join(' · ');
+    /* ⚠ No `nowrap` on either cell. `.dt-sub` is nowrap globally (it suits the one-line
+     * weekday it was written for), which clipped "Groceries & Prov…" and "Educatio…"
+     * here, and a nowrap date clipped to "03 Sep 2…" at her Large text size. Both wrap
+     * on this pane — a total nobody can read is the one thing this tab must not do. */
+    return `<tr>
+      <td style="white-space:normal">${dt.date}${dt.sub?`<div class="dt-sub" style="white-space:normal">${dt.sub}</div>`:''}</td>
+      <td style="white-space:normal">${esc(e.description)}
+        ${sub?`<div class="dt-sub" style="white-space:normal">${esc(sub)}</div>`:''}
+        ${e.note?`<div class="dt-sub" style="white-space:normal;font-style:italic">${esc(e.note)}</div>`:''}</td>
+      <td class="num" style="color:${h.col};font-weight:600;white-space:nowrap">${fmt(e.amount)}</td></tr>`;
+  }).join('');
+  return head+`<div class="rep-scroll" style="margin-top:6px"><table class="rep-table" style="min-width:0;width:100%">
+    <thead><tr><th style="width:100px">Date</th><th>Particulars</th><th class="num" style="width:96px">Amount</th></tr></thead>
+    <tbody>${body}</tbody>
+    <tfoot><tr><td colspan="2" style="white-space:normal">Total ${esc(h.label.toLowerCase())} — ${rows.length} entr${rows.length===1?'y':'ies'}</td>
+      <td class="num" style="color:${h.col};white-space:nowrap">${fmt(tot)}</td></tr></tfoot></table></div>`;
+}
+
+function paneLists(A){
+  const heads=LIST_HEADS.map(h=>listSection(A,h)).join('');
+  return `<div class="rep-note"><b>Every entry under its own head, each with its total.</b>
+      The same entries in date order with a running balance are on the <b>Statement</b> tab.</div>
+    ${heads}
+    <div class="rep-section-title" style="margin-top:20px"><i class="ti ti-equal"></i> The balance line</div>
+    <div class="rep-scroll"><table class="rep-table" style="min-width:0;width:100%"><tbody>
+      <tr><td style="white-space:normal">Income</td><td class="num k-good">${fmt(A.tInc)}</td></tr>
+      <tr><td style="white-space:normal">less Savings put away</td><td class="num k-save">− ${fmt(A.tSav)}</td></tr>
+      <tr><td style="white-space:normal">less Expenses <span style="color:var(--text3)">(paid ${fmt(A.tCash)} + on credit ${fmt(A.tCredit)})</span></td><td class="num k-bad">− ${fmt(A.tExp)}</td></tr>
+      </tbody><tfoot><tr><td style="white-space:normal">Balance — left to spend</td>
+      <td class="num" style="color:${A.balance>=0?'var(--success-text)':'var(--danger-text)'}">${fmtS(A.balance)}</td></tr></tfoot></table></div>
+    <div class="rep-note" style="margin-top:8px">Settlements are not subtracted here — the credit entry they clear was already counted as spend on the day it was taken.</div>`;
 }
 
 function paneStatement(A){
@@ -4883,6 +4959,7 @@ function paintReport(){
     case 'budget':      pane=paneBudget(A); break;
     case 'savings':     pane=paneSavings(A); break;
     case 'liabilities': pane=paneLiabilities(A); break;
+    case 'lists':      pane=paneLists(A); break;
     case 'statement':  pane=paneStatement(A); break;
     case 'trends':     pane=paneTrends(A); break;
     case 'categories': pane=paneCategories(A); break;
@@ -5174,7 +5251,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v3.9</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v4.0</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }

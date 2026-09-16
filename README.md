@@ -1,4 +1,4 @@
-# Mini Personal Finance Tracker v3.9
+# Mini Personal Finance Tracker v4.0
 
 **Live:** <https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/>
 
@@ -306,3 +306,32 @@ set, `apple-touch-icon`.
 The badge next to the app name in the top bar, the drawer's About line, the
 footer, the gate subtitle and `CACHE` in `sw.js` must all move together on a
 release.
+
+## v4.0 (16 Sep 2026) — Lists: every entry under its head, with its total
+
+CEO: *"In reports, I want all Expenses list with Totals at the end. Similarly, list of all
+Savings, Incomes and so on."* A new **Lists** tab in the report, beside Statement.
+
+It is the format her own diary already uses — a page per head with the total ruled off at
+the bottom — so it was built as-is rather than reinvented. Five heads in the diary's order:
+**Income · Savings · Expenses · Credit purchases · Settlements**, each listing every entry
+in date order and ending in its own total, then the **balance line**
+(Income − Savings − Expenses). An empty head still prints: no income this month is a fact,
+not a blank. Statement beside it is the other half of the pair — the same entries in one
+chronological run with a running cash balance. Both are standard and answer different
+questions.
+
+Every figure comes from `analyse()`'s own arrays (`incomes`, `savings`, `cashExp`,
+`credits`, `settles`), so a head total can never disagree with the tile above it.
+
+⚠ **Three columns, not five.** The first cut had Date · Particulars · Party · Category ·
+Amount on a 560px table, and on her 375px phone the **amount — and with it every total, the
+entire point of the tab — sat off the right edge** behind a horizontal scroll. Party and
+category ride as a sub-line under the description instead, which is how a bank app lists a
+statement on a phone. ⚠ The global `td` rule is `white-space:nowrap` + `text-overflow:
+ellipsis` and the tables are `table-layout:fixed`, so **every cell on this pane opts out
+explicitly** — without that the date clipped to "03 Sep 2…" at her Large text size.
+Verified at 375px: no clipped cell, no horizontal overflow.
+
+`GAS.gs` 4.0 is a **number-only** bump — this is a frontend-only report, nothing is blocked
+until she pastes it.
