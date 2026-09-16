@@ -319,7 +319,7 @@ tbody tr.tx-row{cursor:pointer}
 .rep-diag .fixbtn:hover{background:var(--warning-text);color:#000}
 
 /* ── REPORT: TABS ── */
-.rep-tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin:14px 0 0;overflow-x:auto;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.rep-tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin:14px 0 0;overflow-x:auto;scrollbar-width:thin;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 26px),transparent)}
 .rep-tab{flex-shrink:0;background:none;border:none;border-bottom:2px solid transparent;color:var(--text2);font-size:12.5px;font-weight:600;padding:9px 12px;cursor:pointer;font-family:var(--font);white-space:nowrap;display:flex;align-items:center;gap:5px}
 .rep-tab:hover{color:var(--text)}
 .rep-tab.on{color:var(--cyan);border-bottom-color:var(--cyan)}
@@ -836,7 +836,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v4.0</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v4.0.1</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1157,7 +1157,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v4.0 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v4.0.1 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1214,7 +1214,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.0 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.0.1 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1279,7 +1279,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.0</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.0.1</div>
       </div>
     </div>
 
@@ -4170,10 +4170,10 @@ function chartCumulative(buckets){
 /* ── TAB RENDERERS ── */
 const REP_TABS=[
   {k:'overview',  label:'Overview',   icon:'ti-dashboard'},
+  {k:'lists',     label:'Lists',      icon:'ti-receipt-2'},      // v4.0 — SECOND, so a phone shows it without scrolling the strip
   {k:'budget',    label:'Budget',     icon:'ti-target'},        // v2.0 — plan vs actual
   {k:'savings',   label:'Savings',    icon:'ti-pig-money'},     // v2.0 — schemes & deposits
   {k:'liabilities',label:'Loans',     icon:'ti-building-bank'}, // v2.0 — what is owed
-  {k:'lists',     label:'Lists',      icon:'ti-receipt-2'},      // v4.0 — every entry under its head, with totals
   {k:'statement', label:'Statement',  icon:'ti-list-details'},
   {k:'trends',    label:'Trends',     icon:'ti-chart-line'},
   {k:'categories',label:'Categories', icon:'ti-category-2'},
@@ -5251,7 +5251,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v4.0</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v4.0.1</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
