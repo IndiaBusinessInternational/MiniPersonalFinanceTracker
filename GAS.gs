@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Mini Personal Finance Tracker — Google Apps Script backend  v4.0
+   Mini Personal Finance Tracker — Google Apps Script backend  v4.2
    (the backend carries the SAME version number as the web app — 7 Sep 2026)
    For: N. Sowdhamini Sasimurugan
    ───────────────────────────────────────────────────────────────────────────
