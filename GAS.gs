@@ -44,10 +44,10 @@
    ═════════════════════════════════════════════════════════════════════════ */
 
 const APP_NAME    = 'MPFT';                 // identifies this backend to the app
-const APP_VERSION = '4.1';   // kept in step with the web app's badge
+const APP_VERSION = '4.2';   // kept in step with the web app's badge
 // Lets the app detect what this backend can do, so a page newer than the
 // deployment can say "update your Apps Script" instead of failing oddly.
-const FEATURES    = ['profile', 'plans', 'commitments', 'paidby', 'category'];   // v3.1: Category column on Transactions
+const FEATURES    = ['profile', 'plans', 'commitments', 'paidby', 'category', 'rid'];   // v3.1: Category column on Transactions
 
 const SHEET_NAME  = 'Transactions';
 /* PaidBy and Mode are appended AFTER CreatedAt rather than inserted in the
@@ -587,6 +587,8 @@ function addTransaction(p) {
   }
   try {
     const sh  = getSheet();
+    const again = ridSeen_(p);
+    if (again) return again;
     const id  = 'TX' + Date.now();
 
     sh.appendRow([
@@ -603,7 +605,7 @@ function addTransaction(p) {
       p.category || ''
     ]);
     SpreadsheetApp.flush();
-    return { status: 'ok', id: id, message: 'Added successfully.' };
+    return ridKeep_(p, { status: 'ok', id: id, message: 'Added successfully.' });
   } finally {
     try { lock.releaseLock(); } catch (e) {}
   }
@@ -725,10 +727,12 @@ function saveCommitment(p) {
       }
       return { status: 'error', message: 'Commitment not found: ' + p.id };
     }
+    const again = ridSeen_(p);
+    if (again) return again;
     const id = 'CM' + Date.now();
     sh.appendRow(commitmentRow(id, p, stamp()));
     SpreadsheetApp.flush();
-    return { status: 'ok', id: id, message: 'Commitment saved.' };
+    return ridKeep_(p, { status: 'ok', id: id, message: 'Commitment saved.' });
   } finally {
     try { lock.releaseLock(); } catch (e) {}
   }
@@ -783,10 +787,12 @@ function savePlan(p) {
       }
       return { status: 'error', message: 'Plan row not found: ' + p.id };
     }
+    const again = ridSeen_(p);
+    if (again) return again;
     const id = 'PL' + Date.now();
     sh.appendRow(planRow(id, p, stamp()));
     SpreadsheetApp.flush();
-    return { status: 'ok', id: id, message: 'Plan row saved.' };
+    return ridKeep_(p, { status: 'ok', id: id, message: 'Plan row saved.' });
   } finally {
     try { lock.releaseLock(); } catch (e) {}
   }
@@ -820,4 +826,28 @@ function savePlans(p) {
   } finally {
     try { lock.releaseLock(); } catch (e) {}
   }
+}
+
+/* ── NO REPEATS — idempotency key (pairs with the web app's NO REPEATS block) ──
+   Every create the app sends (ledger entry, plan line, commitment) carries a
+   request id, `rid`. A repeat of the same rid — a retry after a lost reply, a
+   Save tapped again — gets the FIRST answer back instead of a second row.
+   Checked INSIDE the script lock, so a slow first request and its repeat can
+   never both write. Six hours is the CacheService maximum. */
+function ridSeen_(p) {
+  const rid = String((p && p.rid) || '').trim();
+  if (!rid) return null;
+  const hit = CacheService.getScriptCache().get('rid_' + rid.slice(0, 200));
+  if (!hit) return null;
+  const first = JSON.parse(hit);
+  first.duplicate = true;
+  first.message = 'Already saved — not added twice.';
+  return first;
+}
+function ridKeep_(p, result) {
+  const rid = String((p && p.rid) || '').trim();
+  if (rid && result && result.status === 'ok') {
+    CacheService.getScriptCache().put('rid_' + rid.slice(0, 200), JSON.stringify(result), 21600);
+  }
+  return result;
 }
