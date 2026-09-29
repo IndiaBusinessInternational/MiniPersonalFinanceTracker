@@ -836,7 +836,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v4.0.1</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v4.1</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1020,6 +1020,7 @@ tbody tr.tx-row{cursor:pointer}
           <option value="Cash">Cash</option>
           <option value="GPay">GPay / UPI</option>
           <option value="Bank">Bank transfer</option>
+          <option value="EFT">EFT — Electronic Funds Transfer</option>
           <option value="Card">Card</option>
           <option value="Cheque">Cheque</option>
           <option value="Auto-debit">Auto-debit / ECS</option>
@@ -1157,7 +1158,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v4.0.1 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Personal Finance Tracker v4.1 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1214,7 +1215,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.0.1 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.1 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1279,7 +1280,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.0.1</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.1</div>
       </div>
     </div>
 
@@ -1444,6 +1445,7 @@ tbody tr.tx-row{cursor:pointer}
           <option value="Cash">Cash</option>
           <option value="GPay">GPay / UPI</option>
           <option value="Bank">Bank transfer</option>
+          <option value="EFT">EFT — Electronic Funds Transfer</option>
           <option value="Card">Card</option>
           <option value="Cheque">Cheque</option>
           <option value="Auto-debit">Auto-debit / ECS</option>
@@ -1632,6 +1634,7 @@ tbody tr.tx-row{cursor:pointer}
           <option value="Cash">Cash</option>
           <option value="GPay">GPay / UPI</option>
           <option value="Bank">Bank transfer</option>
+          <option value="EFT">EFT — Electronic Funds Transfer</option>
           <option value="Card">Card</option>
           <option value="Cheque">Cheque</option>
           <option value="Auto-debit">Auto-debit / ECS</option>
@@ -5251,7 +5254,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v4.0.1</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v4.1</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -6158,6 +6161,7 @@ function vFindSeq(st, phrase){ return vFind(st, phrase.split(' ')); }
 const V_MODES = [
   ['google pay','GPay'],['g pay','GPay'],['gpay','GPay'],['phone pe','GPay'],['phonepe','GPay'],
   ['paytm','GPay'],['upi','GPay'],['bhim','GPay'],['qr code','GPay'],['scanner','GPay'],['scan','GPay'],
+  ['electronic funds transfer','EFT'],['electronic fund transfer','EFT'],['e f t','EFT'],['eft','EFT'],
   ['net banking','Bank'],['netbanking','Bank'],['bank transfer','Bank'],['neft','Bank'],['imps','Bank'],['rtgs','Bank'],
   ['credit card','Card'],['debit card','Card'],['atm card','Card'],
   ['auto debit','Auto-debit'],['autodebit','Auto-debit'],['standing instruction','Auto-debit'],['ecs','Auto-debit'],['nach','Auto-debit'],['mandate','Auto-debit'],
@@ -6925,7 +6929,7 @@ function voiceUseAlt(i){
 }
 
 /* ── the check screen ───────────────────────────────────────────────────── */
-const V_MODE_OPTS = [['',"Not stated"],['Cash','Cash'],['GPay','GPay / UPI'],['Bank','Bank transfer'],
+const V_MODE_OPTS = [['',"Not stated"],['Cash','Cash'],['GPay','GPay / UPI'],['Bank','Bank transfer'],['EFT','EFT — Electronic Funds Transfer'],
   ['Card','Card'],['Cheque','Cheque'],['Auto-debit','Auto-debit / ECS'],['Other','Other']];
 function vSrcHTML(k){
   const s = (vDraft && vDraft.src && vDraft.src[k]) || {};

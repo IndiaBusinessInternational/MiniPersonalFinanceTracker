@@ -44,7 +44,7 @@
    ═════════════════════════════════════════════════════════════════════════ */
 
 const APP_NAME    = 'MPFT';                 // identifies this backend to the app
-const APP_VERSION = '4.0';   // kept in step with the web app's badge
+const APP_VERSION = '4.1';   // kept in step with the web app's badge
 // Lets the app detect what this backend can do, so a page newer than the
 // deployment can say "update your Apps Script" instead of failing oddly.
 const FEATURES    = ['profile', 'plans', 'commitments', 'paidby', 'category'];   // v3.1: Category column on Transactions
