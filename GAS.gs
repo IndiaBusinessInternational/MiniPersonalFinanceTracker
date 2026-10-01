@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Mini Personal Finance Tracker — Google Apps Script backend  v4.2
+   Mini Personal Finance Tracker — Google Apps Script backend  v4.3
    (the backend carries the SAME version number as the web app — 7 Sep 2026)
    For: N. Sowdhamini Sasimurugan
    ───────────────────────────────────────────────────────────────────────────
@@ -44,10 +44,10 @@
    ═════════════════════════════════════════════════════════════════════════ */
 
 const APP_NAME    = 'MPFT';                 // identifies this backend to the app
-const APP_VERSION = '4.2';   // kept in step with the web app's badge
+const APP_VERSION = '4.3';   // kept in step with the web app's badge
 // Lets the app detect what this backend can do, so a page newer than the
 // deployment can say "update your Apps Script" instead of failing oddly.
-const FEATURES    = ['profile', 'plans', 'commitments', 'paidby', 'category', 'rid'];   // v3.1: Category column on Transactions
+const FEATURES    = ['profile', 'plans', 'commitments', 'paidby', 'category', 'rid', 'balances'];   // v3.1: Category column on Transactions
 
 const SHEET_NAME  = 'Transactions';
 /* PaidBy and Mode are appended AFTER CreatedAt rather than inserted in the
@@ -127,6 +127,10 @@ function route(p) {
       case 'savePlan':         return savePlan(p);
       case 'savePlans':        return savePlans(p);
       case 'deletePlan':       return deleteRowById(PLAN_SHEET, PLAN_HDRS, p.id);
+
+      case 'saveBalance':      return saveBalance(p);
+      case 'deleteBalance':    return deleteRowById(BAL_SHEET, BAL_HDRS, p.id);
+      case 'moveToBalances':   return moveToBalances(p);
 
       case 'getProfile':       return getProfile();
       case 'saveProfile':      return saveProfile(p);
@@ -482,6 +486,7 @@ function getAllData() {
     transactions: readTransactions(tz),
     commitments:  readCommitments(),
     plans:        readPlans(tz),
+    balances:     readBalances_(),
     profileAt:    Number(readSetting('profileAt') || 0),
     version:      APP_VERSION,
     features:     FEATURES
@@ -850,4 +855,123 @@ function ridKeep_(p, result) {
     CacheService.getScriptCache().put('rid_' + rid.slice(0, 200), JSON.stringify(result), 21600);
   }
   return result;
+}
+
+/* ── BANK & CASH BALANCES (shared by all three finance trackers' scripts) ────
+   A balance is a READING of an account, not a transaction, so it lives in its
+   own sheet and never reaches the ledger or any total. One row per reading.
+   The Date column is plain TEXT (yyyy-MM-dd) and is read back with
+   getDisplayValues(), so Sheets can never re-read 01-10-2026 as 10 January. */
+const BAL_SHEET = 'Balances';
+const BAL_HDRS  = ['ID', 'Account', 'Date', 'Balance', 'Note', 'CreatedAt'];
+const BAL_WIDTHS = [150, 220, 110, 130, 300, 160];
+
+function balSheet_() {
+  const sh = getNamedSheet(BAL_SHEET, BAL_HDRS, BAL_WIDTHS);
+  sh.getRange('C:C').setNumberFormat('@');
+  return sh;
+}
+function balNum_(v) {
+  const n = parseFloat(String(v == null ? '' : v).replace(/[^0-9.\-]/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+/* yyyy-MM-dd as written; a date typed into the sheet by hand as DD-MM-YYYY
+   (the Indian order) is read that way too. */
+function balIso_(v) {
+  const s = String(v == null ? '' : v).trim();
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return m[1] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[3]).slice(-2);
+  m = s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/);
+  if (m) return m[3] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2);
+  return s;
+}
+function balStamp_() {
+  return Utilities.formatDate(new Date(), 'Asia/Kolkata', 'dd-MMM-yyyy HH:mm:ss');
+}
+
+function readBalances_() {
+  const sh = getNamedSheet(BAL_SHEET, BAL_HDRS, BAL_WIDTHS);
+  const data = sh.getDataRange().getDisplayValues();
+  if (data.length <= 1) return [];
+  return data.slice(1)
+    .filter(function (r) { return String(r[0] || '').trim() !== ''; })
+    .map(function (r) {
+      return { id: String(r[0]), account: String(r[1] || '').trim(), date: balIso_(r[2]),
+               balance: balNum_(r[3]), note: String(r[4] || ''), createdAt: String(r[5] || '') };
+    });
+}
+
+function saveBalance(p) {
+  const account = String(p.account || '').trim().slice(0, 80);
+  const date = balIso_(p.date);
+  const bal = parseFloat(p.balance);
+  if (!account) return { status:'error', message:'Name the account.' };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { status:'error', message:'A balance needs a date.' };
+  if (isNaN(bal)) return { status:'error', message:'Enter the balance.' };
+  const note = String(p.note || '').slice(0, 400);
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(20000); } catch (e) {
+    return { status:'error', message:'Busy — please try again in a moment.' };
+  }
+  try {
+    const sh = balSheet_();
+    if (p.id) {
+      const ids = sh.getRange(1, 1, sh.getLastRow(), 1).getValues();
+      for (let i = 1; i < ids.length; i++) {
+        if (String(ids[i][0]) === String(p.id)) {
+          sh.getRange(i + 1, 2, 1, 4).setValues([[account, date, bal, note]]);
+          SpreadsheetApp.flush();
+          return { status:'ok', id:String(p.id), message:'Balance updated.' };
+        }
+      }
+      return { status:'error', message:'Balance reading not found: ' + p.id };
+    }
+    const again = ridSeen_(p);
+    if (again) return again;
+    const id = 'BL' + Date.now();
+    sh.appendRow([id, account, date, bal, note, balStamp_()]);
+    SpreadsheetApp.flush();
+    return ridKeep_(p, { status:'ok', id:id, message:'Balance saved.' });
+  } finally { try { lock.releaseLock(); } catch (e) {} }
+}
+
+/* The one-time move of the old ₹1 / ₹0 balance rows out of the ledger. Each
+   reading's ID is 'BL' + the ledger row's ID, so a repeat of the same request
+   finds it already there and only finishes the delete — nothing is doubled. */
+function moveToBalances(p) {
+  let items;
+  try { items = JSON.parse(p.items || '[]'); } catch (e) { return { status:'error', message:'Bad list.' }; }
+  if (!Array.isArray(items) || !items.length) return { status:'error', message:'Nothing to move.' };
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(30000); } catch (e) {
+    return { status:'error', message:'Busy — please try again in a moment.' };
+  }
+  try {
+    const bs = balSheet_();
+    const have = {};
+    bs.getRange(1, 1, Math.max(bs.getLastRow(), 1), 1).getValues()
+      .forEach(function (r) { have[String(r[0])] = true; });
+    const tx = getSheet();
+    const txIds = tx.getRange(1, 1, Math.max(tx.getLastRow(), 1), 1).getValues()
+      .map(function (r) { return String(r[0]); });
+    const add = [], del = [];
+    let ok = 0;
+    items.forEach(function (it) {
+      const txId = String(it.txId || '').trim();
+      const account = String(it.account || '').trim().slice(0, 80);
+      const date = balIso_(it.date);
+      const bal = parseFloat(it.balance);
+      if (!txId || !account || isNaN(bal) || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+      ok++;
+      const id = 'BL' + txId;
+      if (!have[id]) { add.push([id, account, date, bal, String(it.note || '').slice(0, 400), balStamp_()]); have[id] = true; }
+      const row = txIds.indexOf(txId);
+      if (row > 0) del.push(row + 1);
+    });
+    if (add.length) bs.getRange(bs.getLastRow() + 1, 1, add.length, BAL_HDRS.length).setValues(add);
+    del.sort(function (a, b) { return b - a; }).forEach(function (r) { tx.deleteRow(r); });
+    SpreadsheetApp.flush();
+    return { status:'ok', moved: ok, added: add.length, removed: del.length,
+             message: 'Moved ' + add.length + ' into Balances; removed ' + del.length + ' ledger rows.' };
+  } finally { try { lock.releaseLock(); } catch (e) {} }
 }

@@ -826,6 +826,43 @@ tbody tr.tx-row{cursor:pointer}
   .v-sum-line{font-size:calc(16px*var(--ts))}
 }
 /* ══ end VOICE ENTRY CSS ═══════════════════════════════════════════════ */
+/* ══ BANK & CASH BALANCES (shared by all three finance trackers) ══ */
+.bal-needs{display:none;background:var(--warning-bg);border:1px solid var(--warning-border);color:var(--warning-text);border-radius:var(--radius);padding:12px 14px;font-size:13px;line-height:1.55;margin-bottom:12px}
+.bal-needs.show{display:block}
+.bal-big{font-size:20px;font-weight:800;color:var(--text);white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+.bal-big.neg{color:var(--danger-text)}
+.bal-ico{width:38px;height:38px;border-radius:10px;background:var(--bg3);display:inline-flex;align-items:center;justify-content:center;font-size:20px;color:var(--cyan);flex:0 0 auto}
+.bal-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.bal-head{display:flex;gap:11px;align-items:center;min-width:0;flex:1 1 auto}
+.bal-amt{flex:0 0 auto}
+.bal-chg{font-size:12.5px;font-weight:600;margin-top:3px;text-align:right;white-space:nowrap}
+.bal-chg.up{color:var(--success-text)}
+.bal-chg.down{color:var(--danger-text)}
+.bal-old{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--warning-bg);color:var(--warning-text)}
+.bal-acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+.bal-hist{margin-top:11px;border-top:1px solid var(--border);padding-top:6px}
+.bal-hrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+.bal-hrow:last-child{border-bottom:none}
+.bal-hrow .d{color:var(--text2);white-space:nowrap;min-width:88px}
+.bal-hrow .n{flex:1 1 auto;color:var(--text3);min-width:0;overflow-wrap:anywhere;font-size:12.5px}
+.bal-hrow .a{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.bal-hrow button{background:none;border:none;color:var(--text3);cursor:pointer;padding:6px;font-size:16px;min-width:40px;min-height:40px}
+.bal-move{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--info-bg);border:1px solid var(--info-border);color:var(--info-text);border-radius:var(--radius);padding:12px 14px;font-size:13px;line-height:1.5;margin-bottom:12px}
+.bal-mv{border:1px solid var(--border);border-radius:var(--radius);padding:11px 12px;margin-bottom:9px;background:var(--bg2)}
+.bal-mv.off{opacity:.55}
+.bal-mv-top{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--text2);line-height:1.45}
+.bal-mv-top input[type=checkbox]{width:20px;height:20px;flex:0 0 auto;margin-top:1px;accent-color:var(--cyan)}
+.bal-mv-desc{overflow-wrap:anywhere;min-width:0}
+.bal-mv-desc small{display:block;color:var(--text3);font-size:12px;margin-top:2px}
+.bal-mv .fld-row{margin:10px 0 0}
+@media(max-width:560px){
+  .bal-top{flex-direction:column;gap:8px}
+  .bal-amt{padding-left:49px}
+  .bal-big,.bal-chg{text-align:left}
+  .bal-chg{white-space:normal}
+  .bal-big{font-size:18px}
+  .bal-mv .fld-row{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
@@ -836,7 +873,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v4.2</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v4.3</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -885,6 +922,7 @@ tbody tr.tx-row{cursor:pointer}
     <button class="vn-btn on" id="vnLedger" onclick="setView('ledger')" aria-label="Ledger"><i class="ti ti-notebook"></i> Ledger<span class="vn-dot"></span></button>
     <button class="vn-btn"    id="vnPlan"   onclick="setView('plan')"   aria-label="Monthly plan"><i class="ti ti-calendar-dollar"></i> Plan<span class="vn-dot"></span></button>
     <button class="vn-btn"    id="vnCommit" onclick="setView('commit')" aria-label="Savings, loans and commitments"><i class="ti ti-pig-money"></i> Commitments<span class="vn-dot"></span></button>
+    <button class="vn-btn"    id="vnBal"    onclick="setView('bal')"    aria-label="Bank and cash balances"><i class="ti ti-building-bank"></i> Balances<span class="vn-dot"></span></button>
     <button class="vn-btn"    id="vnReport" onclick="openReport()"      aria-label="Reports"><i class="ti ti-report-analytics"></i> Reports<span class="vn-dot"></span></button>
   </div>
 </nav>
@@ -1158,7 +1196,33 @@ tbody tr.tx-row{cursor:pointer}
   <div id="commitList" class="cm-list"></div>
 </div><!-- /viewCommit -->
 
-  <div class="footer">Mini Personal Finance Tracker v4.2 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+<!-- ═══ VIEW: BANK & CASH BALANCES (shared by all three finance trackers) ═══
+     A balance is a READING of an account, not money coming in or going out.
+     It lives in its own sheet, so it never touches Income, Expenses or any
+     report total — and nobody has to book ₹1 to keep one. -->
+<div class="view" id="viewBal">
+  <div class="bal-needs" id="balNeeds">
+    <b><i class="ti ti-alert-triangle"></i> Paste the new Apps Script to switch Balances on.</b><br>
+    Balances save into a new <b>Balances</b> sheet that your current Apps Script does not have yet.
+    Paste the new script, then <b>Deploy → Manage deployments → ✏ → Version: New version → Deploy</b>.
+  </div>
+
+  <div class="tot-grid" id="balTotals"></div>
+
+  <div class="pane-head">
+    <div class="pane-h"><i class="ti ti-building-bank"></i> Bank &amp; Cash Balances</div>
+    <button class="mini-btn primary" onclick="openBal('')"><i class="ti ti-plus"></i> Update balance</button>
+  </div>
+  <div class="pane-sub">
+    Type what the bank shows — the app keeps every reading, shows each account&rsquo;s latest one and adds them up.
+    Balances never count as income or expense.
+  </div>
+
+  <div id="balMove"></div>
+  <div id="bankBalList" class="cm-list"></div>
+</div><!-- /viewBal -->
+
+  <div class="footer">Mini Personal Finance Tracker v4.3 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1215,7 +1279,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.2 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.3 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1280,7 +1344,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.2</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.3</div>
       </div>
     </div>
 
@@ -1531,6 +1595,67 @@ tbody tr.tx-row{cursor:pointer}
     <button class="mini-btn danger" id="cmDeleteBtn" style="display:none" onclick="deleteCommit()"><i class="ti ti-trash"></i> Delete</button>
     <button class="mini-btn" onclick="closeCommit()">Cancel</button>
     <button class="btn-save" id="cmSaveBtn" onclick="saveCommit()"><i class="ti ti-device-floppy"></i> Save</button>
+  </div>
+</div>
+
+<!-- BALANCE EDITOR — one reading of one account ───────────────────────────── -->
+<div class="sheet-overlay" id="balOverlay" onclick="closeBal()"></div>
+<div class="sheet-modal" id="balModal" role="dialog" aria-modal="true" aria-labelledby="balTitle">
+  <div class="sheet-hdr">
+    <span class="sheet-hdr-title" id="balTitle"><i class="ti ti-building-bank"></i> Update a Balance</span>
+    <button class="drawer-close" onclick="closeBal()" aria-label="Close"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="sheet-body">
+    <div class="fld-row one">
+      <div class="fld">
+        <label for="balAcct">Account</label>
+        <input type="text" id="balAcct" list="dlBalAcct" placeholder="e.g. ICICI Savings, HDFC Current, Cash in Hand" autocomplete="off">
+        <datalist id="dlBalAcct"></datalist>
+      </div>
+    </div>
+    <div class="fld-row">
+      <div class="fld">
+        <label for="balAmt">Balance (₹)</label>
+        <input type="number" id="balAmt" placeholder="0.00" step="0.01" inputmode="decimal">
+      </div>
+      <div class="fld">
+        <label for="balDate">As on</label>
+        <input type="date" id="balDate">
+      </div>
+    </div>
+    <div class="fld-row one">
+      <div class="fld">
+        <label for="balNote">Note <span style="color:var(--text3)">(optional)</span></label>
+        <textarea id="balNote" rows="2" placeholder="e.g. after staff salaries, at 7:06 PM"></textarea>
+      </div>
+    </div>
+    <div class="fld-hint" id="balHint"></div>
+  </div>
+  <div class="sheet-foot">
+    <button class="mini-btn danger" id="balDeleteBtn" style="display:none" onclick="deleteBal()"><i class="ti ti-trash"></i> Delete</button>
+    <button class="mini-btn" onclick="closeBal()">Cancel</button>
+    <button class="btn-save" id="balSaveBtn" onclick="saveBal()"><i class="ti ti-device-floppy"></i> Save</button>
+  </div>
+</div>
+
+<!-- MOVE BALANCE ENTRIES — the old ₹1 / ₹0 ledger rows, into Balances ─────── -->
+<div class="sheet-overlay" id="balMvOverlay" onclick="closeBalMove()"></div>
+<div class="sheet-modal wide" id="balMvModal" role="dialog" aria-modal="true" aria-labelledby="balMvTitle">
+  <div class="sheet-hdr">
+    <span class="sheet-hdr-title" id="balMvTitle"><i class="ti ti-arrows-transfer-up"></i> Move Balance Entries</span>
+    <button class="drawer-close" onclick="closeBalMove()" aria-label="Close"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="sheet-body">
+    <div class="pane-sub" style="margin-top:0">
+      These ledger entries are bank balances typed as ₹1 or ₹0 transactions. Check each account name and balance —
+      they were read out of the description. Each ticked one becomes a balance reading and is then
+      <b>removed from the ledger</b>.
+    </div>
+    <div id="balMvList"></div>
+  </div>
+  <div class="sheet-foot">
+    <button class="mini-btn" onclick="closeBalMove()">Cancel</button>
+    <button class="btn-save" id="balMvBtn" onclick="runBalMove()"><i class="ti ti-arrows-transfer-up"></i> Move</button>
   </div>
 </div>
 
@@ -2217,11 +2342,11 @@ async function loadAll(){
       if(hasPlans){ commitments = data.commitments; plans = data.plans; }
       setBackendOK(hasPlans);
       setCatBackend(Array.isArray(data.features) && data.features.indexOf('category') >= 0);   // v3.1
-      paintBackendVer(data.version);                                                            // v3.2
+      balLoad(data); paintBackendVer(data.version);                                                            // v3.2
       cacheEntries();                                   // next cold open paints instantly
       setOffline(false);
       setStatus(true,'Connected — Google Drive' + (data.version ? ' · backend v' + data.version : ''));
-      render(); renderPlan(); renderCommitments();
+      render(); renderPlan(); renderCommitments(); renderBankBal();
       syncProfileIfStale(data.profileAt);                // picks up a photo set elsewhere
     }
     else{ setStatus(false,'Error: '+data.message); showToast('Load failed','error'); }
@@ -2275,6 +2400,295 @@ function cancelEdit(){
   render();
 }
 
+/* ══ BANK & CASH BALANCES — shared by all three finance trackers ══════════════
+   A bank balance is a READING of an account, not money in or out. The old
+   way — a ₹1 "income" whose Description carried the balance — put a fake
+   rupee into every total and left the real figure where nothing could add it
+   up. The standard (Money Manager, YNAB, Tally, every bank app) keeps
+   readings apart: one row per account per reading, in their own sheet.
+   The view shows each account's LATEST reading, the change since the one
+   before, and the total; a stale account (no reading for 30 days) is flagged.
+   Change this block in all three apps together. */
+let balances = [];                 // [{id, account, date, balance, note, createdAt}]
+let balBackend = null;             // null = not heard yet · true/false = the Apps Script has / lacks the Balances sheet
+let balEditId = '', balFromLedger = false, balMvRows = [];
+const balOpenAcct = {};            // account key → its history is expanded
+const BAL_CACHE = 'balances:' + location.pathname;   // Mini and TSM share an origin — the path keeps them apart
+const BAL_STALE_DAYS = 30;
+const BAL_RX = /\b(?:bal|balance|avbl|avl)\b|cash in hand/i;
+const BAL_BANKS = [[/icici/i,'ICICI'],[/hdfc/i,'HDFC'],[/\btmb\b|tamil ?nad merc/i,'TMB'],[/\bsbi\b|state bank/i,'SBI'],
+  [/canara/i,'Canara'],[/baroda|\bbob\b/i,'Bank of Baroda'],[/\baxis\b/i,'Axis'],[/kotak/i,'Kotak'],
+  [/\biob\b|indian overseas/i,'IOB'],[/indian bank/i,'Indian Bank'],[/federal bank/i,'Federal'],[/\bkvb\b|karur vysya/i,'KVB'],
+  [/\bcub\b|city union/i,'City Union'],[/union bank/i,'Union Bank'],[/\bpnb\b|punjab national/i,'PNB'],[/post office|\bippb\b/i,'Post Office']];
+
+function balLoad(data){
+  balBackend = Array.isArray(data && data.balances);
+  balances = balBackend ? data.balances : [];
+  try{ if(balBackend) localStorage.setItem(BAL_CACHE, JSON.stringify(balances)); }catch(_){}
+}
+function _balKey(s){ return String(s == null ? '' : s).toLowerCase().replace(/\s+/g, ' ').trim(); }
+function _balOrd(b){ return String(b.date || '') + '|' + String(String(b.id || '').replace(/\D/g, '')).padStart(16, '0'); }
+function _balMoney(n){ n = Number(n) || 0; return n < 0 ? '−' + fmt(-n) : fmt(n); }
+function _balDays(iso){ const t = Date.parse(iso + 'T00:00:00'); return isNaN(t) ? 0 : Math.floor((Date.now() - t) / 864e5); }
+function _balIcon(name){
+  return /cash/i.test(name) ? 'ti-cash' : /card|credit/i.test(name) ? 'ti-credit-card'
+       : /wallet|paytm|gpay|phonepe|upi/i.test(name) ? 'ti-wallet' : 'ti-building-bank';
+}
+/* Every account with its readings, newest first. */
+function balAccounts(){
+  const map = new Map();
+  balances.forEach(b => {
+    const k = _balKey(b.account); if(!k) return;
+    if(!map.has(k)) map.set(k, { key:k, name:b.account, rows:[] });
+    map.get(k).rows.push(b);
+  });
+  return [...map.values()].map(a => {
+    a.rows.sort((x, y) => _balOrd(y) < _balOrd(x) ? -1 : 1);
+    a.name = a.rows[0].account;            // the spelling used most recently
+    return a;
+  }).sort((x, y) => x.name.localeCompare(y.name));
+}
+
+function renderBankBal(){
+  const box = document.getElementById('bankBalList'); if(!box) return;
+  if(balBackend === null && !balances.length){
+    try{ const c = JSON.parse(localStorage.getItem(BAL_CACHE) || '[]'); if(Array.isArray(c)) balances = c; }catch(_){}
+  }
+  document.getElementById('balNeeds').classList.toggle('show', balBackend === false);
+  const accts = balAccounts();
+  const total = accts.reduce((s, a) => s + (Number(a.rows[0].balance) || 0), 0);
+  const latest = accts.map(a => a.rows[0]).sort((x, y) => _balOrd(y) < _balOrd(x) ? -1 : 1)[0];
+  const stale = accts.filter(a => _balDays(a.rows[0].date) > BAL_STALE_DAYS);
+  document.getElementById('balTotals').innerHTML = accts.length
+    ? tot('in', 'Total across accounts', _balMoney(total), total < 0 ? 'k-bad' : 'k-good', `${accts.length} account${accts.length === 1 ? '' : 's'}`)
+    + tot('cy', 'Last updated', latest ? fmtDate(latest.date) : '—', '', latest ? esc(latest.account) : '')
+    + tot(stale.length ? 'out' : 'wa', 'Need a fresh reading', String(stale.length), stale.length ? 'k-bad' : 'k-good',
+          stale.length ? `not updated for ${BAL_STALE_DAYS}+ days` : 'every account is current')
+    : '';
+
+  const cands = balBackend ? balCandidates() : [];
+  document.getElementById('balMove').innerHTML = cands.length
+    ? `<div class="bal-move"><span><i class="ti ti-info-circle"></i> <b>${cands.length} balance entr${cands.length === 1 ? 'y is' : 'ies are'}</b> still in the ledger as ₹1 / ₹0 transactions.</span>
+       <button class="mini-btn primary" onclick="openBalMove()"><i class="ti ti-arrows-transfer-up"></i> Review &amp; move</button></div>`
+    : '';
+
+  if(!accts.length){
+    box.innerHTML = `<div class="pane-empty">
+      <i class="ti ti-building-bank"></i>
+      <b>No balances yet</b>
+      Add each bank account (and the cash in hand) with the balance it shows today. Update it whenever you check — the app keeps every reading.
+      <button class="mini-btn primary" onclick="openBal('')"><i class="ti ti-plus"></i> Add the first balance</button>
+    </div>`;
+    return;
+  }
+  box.innerHTML = accts.map(balCardHTML).join('');
+}
+
+function balCardHTML(a){
+  const cur = a.rows[0], prev = a.rows[1], n = Number(cur.balance) || 0;
+  const days = _balDays(cur.date);
+  const sub = [`as on <b>${fmtDate(cur.date)}</b>`];
+  if(cur.note) sub.push(esc(cur.note));
+  let chg = '';
+  if(prev){
+    const d = n - (Number(prev.balance) || 0);
+    chg = d ? `<div class="bal-chg ${d > 0 ? 'up' : 'down'}">${d > 0 ? '▲ +' : '▼ −'}${fmt(Math.abs(d))} since ${fmtDate(prev.date)}</div>`
+            : `<div class="bal-chg">no change since ${fmtDate(prev.date)}</div>`;
+  }
+  const k = encodeURIComponent(a.key).replace(/'/g, '%27');   // safe inside a quoted onclick
+  const open = !!balOpenAcct[a.key];
+  const hist = open ? `<div class="bal-hist">${a.rows.map(b =>
+      `<div class="bal-hrow"><span class="d">${fmtDate(b.date)}</span><span class="n">${esc(b.note || '')}</span>
+         <span class="a">${_balMoney(b.balance)}</span>
+         <button onclick="openBal('${esc(b.id)}')" aria-label="Edit this reading" title="Edit"><i class="ti ti-edit"></i></button></div>`).join('')}</div>` : '';
+  return `<div class="cm-card">
+    <div class="bal-top">
+      <div class="bal-head"><span class="bal-ico"><i class="ti ${_balIcon(a.name)}"></i></span>
+        <div style="min-width:0"><div class="cm-name">${esc(a.name)}</div>
+        <div class="cm-sub">${sub.join(' · ')}${days > BAL_STALE_DAYS ? ` <span class="bal-old"><i class="ti ti-clock-exclamation"></i> ${days} days old</span>` : ''}</div></div>
+      </div>
+      <div class="bal-amt"><div class="bal-big${n < 0 ? ' neg' : ''}">${_balMoney(n)}</div>${chg}</div>
+    </div>
+    <div class="bal-acts">
+      <button class="mini-btn primary" onclick="openBal('', decodeURIComponent('${k}'))"><i class="ti ti-refresh"></i> Update</button>
+      <button class="mini-btn" onclick="balToggle(decodeURIComponent('${k}'))"><i class="ti ti-history"></i> ${open ? 'Hide history' : `History (${a.rows.length})`}</button>
+    </div>${hist}
+  </div>`;
+}
+function balToggle(key){ balOpenAcct[key] = !balOpenAcct[key]; renderBankBal(); }
+
+function balRequire(){
+  if(balBackend === false){ showToast('Paste the new Apps Script first — see the note at the top of Balances', 'error'); return false; }
+  return true;
+}
+/* id = edit that reading · otherwise a new reading, for `acct` when given. */
+function openBal(id, acct){
+  if(!balRequire()) return;
+  const b = id ? balances.find(x => x.id === id) : null;
+  balEditId = b ? b.id : '';
+  const name = b ? b.account : (acct ? (balAccounts().find(a => a.key === _balKey(acct)) || { name: acct }).name : '');
+  document.getElementById('balTitle').innerHTML = b
+    ? '<i class="ti ti-edit"></i> Edit a Balance Reading' : '<i class="ti ti-building-bank"></i> Update a Balance';
+  document.getElementById('balDeleteBtn').style.display = b ? '' : 'none';
+  document.getElementById('balAcct').value = name;
+  document.getElementById('balAmt').value  = b ? b.balance : '';
+  document.getElementById('balDate').value = b ? b.date : today();
+  document.getElementById('balNote').value = b ? (b.note || '') : '';
+  document.getElementById('dlBalAcct').innerHTML = balAccounts().map(a => `<option value="${esc(a.name)}">`).join('');
+  balFromLedger = false;
+  balPaintHint();
+  openSheet('bal');
+  if(typeof autoGrow === 'function') autoGrow(document.getElementById('balNote'));
+  setTimeout(() => document.getElementById(name ? 'balAmt' : 'balAcct').focus(), 60);
+}
+function closeBal(){ closeSheet('bal'); }
+function balPaintHint(){
+  const a = balAccounts().find(x => x.key === _balKey(document.getElementById('balAcct').value));
+  const last = a && a.rows.find(r => r.id !== balEditId);
+  document.getElementById('balHint').innerHTML = last
+    ? `<i class="ti ti-history"></i> Last reading: <b>${_balMoney(last.balance)}</b> on ${fmtDate(last.date)}`
+    : (document.getElementById('balAcct').value.trim() ? '<i class="ti ti-sparkles"></i> A new account — it starts with this reading.' : '');
+}
+document.addEventListener('input', e => { if(e.target && e.target.id === 'balAcct') balPaintHint(); });
+
+async function saveBal(){
+  const account = document.getElementById('balAcct').value.trim();
+  const raw = document.getElementById('balAmt').value.trim();
+  const balance = parseFloat(raw);
+  const date = document.getElementById('balDate').value;
+  const note = document.getElementById('balNote').value.trim();
+  if(!account){ showToast('Name the account', 'error'); return; }
+  if(raw === '' || isNaN(balance)){ showToast('Enter the balance', 'error'); return; }
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){ showToast('Pick the date', 'error'); return; }
+  gateBusy('balSaveBtn', true, 'Saving…');
+  try{
+    const res = await gasCall({ action:'saveBalance', id: balEditId || '', account, date, balance, note }, 1, 30000);
+    if(res && res.status === 'ok'){
+      showToast(res.duplicate ? 'Already saved — not added twice' : 'Balance saved');
+      closeBal();
+      if(balFromLedger){ balFromLedger = false; cancelEdit(); }
+      await loadAll();
+    } else showToast(backendMsg(res), 'error');
+  }catch(e){ if(!AUTH_LOST) showToast('Couldn’t confirm — tap Sync. Saving again will not add it twice.', 'error'); }
+  finally{ gateBusy('balSaveBtn', false, '', '<i class="ti ti-device-floppy"></i> Save'); }
+}
+async function deleteBal(){
+  const b = balances.find(x => x.id === balEditId); if(!b) return;
+  if(!confirm(`Delete this reading?\n\n${b.account} · ${_balMoney(b.balance)} on ${fmtDate(b.date)}`)) return;
+  try{
+    const res = await gasCall({ action:'deleteBalance', id: b.id });
+    if(res && res.status === 'ok'){ showToast('Deleted'); closeBal(); await loadAll(); }
+    else showToast(backendMsg(res), 'error');
+  }catch(e){ if(!AUTH_LOST) showToast('Could not reach Google Drive', 'error'); }
+}
+
+/* ── the old ₹1 / ₹0 balance rows in the ledger ──────────────────────────── */
+function balLooksLike(desc, amount){ return Number(amount) <= 1 && BAL_RX.test(String(desc || '')); }
+function balCandidates(){
+  return entries.filter(e => (Number(e.amount) || 0) <= 1 && (
+    BAL_RX.test([e.description, e.party, e.note].join(' ')) || /balance record/i.test(e.category || '')));
+}
+/* The balance written into the description: "Bal Rs 9,989.77", "AVBL bal is
+   Rs.43,273.72", "Available Balance is INR 5,451.59", "Bal after … 53,692.54".
+   A bank SMS about a debit quotes the DEBIT first — that is never taken for
+   the balance; with no balance figure the row is left unticked. */
+function balParse(e){
+  const d = String(e.description || '');
+  const num = s => { const x = parseFloat(String(s).replace(/,/g, '')); return isNaN(x) ? null : x; };
+  // A balance looks like money — grouped, with paise, or 3+ digits — so "after 2 salaries" is never ₹2.
+  let m = d.match(/\b(?:bal|balance)\b[^₹]{0,40}?(?:rs\.?|inr|₹)?\s*(\d{1,3}(?:,\d{2,3})+(?:\.\d+)?|\d+\.\d{1,2}|\d{3,})(?![\d,])/i);
+  if(m) return num(m[1]);
+  m = d.match(/(?:rs\.?|inr|₹)\s*([\d,]+(?:\.\d+)?)/i);
+  if(m && !/debited|credited|withdrawn|\btxn\b/i.test(d)) return num(m[1]);
+  m = String(e.note || '').match(/was ₹\s*([\d,]+(?:\.\d+)?)/);
+  if(m){ const x = num(m[1]); if(x > 1) return x; }
+  return null;
+}
+function balGuessAcct(e){
+  const s = [e.description, e.party].join(' ');
+  if(/cash in hand|hand cash/i.test(s)) return 'Cash in Hand';
+  const b = BAL_BANKS.find(x => x[0].test(s));
+  const t = /current/i.test(s) ? 'Current' : /saving|\bsb\b/i.test(s) ? 'Savings' : /salary/i.test(s) ? 'Salary' : '';
+  const name = b ? (b[1] + ' ' + t).trim()
+                 : String(e.party || '').replace(/\b(?:a\/?c|acc(?:ount)?|ac)?\s*bal(?:ance)?\b.*$/i, '').trim();
+  const known = balAccounts().find(a => a.key === _balKey(name));
+  if(known) return known.name;
+  // Only the bank is named ("TMB … bal is …"): the one account you already keep there.
+  if(b && !t){
+    const there = balAccounts().filter(a => a.key.indexOf(_balKey(b[1]) + ' ') === 0);
+    if(there.length === 1) return there[0].name;
+  }
+  return name;
+}
+function openBalFromLedger(e){
+  openBal('', balGuessAcct(e));
+  const v = balParse(e);
+  if(v != null) document.getElementById('balAmt').value = v;
+  if(e.date) document.getElementById('balDate').value = e.date;
+  balFromLedger = true;
+  balPaintHint();
+}
+
+function openBalMove(){
+  if(!balRequire()) return;
+  balMvRows = balCandidates().map(e => {
+    const v = balParse(e);
+    const sms = /debited|credited|withdrawn|\btxn\b/i.test(e.description || '');   // also records a payment
+    return { id:e.id, on: v != null && !sms, sms, acct: balGuessAcct(e), amt: v == null ? '' : String(v), date: String(e.date || '').slice(0, 10),
+             note: String(e.description || '').trim().slice(0, 200), desc: e.description || '', party: e.party || '', type: e.type || '', was: Number(e.amount) || 0 };
+  }).sort((x, y) => x.date < y.date ? -1 : 1);
+  // A row naming only the bank ("TMB") takes the one account of that bank named elsewhere in the batch.
+  balMvRows.forEach(r => {
+    const b = BAL_BANKS.find(x => x[1] === r.acct); if(!b) return;
+    const there = [...new Set(balMvRows.map(o => o.acct).filter(a => a.indexOf(b[1] + ' ') === 0))];
+    if(there.length === 1) r.acct = there[0];
+  });
+  paintBalMove();
+  openSheet('balMv');
+}
+function closeBalMove(){ closeSheet('balMv'); }
+function balMvSet(i, k, v){ balMvRows[i][k] = v; if(k === 'on') paintBalMove(); else balMvCount(); }
+function balMvCount(){
+  const n = balMvRows.filter(r => r.on).length;
+  document.getElementById('balMvBtn').innerHTML = `<i class="ti ti-arrows-transfer-up"></i> Move ${n}`;
+  document.getElementById('balMvBtn').disabled = !n;
+}
+function paintBalMove(){
+  document.getElementById('balMvList').innerHTML = balMvRows.map((r, i) => `
+    <div class="bal-mv${r.on ? '' : ' off'}">
+      <label class="bal-mv-top"><input type="checkbox" ${r.on ? 'checked' : ''} onchange="balMvSet(${i},'on',this.checked)">
+        <span class="bal-mv-desc">${esc(r.desc)}<small>${fmtDate(r.date)} · ${esc(r.party)} · booked as ${esc(r.type)} ${fmt(r.was)}</small>${r.sms ? '<small style="color:var(--warning-text)"><i class="ti ti-alert-triangle"></i> This message also records a payment — make sure that payment is in the ledger before moving it.</small>' : ''}</span></label>
+      ${r.on ? `<div class="fld-row">
+        <div class="fld"><label for="bmA${i}">Account</label><input type="text" id="bmA${i}" list="dlBalAcct" value="${esc(r.acct)}" oninput="balMvSet(${i},'acct',this.value)" autocomplete="off"></div>
+        <div class="fld"><label for="bmB${i}">Balance (₹)</label><input type="number" id="bmB${i}" step="0.01" inputmode="decimal" value="${esc(r.amt)}" oninput="balMvSet(${i},'amt',this.value)"></div>
+      </div>` : ''}
+    </div>`).join('') || '<div class="pane-empty"><i class="ti ti-circle-check"></i><b>Nothing to move</b>No balance entries are left in the ledger.</div>';
+  document.getElementById('dlBalAcct').innerHTML = balAccounts().map(a => `<option value="${esc(a.name)}">`).join('');
+  balMvCount();
+}
+async function runBalMove(){
+  const pick = balMvRows.filter(r => r.on);
+  const bad = pick.find(r => !String(r.acct).trim() || r.amt === '' || isNaN(parseFloat(r.amt)));
+  if(bad){ showToast('Every ticked row needs an account and a balance', 'error'); return; }
+  if(!confirm(`Move ${pick.length} balance entr${pick.length === 1 ? 'y' : 'ies'} into Balances?\n\nEach becomes a balance reading and is removed from the ledger.`)) return;
+  gateBusy('balMvBtn', true, 'Moving…');
+  let moved = 0, failed = 0;
+  try{
+    for(let i = 0; i < pick.length; i += 8){
+      const items = pick.slice(i, i + 8).map(r => ({ txId:r.id, account:String(r.acct).trim(), date:r.date, balance:parseFloat(r.amt), note:r.note }));
+      try{
+        const res = await gasCall({ action:'moveToBalances', items: JSON.stringify(items) }, 1, 60000);
+        if(res && res.status === 'ok') moved += Number(res.moved) || 0; else { failed += items.length; showToast(backendMsg(res), 'error'); }
+      }catch(e){ failed += items.length; }
+    }
+  } finally {
+    gateBusy('balMvBtn', false, '', '<i class="ti ti-arrows-transfer-up"></i> Move');
+  }
+  closeBalMove();
+  showToast(failed ? `Moved ${moved}; ${failed} not confirmed — open Review & move again (nothing is moved twice)` : `Moved ${moved} into Balances`, failed ? 'error' : undefined);
+  await loadAll();
+}
+
 /* ══ NO REPEATS — one entry, one row (shared by all three finance trackers) ══
    Two things put the same entry in the books twice, and nobody saw either:
    1. A create request sent AGAIN after its answer was lost — the app's own
@@ -2290,7 +2704,7 @@ function cancelEdit(){
       party and amount. That is a WARNING, not a block (two ₹30 milk entries
       on one day are real): lookAlikeOk() shows it and the person decides.
    Change this block in all three apps together. */
-const RID_ACTIONS = ['add', 'savePlan', 'saveCommitment'];
+const RID_ACTIONS = ['add', 'savePlan', 'saveCommitment', 'saveBalance', 'moveToBalances'];
 const _ridPending = new Map();              // payload fingerprint → rid, until the server confirms it
 let _saveBusy = false;                      // a second Save while the first is still running is ignored
 
@@ -2377,6 +2791,11 @@ async function saveEntry(opts){
   if(!date||!desc||!party||!amount||amount<=0){ showToast('Fill date, description, party & amount','error'); return false; }
   if(_saveBusy) return false;                       // double tap while the first save is still running
   const wasEditing = editingId;
+  // A balance typed into the ledger as ₹1 belongs in Balances — never a fake rupee of income.
+  if(!wasEditing && !opts.lookAlikeSeen && balBackend && balLooksLike(desc, amount)
+     && confirm('This looks like a bank balance, not money in or out.\n\nOK = record it under Balances (nothing goes into the ledger)\nCancel = save it in the ledger anyway')){
+    setView('bal'); openBalFromLedger({ description:desc, party, date }); return false;
+  }
   // Voice entry has already shown the same warning on its check screen.
   if(!opts.lookAlikeSeen && !lookAlikeOk({ date, party, amount }, wasEditing)) return false;
   _saveBusy = true;
@@ -2958,7 +3377,7 @@ const PLAN_STATUS = {
 /* ── SECTION SWITCHING ──────────────────────────────────────────────────── */
 function setView(v){
   curView = v;
-  [['ledger','viewLedger','vnLedger'],['plan','viewPlan','vnPlan'],['commit','viewCommit','vnCommit']]
+  [['ledger','viewLedger','vnLedger'],['plan','viewPlan','vnPlan'],['commit','viewCommit','vnCommit'],['bal','viewBal','vnBal']]
     .forEach(([k,vid,bid])=>{
       document.getElementById(vid).classList.toggle('on', k===v);
       document.getElementById(bid).classList.toggle('on', k===v);
@@ -2966,6 +3385,7 @@ function setView(v){
   localStorage.setItem(LS.view, v);
   if(v==='plan')   renderPlan();
   if(v==='commit') renderCommitments();
+  if(v==='bal')    renderBankBal();
   // A section switch is a new screen: start it at the top, the way a tab bar
   // behaves everywhere else.
   window.scrollTo({top:0, behavior:'auto'});
@@ -5355,7 +5775,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v4.2</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v4.3</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -5731,7 +6151,7 @@ function renderCached(){
       setStatus(false, 'Saved copy — syncing…');
       document.getElementById('loadingState').style.display = 'none';
     }
-    render(); renderPlan(); renderCommitments();
+    render(); renderPlan(); renderCommitments(); renderBankBal();
   }catch(e){}
 }
 function setOffline(on){
