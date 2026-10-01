@@ -863,6 +863,16 @@ tbody tr.tx-row{cursor:pointer}
   .bal-big{font-size:18px}
   .bal-mv .fld-row{grid-template-columns:1fr 1fr}
 }
+
+/* ══ INSTANT SAVE — entries on their way to Google Drive ══ */
+.tx-row.row-pending td{opacity:.72}
+.tx-row.row-pending td:first-child{box-shadow:inset 3px 0 0 var(--warning-text)}
+.tx-row.row-failed td:first-child{box-shadow:inset 3px 0 0 var(--danger-text)}
+.ob-chip{display:none;margin-left:10px;font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--warning-bg);color:var(--warning-text);border:1px solid var(--warning-border);cursor:pointer;white-space:nowrap;font-family:inherit}
+.ob-chip.show{display:inline-flex;align-items:center;gap:5px}
+.ob-chip.bad{background:var(--danger-bg);color:var(--danger-text);border-color:var(--danger-border)}
+.ob-chip .spin{display:inline-block;animation:obspin 1s linear infinite}
+@keyframes obspin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -873,7 +883,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.6</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.7</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -984,7 +994,7 @@ tbody tr.tx-row{cursor:pointer}
 
   <!-- STATUS BAR -->
   <div class="status-bar">
-    <span class="status-txt"><span class="status-dot" id="statusDot"></span><span id="statusTxt">Connecting...</span></span>
+    <span class="status-txt"><span class="status-dot" id="statusDot"></span><span id="statusTxt">Connecting...</span></span><button type="button" class="ob-chip" id="obChip" onclick="outboxChipTap()"></button>
     <div class="status-actions">
       <button class="s-btn rep-btn" onclick="openReport()"><i class="ti ti-report-money"></i> Report</button>
       <button class="s-btn" onclick="loadAll()"><i class="ti ti-refresh"></i> Sync</button>
@@ -1222,7 +1232,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="bankBalList" class="cm-list"></div>
 </div><!-- /viewBal -->
 
-  <div class="footer">Mini Finance Tracker v4.6 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Finance Tracker v4.7 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1279,7 +1289,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.6 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.7 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1344,7 +1354,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.6</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.7</div>
       </div>
     </div>
 
@@ -2334,7 +2344,7 @@ async function loadAll(){
   try{
     const data = await gasCall({action:'getAll'});
     if(data.status==='ok'){
-      entries=(data.transactions||[]).map(normType);
+      entries=(data.transactions||[]).map(normType); outboxMerge(); setTimeout(flushOutbox, 0);
       /* A v1.x deployment answers with transactions and nothing else. The
          absence of the key — not an empty array, which is a real answer — is
          what says the Plan and Commitments sheets do not exist there yet. */
@@ -2363,6 +2373,7 @@ async function loadAll(){
 
 // ── EDIT ──
 function startEdit(id){
+  if(outboxHold(id)) return;
   const e = entries.find(x=>x.id===id); if(!e) return;
   editingId = id;
   document.getElementById('fDate').value   = e.date||today();
@@ -2745,6 +2756,117 @@ async function runBalMove(){
   await loadAll();
 }
 
+/* ══ INSTANT SAVE — an outbox, the way WhatsApp, Gmail and Sheets offline work ══
+   Google's Apps Script servers sometimes take 20–50 s just to START a request
+   (measured 1 Oct 2026: a 'ping' that does nothing took 4 s, then 38 s, while
+   a GitHub Pages file took 0.2 s). Nobody should wait for that. A new entry is
+   shown at once — in the list and in every total — and put in this outbox,
+   kept on the device; it is sent in the background, in order, and retried
+   with growing gaps until Google Drive takes it. The request id from NO
+   REPEATS makes every retry safe: a re-send is answered, never written twice.
+   An entry the server refuses is kept and marked red, never dropped silently.
+   Change this block in all three apps together. */
+const OB_KEY = 'outbox:' + location.pathname;          // Mini and TSM share an origin — the path keeps them apart
+let outbox = (() => { try{ const a = JSON.parse(localStorage.getItem(OB_KEY) || '[]'); return Array.isArray(a) ? a : []; }catch(_){ return []; } })();
+let _obBusy = false, _obTimer = 0, _obWait = 0;
+const _obConfirmed = new Map();                         // id → {row, at}: landed rows a slower sync may not list yet
+const OB_RID_TTL = 5.5 * 3600e3;                        // the server remembers a request id for 6 h
+
+function _obSave(){ try{ localStorage.setItem(OB_KEY, JSON.stringify(outbox)); }catch(_){} }
+function _obRow(it){ return Object.assign({ id:'LOCAL-' + it.rid, _pending:true, _failed: !!it.failed }, it.fields); }
+function _obSame(t, f){
+  return String(t.date || '').slice(0, 10) === String(f.date) && t.type === f.type
+    && _laNorm(t.description) === _laNorm(f.description) && _laNorm(t.party) === _laNorm(f.party)
+    && Math.abs((Number(t.amount) || 0) - Number(f.amount)) < 0.005;
+}
+function outboxAdd(fields){
+  const rid = 'R' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const it = { rid, fields: Object.assign({}, fields), at: Date.now(), tries: 0 };
+  outbox.push(it); _obSave();
+  entries.push(_obRow(it));
+  try{ cacheEntries(); }catch(_){}
+  paintOutbox();
+  setTimeout(flushOutbox, 0);
+  return { state:'queued' };
+}
+/* After any load: the list is the Sheet's rows plus whatever is still on its way. */
+function outboxMerge(){
+  entries = entries.filter(e => String(e.id).indexOf('LOCAL-') !== 0);
+  const have = new Set(entries.map(e => e.id)), now = Date.now();
+  _obConfirmed.forEach((v, id) => { if(now - v.at > 180000) _obConfirmed.delete(id); else if(!have.has(id)) entries.push(v.row); });
+  outbox.forEach(it => entries.push(_obRow(it)));
+  paintOutbox();
+}
+/* Edit / delete wait until the row exists in the Sheet. A refused entry can be
+   sent again or removed. */
+function outboxHold(id){
+  if(String(id || '').indexOf('LOCAL-') !== 0) return false;
+  const it = outbox.find(x => 'LOCAL-' + x.rid === id);
+  if(it && it.failed){
+    if(confirm('This entry has NOT reached Google Drive' + (it.err ? ' (' + it.err + ')' : '') + '.\n\nOK = send it again now\nCancel = remove it from this device'))
+      { it.failed = false; it.err = ''; _obSave(); outboxMerge(); render(); flushOutbox(); }
+    else if(confirm('Remove this unsaved entry? It was never saved to Google Drive.'))
+      { outbox = outbox.filter(x => x !== it); _obSave(); outboxMerge(); try{ cacheEntries(); }catch(_){} render(); }
+    return true;
+  }
+  showToast('Still syncing to Google Drive — you can edit it in a moment');
+  return true;
+}
+function paintOutbox(){
+  const chip = document.getElementById('obChip'); if(!chip) return;
+  const failed = outbox.filter(x => x.failed).length, waiting = outbox.length - failed;
+  chip.classList.toggle('show', outbox.length > 0);
+  chip.classList.toggle('bad', failed > 0);
+  chip.innerHTML = failed
+    ? `<i class="ti ti-alert-triangle"></i> ${failed} not saved — tap`
+    : `<i class="ti ti-refresh spin"></i> ${waiting} syncing…`;
+  chip.title = failed ? 'Tap to send again or remove' : 'Saved on this device — on its way to Google Drive';
+}
+function outboxChipTap(){
+  const f = outbox.find(x => x.failed);
+  if(f) outboxHold('LOCAL-' + f.rid); else { _obWait = 0; flushOutbox(); showToast('Sending now…'); }
+}
+async function flushOutbox(){
+  if(_obBusy || !outbox.length) return;
+  if(typeof AUTH_LOST !== 'undefined' && AUTH_LOST) return;
+  _obBusy = true; clearTimeout(_obTimer);
+  let later = false;
+  try{
+    for(const it of outbox.slice()){
+      if(it.failed) continue;
+      // Past the server's memory of this request id, check the Sheet before re-sending.
+      if(it.tries > 0 && Date.now() - it.at > OB_RID_TTL &&
+         entries.some(e => String(e.id).indexOf('LOCAL-') !== 0 && _obSame(e, it.fields))){
+        outbox = outbox.filter(x => x !== it); _obSave(); continue;
+      }
+      it.tries++; _obSave();
+      let res = null;
+      try{ res = await gasCall(Object.assign({ action:'add', rid: it.rid }, it.fields), 1, 30000); }
+      catch(e){ later = true; break; }                  // offline or Google slow — keep the order, try again soon
+      if(res && res.status === 'ok'){
+        const row = Object.assign({}, it.fields, { id: res.id || ('TX' + Date.now()) });
+        outbox = outbox.filter(x => x !== it); _obSave();
+        _obConfirmed.set(row.id, { row, at: Date.now() });
+        const i = entries.findIndex(e => e.id === 'LOCAL-' + it.rid);
+        if(i >= 0) entries[i] = row; else entries.push(row);
+      } else if(res && /busy|try again/i.test(res.message || '')){ later = true; break; }
+      else {
+        it.failed = true; it.err = (res && res.message) || 'not saved'; _obSave();
+        const i = entries.findIndex(e => e.id === 'LOCAL-' + it.rid); if(i >= 0) entries[i]._failed = true;
+        showToast('An entry could not be saved — tap the red badge', 'error');
+      }
+    }
+  } finally {
+    _obBusy = false;
+    try{ cacheEntries(); }catch(_){}
+    render(); paintOutbox();
+    if(later && outbox.some(x => !x.failed)){ _obWait = Math.min(60000, (_obWait || 3000) * 2); _obTimer = setTimeout(flushOutbox, _obWait); }
+    else _obWait = 0;
+  }
+}
+window.addEventListener('online', () => { _obWait = 0; flushOutbox(); });
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') flushOutbox(); });
+
 /* ══ NO REPEATS — one entry, one row (shared by all three finance trackers) ══
    Two things put the same entry in the books twice, and nobody saw either:
    1. A create request sent AGAIN after its answer was lost — the app's own
@@ -2869,14 +2991,23 @@ async function saveEntry(opts){
         r = (res && res.status === 'ok') ? { state:'saved' } : { state:'error', message: res && res.message };
       } catch(e){ console.warn('Update reply lost', e); }
     } else {
-      r = await addTx(fields);
+      r = outboxAdd(fields);                       // on screen now, sent in the background
     }
-    if(r.state === 'saved'){
+    if(r.state === 'queued'){
+      ok = true;
+      showToast('Saved — syncing to Google Drive');
+      cancelEdit();
+    } else if(r.state === 'saved'){
       ok = true;
       showToast(r.repeat ? 'Already saved — it was not added twice'
                          : (wasEditing ? 'Updated in Google Drive!' : 'Saved to Google Drive!'));
       cancelEdit();
-      if(r.fresh){ entries = r.fresh; render(); } else { await loadAll(); }
+      if(wasEditing){                                // the row is known: change it here, no full re-download
+        const i = entries.findIndex(e => e.id === wasEditing);
+        if(i >= 0) entries[i] = Object.assign({}, entries[i], fields);
+        try{ cacheEntries(); }catch(_){}
+        render();
+      } else if(r.fresh){ entries = r.fresh; outboxMerge(); render(); } else { await loadAll(); }
     } else if(r.state === 'error'){
       showToast('Error: ' + (r.message || 'not saved'), 'error');
     } else if(r.state === 'missing'){
@@ -2897,6 +3028,7 @@ async function saveEntry(opts){
 }
 
 async function deleteEntry(id){
+  if(outboxHold(id)) return;
   if(!confirm('Delete this transaction?')) return;
   if(editingId===id) cancelEdit();
   try{
@@ -2912,7 +3044,7 @@ async function deleteEntry(id){
         const stillExists = (check.transactions||[]).some(t => t.id === id);
         if(!stillExists){
           showToast('Deleted ✓ (verified OK)');
-          entries = check.transactions || []; render();
+          entries = check.transactions || []; outboxMerge(); render();
         } else {
           showToast('Delete failed — please try again', 'error');
         }
@@ -3121,7 +3253,7 @@ function render(){
     // table is already eight columns wide on a phone.
     const who=[e.paidBy,e.mode].filter(Boolean).join(' · ');
     return `
-    <tr class="tx-row ${editingId===e.id?'row-editing':''}" onclick="openDetail('${e.id}')" title="Tap for details">
+    <tr class="tx-row ${editingId===e.id?'row-editing':''}${e._failed?' row-failed':e._pending?' row-pending':''}" onclick="openDetail('${e.id}')" title="Tap for details">
       <td style="color:var(--text2)">${i+1}</td>
       <td class="dt-cell" style="color:var(--text2);font-size:12px"><div>${dt.date}</div>${dt.sub?`<div class="dt-sub">${dt.sub}</div>`:''}</td>
       <td><span class="pill ${e.type}">${(m=>`<i class="ti ${m.icon}"></i> ${m.label}`)(TYPE_META[e.type]||TYPE_META.expense)}</span></td>
@@ -3946,7 +4078,7 @@ async function savePay(){
           gateBusy('paySaveBtn', false, '', '<i class="ti ti-check"></i> Record it'); return;
         }
         // Keep the ledger in step, so the very next save sees this row too.
-        if(r.fresh) entries = r.fresh;
+        if(r.fresh){ entries = r.fresh; outboxMerge(); }
         else if(txId && !entries.some(e => e.id === txId)) entries.push(Object.assign({ id: txId }, entry));
       }
     }
@@ -5831,7 +5963,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.6</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.7</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -6203,7 +6335,7 @@ function renderCached(){
     if(Array.isArray(c.commitments)) commitments = c.commitments;
     if(Array.isArray(c.plans))       plans       = c.plans;
     if(Array.isArray(c.rows) && c.rows.length){
-      entries = c.rows.map(normType);
+      entries = c.rows.map(normType); outboxMerge();
       setStatus(false, 'Saved copy — syncing…');
       document.getElementById('loadingState').style.display = 'none';
     }

@@ -1,4 +1,7 @@
-# Mini Finance Tracker v4.6
+# Mini Finance Tracker v4.7
+
+**Instant save (v4.7)** — a new entry appears at once (list and totals) and goes into an on-device outbox that syncs to Google Drive in the background, in order, retrying with growing gaps; the NO REPEATS request id makes every retry safe. A small badge in the status bar shows "N syncing…" or, if the server refuses one, "N not saved — tap" (send again / remove). The outbox survives closing the app. Edits update the row in place instead of re-downloading the ledger. Measured before: Apps Script took 4–50 s just to start a request.
+
 
 **Balances: edit, rename, delete (v4.6)** — every account card now has **Edit** (latest reading), **Rename** (renaming to an existing account's name offers to MERGE them — e.g. "HDFC Bank Savings Account" into "HDFC Savings"), and **Delete** (the account and all its readings, after a confirm); History rows gain a delete button. Changes show on screen at once and are sent in the background. GAS is a number-only bump.
 
