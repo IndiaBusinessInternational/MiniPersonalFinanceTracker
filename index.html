@@ -873,7 +873,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.5</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.6</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1222,7 +1222,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="bankBalList" class="cm-list"></div>
 </div><!-- /viewBal -->
 
-  <div class="footer">Mini Finance Tracker v4.5 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Finance Tracker v4.6 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1279,7 +1279,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.5 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.6 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1344,7 +1344,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.5</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.6</div>
       </div>
     </div>
 
@@ -2500,7 +2500,8 @@ function balCardHTML(a){
   const hist = open ? `<div class="bal-hist">${a.rows.map(b =>
       `<div class="bal-hrow"><span class="d">${fmtDate(b.date)}</span><span class="n">${esc(b.note || '')}</span>
          <span class="a">${_balMoney(b.balance)}</span>
-         <button onclick="openBal('${esc(b.id)}')" aria-label="Edit this reading" title="Edit"><i class="ti ti-edit"></i></button></div>`).join('')}</div>` : '';
+         <button onclick="openBal('${esc(b.id)}')" aria-label="Edit this reading" title="Edit"><i class="ti ti-edit"></i></button>
+         <button onclick="balDelOne('${esc(b.id)}')" aria-label="Delete this reading" title="Delete"><i class="ti ti-trash"></i></button></div>`).join('')}</div>` : '';
   return `<div class="cm-card">
     <div class="bal-top">
       <div class="bal-head"><span class="bal-ico"><i class="ti ${_balIcon(a.name)}"></i></span>
@@ -2512,10 +2513,65 @@ function balCardHTML(a){
     <div class="bal-acts">
       <button class="mini-btn primary" onclick="openBal('', decodeURIComponent('${k}'))"><i class="ti ti-refresh"></i> Update</button>
       <button class="mini-btn" onclick="balToggle(decodeURIComponent('${k}'))"><i class="ti ti-history"></i> ${open ? 'Hide history' : `History (${a.rows.length})`}</button>
+      <button class="mini-btn" onclick="openBal('${esc(cur.id)}')" title="Edit the latest reading"><i class="ti ti-edit"></i> Edit</button>
+      <button class="mini-btn" onclick="balRename(decodeURIComponent('${k}'))" title="Rename — or merge into another account"><i class="ti ti-pencil"></i> Rename</button>
+      <button class="mini-btn danger" onclick="balDeleteAcct(decodeURIComponent('${k}'))" title="Delete this account and all its readings"><i class="ti ti-trash"></i> Delete</button>
     </div>${hist}
   </div>`;
 }
 function balToggle(key){ balOpenAcct[key] = !balOpenAcct[key]; renderBankBal(); }
+
+/* ── Edit / rename / delete on the card itself ───────────────────────────
+   Each change is applied on screen at once and sent in the background, the
+   way every banking app behaves; a reading that fails to save is reloaded
+   from the Sheet so the screen never shows something the Sheet does not. */
+async function _balSend(params, label, n, i){
+  if(n > 1) showToast(`${label}… ${i + 1} of ${n}`);
+  try{
+    const r = await gasCall(params, 2, 30000);
+    return !!(r && (r.status === 'ok' || /not found/i.test(r.message || '')));   // already gone counts as done
+  }catch(e){ return false; }
+}
+async function balRename(key){
+  if(!balRequire()) return;
+  const a = balAccounts().find(x => x.key === key); if(!a) return;
+  const name = (prompt(`Rename "${a.name}" to:`, a.name) || '').trim().slice(0, 80);
+  if(!name || name === a.name) return;
+  const into = balAccounts().find(x => x.key === _balKey(name) && x.key !== key);
+  if(into && !confirm(`"${into.name}" already exists.\n\nMerge "${a.name}" into it? Its ${a.rows.length} reading${a.rows.length === 1 ? '' : 's'} join that account's history.`)) return;
+  const target = into ? into.name : name;
+  a.rows.forEach(b => { b.account = target; });                 // on screen at once
+  if(balOpenAcct[key]){ delete balOpenAcct[key]; balOpenAcct[_balKey(target)] = true; }
+  renderBankBal();
+  let fail = 0;
+  for(let i = 0; i < a.rows.length; i++){
+    const b = a.rows[i];
+    if(!await _balSend({ action:'saveBalance', id:b.id, account:target, date:b.date, balance:b.balance, note:b.note || '' }, 'Renaming', a.rows.length, i)) fail++;
+  }
+  showToast(fail ? `${fail} reading${fail === 1 ? '' : 's'} not confirmed — tap Sync to check` : (into ? `Merged into ${target}` : `Renamed to ${target}`), fail ? 'error' : undefined);
+  if(fail) loadAll();
+}
+async function balDeleteAcct(key){
+  if(!balRequire()) return;
+  const a = balAccounts().find(x => x.key === key); if(!a) return;
+  if(!confirm(`Delete the account "${a.name}" and all ${a.rows.length} of its reading${a.rows.length === 1 ? '' : 's'}?\n\nThis cannot be undone.`)) return;
+  const ids = a.rows.map(b => b.id);
+  balances = balances.filter(b => ids.indexOf(b.id) < 0);       // gone from the screen at once
+  renderBankBal();
+  let fail = 0;
+  for(let i = 0; i < ids.length; i++) if(!await _balSend({ action:'deleteBalance', id: ids[i] }, 'Deleting', ids.length, i)) fail++;
+  showToast(fail ? `${fail} reading${fail === 1 ? '' : 's'} not confirmed — tap Sync to check` : `Deleted ${a.name}`, fail ? 'error' : undefined);
+  if(fail) loadAll();
+}
+async function balDelOne(id){
+  if(!balRequire()) return;
+  const b = balances.find(x => x.id === id); if(!b) return;
+  if(!confirm(`Delete this reading?\n\n${b.account} · ${_balMoney(b.balance)} on ${fmtDate(b.date)}`)) return;
+  balances = balances.filter(x => x.id !== id);
+  renderBankBal();
+  if(await _balSend({ action:'deleteBalance', id }, 'Deleting', 1, 0)) showToast('Reading deleted');
+  else { showToast('Not confirmed — tap Sync to check', 'error'); loadAll(); }
+}
 
 function balRequire(){
   if(balBackend === false){ showToast('Paste the new Apps Script first — see the note at the top of Balances', 'error'); return false; }
@@ -5775,7 +5831,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.5</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.6</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
