@@ -873,7 +873,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.4</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.5</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1222,7 +1222,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="bankBalList" class="cm-list"></div>
 </div><!-- /viewBal -->
 
-  <div class="footer">Mini Finance Tracker v4.4 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Finance Tracker v4.5 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1279,7 +1279,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.4 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.5 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1344,7 +1344,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.4</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.5</div>
       </div>
     </div>
 
@@ -5775,7 +5775,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.4</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.5</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -6243,6 +6243,23 @@ function clearPhoto(){ pfPhotoDraft = ''; paintProfilePreview(); }
 
 /* Saving writes the device copy first so the screen never waits on the
    network, then pushes to the Sheet so her other devices pick it up. */
+/* A photo is ~33,000 characters; Google refuses a web address longer than
+   about 12,000 (HTTP 400, measured 1 Oct 2026). So the profile is UPLOADED in
+   the request body — the standard for sending a file — never put in the URL.
+   text/plain keeps it a "simple" request: no CORS preflight, and the Apps
+   Script reply is still readable. */
+async function gasPost(params, timeoutMs = 45000){
+  if(AUTH_LOST) throw new Error('Signed out');
+  const body = Object.assign({}, params); if(AUTH_TOKEN) body.token = AUTH_TOKEN;
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), timeoutMs);
+  try{
+    const r = await fetch(GAS_URL, { method:'POST', redirect:'follow', signal: ctl.signal,
+      headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
+    const data = JSON.parse(await r.text());
+    if(data && data.status === 'auth'){ handleAuthLoss(data.message); throw new Error(data.message || 'Session expired'); }
+    return data;
+  } finally { clearTimeout(t); }
+}
 async function saveProfile(){
   const name = document.getElementById('pfName').value.trim() || PROFILE_DEFAULT.name;
   const sub  = document.getElementById('pfSub').value.trim()  || PROFILE_DEFAULT.sub;
@@ -6260,7 +6277,7 @@ async function saveProfile(){
   }
   showToast('Profile saved — syncing…');
   try{
-    const res = await gasCall({action:'saveProfile', profile:json}, 2, 25000);
+    const res = await gasPost({action:'saveProfile', profile:json});
     if(res && res.status === 'ok'){
       localStorage.setItem(LS.profileAt, String(res.profileAt || Date.now()));
       showToast('Profile saved on all your devices');

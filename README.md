@@ -1,4 +1,7 @@
-# Mini Finance Tracker v4.4
+# Mini Finance Tracker v4.5
+
+**Photo sync fixed (v4.5)** — the profile photo was sent inside the web address; at ~33,000 characters Google refused it (HTTP 400, limit ~12,000), so a photo stayed on the device it was chosen on. It is now UPLOADED in the request body, which this backend already reads, so it reaches the Sheet and every device. GAS 4.5 is a number-only bump.
+
 
 **Renamed (v4.4)** — the app is now called **Mini Finance Tracker** everywhere a person reads it (title, top bar, sign-in, footer, print and CSV headers, install name, link preview + a redrawn og-banner.png). The address, repo and files are unchanged, so bookmarks and the installed app keep working.
 
