@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Mini Personal Finance Tracker — Google Apps Script backend  v4.3
+   Mini Finance Tracker — Google Apps Script backend  v4.4
    (the backend carries the SAME version number as the web app — 7 Sep 2026)
    For: N. Sowdhamini Sasimurugan
    ───────────────────────────────────────────────────────────────────────────
@@ -44,7 +44,7 @@
    ═════════════════════════════════════════════════════════════════════════ */
 
 const APP_NAME    = 'MPFT';                 // identifies this backend to the app
-const APP_VERSION = '4.3';   // kept in step with the web app's badge
+const APP_VERSION = '4.4';   // kept in step with the web app's badge
 // Lets the app detect what this backend can do, so a page newer than the
 // deployment can say "update your Apps Script" instead of failing oddly.
 const FEATURES    = ['profile', 'plans', 'commitments', 'paidby', 'category', 'rid', 'balances'];   // v3.1: Category column on Transactions
@@ -154,7 +154,7 @@ function ping() {
     features: FEATURES,
     configured: !!scriptPassword(),
     user: scriptUser(),
-    message: 'Mini Personal Finance Tracker backend v' + APP_VERSION + ' is live.'
+    message: 'Mini Finance Tracker backend v' + APP_VERSION + ' is live.'
   };
 }
 

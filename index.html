@@ -7,21 +7,21 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Mini Finance">
-<meta name="description" content="Mini Personal Finance Tracker — a private income, expense and credit ledger for N. Sowdhamini Sasimurugan.">
-<title>Mini Personal Finance Tracker</title>
+<meta name="description" content="Mini Finance Tracker — a private income, expense and credit ledger for N. Sowdhamini Sasimurugan.">
+<title>Mini Finance Tracker</title>
 <!-- Open Graph / social sharing -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="India Business International">
-<meta property="og:title" content="Mini Personal Finance Tracker">
+<meta property="og:title" content="Mini Finance Tracker">
 <meta property="og:description" content="A private personal ledger — fast entry, credit and settlement tracking, and a full financial analysis pack. Works offline on mobile.">
 <meta property="og:url" content="https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/">
 <meta property="og:image" content="https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/og-banner.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Mini Personal Finance Tracker — India Business International">
+<meta property="og:image:alt" content="Mini Finance Tracker — India Business International">
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Mini Personal Finance Tracker">
+<meta name="twitter:title" content="Mini Finance Tracker">
 <meta name="twitter:description" content="A private personal ledger — fast entry, credit and settlement tracking, and a full financial analysis pack. Works offline on mobile.">
 <meta name="twitter:image" content="https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/og-banner.png">
 <link rel="canonical" href="https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/">
@@ -873,7 +873,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Personal Finance Tracker</span><span class="ver-badge">v4.3</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.4</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1222,7 +1222,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="bankBalList" class="cm-list"></div>
 </div><!-- /viewBal -->
 
-  <div class="footer">Mini Personal Finance Tracker v4.3 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Finance Tracker v4.4 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1279,7 +1279,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.3 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.4 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1343,8 +1343,8 @@ tbody tr.tx-row{cursor:pointer}
     <div class="gate-brand">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
-        <div class="gate-title" id="gateTitle">Mini Personal Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.3</div>
+        <div class="gate-title" id="gateTitle">Mini Finance Tracker</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.4</div>
       </div>
     </div>
 
@@ -1404,7 +1404,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="ins-hero">
       <img class="ins-icon" src="icon-192.png" alt="" width="60" height="60">
       <div>
-        <div class="ins-hero-name">Mini Personal Finance Tracker</div>
+        <div class="ins-hero-name">Mini Finance Tracker</div>
         <div class="ins-hero-sub" id="insDevice">On this device</div>
       </div>
     </div>
@@ -5728,7 +5728,7 @@ function printReport(){
     @media print{ body{margin:11mm} }
   </style></head><body>
     <div class="head">
-      <div><h1>Mini Personal Finance Tracker</h1><h2>Financial Analysis Report</h2><div class="muted">${esc(PROFILE.name)}</div></div>
+      <div><h1>Mini Finance Tracker</h1><h2>Financial Analysis Report</h2><div class="muted">${esc(PROFILE.name)}</div></div>
       <div style="text-align:right"><div style="font-size:16px;font-weight:700">${esc(A.p.label)}</div>
         <div class="muted">${fmtDate(A.p.from)} → ${fmtDate(A.p.to)} · ${A.days} day(s)</div>
         <div class="muted">${A.rows.length} transaction(s)${repFilterText()?' · filters: '+esc(repFilterText()):''}</div></div>
@@ -5775,7 +5775,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Personal Finance Tracker v4.3</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.4</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -5818,7 +5818,7 @@ function downloadReportCSV(){
   if(!lastReport){ showToast('Generate a report first','error'); return; }
   const {A,C}=lastReport;
   const rows=[
-    ['Mini Personal Finance Tracker — Financial Analysis Report'],
+    ['Mini Finance Tracker — Financial Analysis Report'],
     ['Account', PROFILE.name],
     ['Period', A.p.label],
     ['From', A.p.from, 'To', A.p.to, 'Days', A.days],
@@ -6034,7 +6034,7 @@ async function gateConnect(ev){
   try{
     const data = await rawCall(raw, {action:'ping'}, 2, 20000);
     if(!data || data.status !== 'ok' || data.app !== 'MPFT'){
-      gateMsg('connectMsg','err','That link answered, but it is not a Mini Personal Finance Tracker backend. Check that you pasted <b>GAS.gs</b> from this app and deployed it again.');
+      gateMsg('connectMsg','err','That link answered, but it is not a Mini Finance Tracker backend. Check that you pasted <b>GAS.gs</b> from this app and deployed it again.');
       return;
     }
     GAS_URL = raw;

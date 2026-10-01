@@ -1,4 +1,7 @@
-# Mini Personal Finance Tracker v4.3
+# Mini Finance Tracker v4.4
+
+**Renamed (v4.4)** — the app is now called **Mini Finance Tracker** everywhere a person reads it (title, top bar, sign-in, footer, print and CSV headers, install name, link preview + a redrawn og-banner.png). The address, repo and files are unchanged, so bookmarks and the installed app keep working.
+
 
 **Bank & Cash Balances (v4.3)** — a new **Balances** section (bottom bar on a phone) keeps each account's balance as a *reading*, never as a transaction: account, date, balance, note. Each account shows its latest reading, the change since the one before and its history; the section totals every account and flags one not updated for 30 days. Readings live in their own **Balances** sheet (date stored as text, read with getDisplayValues), so they never touch Income, Expenses or any report — no more ₹1 entries. *Review & move* finds the old ₹1 / ₹0 balance rows in the ledger, reads the figure out of the description, and moves the ticked ones into Balances (idempotent: each reading's ID is BL + the ledger row's ID). Typing a ₹1 balance into the ledger now offers to record it under Balances instead. Paste the Apps Script v4.3 for the server half.
 
