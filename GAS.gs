@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Mini Finance Tracker — Google Apps Script backend  v4.7
+   Mini Finance Tracker — Google Apps Script backend  v4.8
    (the backend carries the SAME version number as the web app — 7 Sep 2026)
    For: N. Sowdhamini Sasimurugan
    ───────────────────────────────────────────────────────────────────────────
@@ -44,7 +44,7 @@
    ═════════════════════════════════════════════════════════════════════════ */
 
 const APP_NAME    = 'MPFT';                 // identifies this backend to the app
-const APP_VERSION = '4.7';   // kept in step with the web app's badge
+const APP_VERSION = '4.8';   // kept in step with the web app's badge — 4.8 is a number-only bump (paste when convenient)
 // Lets the app detect what this backend can do, so a page newer than the
 // deployment can say "update your Apps Script" instead of failing oddly.
 const FEATURES    = ['profile', 'plans', 'commitments', 'paidby', 'category', 'rid', 'balances'];   // v3.1: Category column on Transactions

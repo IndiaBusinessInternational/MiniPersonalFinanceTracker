@@ -1,6 +1,6 @@
-/* Mini Finance Tracker — service worker v4.7.0
+/* Mini Finance Tracker — service worker v4.8.0
    Bump CACHE on every release, in step with the version badge in index.html. */
-const CACHE  = 'mpft-v4.7.0';
+const CACHE  = 'mpft-v4.8.0';
 // The icons are precached too: an installed app that opens offline still has to
 // draw its own mark in the install dialog and the task switcher.
 const ASSETS = ['./', './index.html', './manifest.json',
@@ -25,7 +25,8 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      // v4.8: only this app's own old caches — the TSM app shares this github.io origin
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE && k.indexOf('mpft-') === 0).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });

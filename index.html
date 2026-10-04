@@ -417,7 +417,7 @@ tbody tr.tx-row{cursor:pointer}
 .hero-avatar:focus-visible,.hero-name-btn:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 
 /* Gate — connect, then sign in. Nothing behind it is usable until both pass. */
-.gate{position:fixed;inset:0;z-index:500;background:var(--bg);display:none;overflow-y:auto;padding:max(22px,env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom))}
+.gate{position:fixed;inset:0;z-index:9000;background:var(--bg);display:none;overflow-y:auto;padding:max(22px,env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom))}
 .gate.open{display:block}
 .gate-card{max-width:432px;margin:min(5vh,44px) auto 0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xl);padding:26px 22px}
 .gate-brand{display:flex;align-items:center;gap:11px;margin-bottom:20px}
@@ -429,6 +429,7 @@ tbody tr.tx-row{cursor:pointer}
 .gate-p{font-size:12.5px;color:var(--text2);line-height:1.65;margin-bottom:16px}
 .gate-form .form-group{margin-bottom:13px}
 .gate-btn{width:100%;justify-content:center;margin-top:4px}
+.gate-q{margin:0 0 14px;padding:10px 12px;border-radius:var(--radius);background:var(--info-bg);color:var(--info-text);border:1px solid var(--info-border);font-size:13px;line-height:1.55}
 .gate-msg{display:none;margin-top:13px;padding:10px 12px;border-radius:var(--radius);font-size:12.5px;line-height:1.6}
 .gate-msg.show{display:block}
 .gate-msg.err{background:var(--danger-bg);color:var(--danger-text);border:1px solid var(--danger-border)}
@@ -883,7 +884,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.7</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.8</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1232,7 +1233,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="bankBalList" class="cm-list"></div>
 </div><!-- /viewBal -->
 
-  <div class="footer">Mini Finance Tracker v4.7 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Finance Tracker v4.8 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1289,7 +1290,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.7 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.8 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1354,7 +1355,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.7</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.8</div>
       </div>
     </div>
 
@@ -1386,6 +1387,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="gate-step" id="stepSignIn">
       <div class="gate-h"><i class="ti ti-lock"></i> Sign in</div>
       <div class="gate-p">Your password is checked inside your own Apps Script, never by this page.</div>
+      <div class="gate-q" id="gateQueue" style="display:none"></div>
       <form class="gate-form" id="signInForm" onsubmit="gateSignIn(event)">
         <div class="form-group">
           <label for="gUser">Username</label>
@@ -2319,16 +2321,16 @@ async function rawCall(base, params, retries=2, timeoutMs=20000){
 // short-circuit the moment that happens so the save-verify poll below does not
 // keep hammering a door that will not open.
 async function gasCall(params, retries=2, timeoutMs=20000){
-  if(AUTH_LOST) throw new Error('Signed out');
+  if(AUTH_LOST) throw authError();
   params = ridStamp(params);                 // NO REPEATS — a create carries its request id
   if(params.rid) retries = 1;                // …and is never re-sent automatically
   const q = Object.assign({}, params);
   if(AUTH_TOKEN) q.token = AUTH_TOKEN;
   const data = await rawCall(GAS_URL, q, retries, timeoutMs);
   if(data && data.status === 'ok') ridDone(params);
-  if(data && data.status === 'auth'){
+  if(authRefused(data)){                     // never retried — the sign-in screen opens; the outbox waits
     handleAuthLoss(data.message);
-    throw new Error(data.message || 'Session expired');
+    throw authError(data.message || 'Session expired');
   }
   return data;
 }
@@ -2344,7 +2346,7 @@ async function loadAll(){
   try{
     const data = await gasCall({action:'getAll'});
     if(data.status==='ok'){
-      entries=(data.transactions||[]).map(normType); outboxMerge(); setTimeout(flushOutbox, 0);
+      entries=(data.transactions||[]).map(normType); outboxSynced(); outboxMerge(); setTimeout(flushOutbox, 0);
       /* A v1.x deployment answers with transactions and nothing else. The
          absence of the key — not an empty array, which is a real answer — is
          what says the Plan and Commitments sheets do not exist there yet. */
@@ -2756,6 +2758,34 @@ async function runBalMove(){
   await loadAll();
 }
 
+/* ══ AUTH CLIENT — shared by all three finance trackers (Mini v4.8 / IBI v5.18 / TSM v6.18) ══
+   The Apps Script holds the password; this page only forwards what was typed
+   once and then carries the token it is handed. Change this block in all
+   three apps together.
+   • authRefused(d) — the backend's "please sign in" answer, in either
+     spelling: Mini's status:'auth', or code:'auth' (the IBI and TSM scripts
+     send both, like Order Processing and Package Tracker).
+   • authError() — a call that failed because of sign-in, not the network.
+     The outbox keeps such an entry, does not count it as an attempt, and
+     sends it after sign-in with the SAME request id — it can never land twice.
+   • authLogin() — the password travels in a POST body, never in a URL. */
+function authRefused(d){ return !!d && (d.status === 'auth' || d.code === 'auth'); }
+function authError(msg){ const e = new Error(msg || 'Signed out — sign in again'); e.auth = true; return e; }
+async function authLogin(base, user, pw){
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 30000);
+  try{
+    const r = await fetch(base, { method:'POST', redirect:'follow', signal: ctl.signal,
+      headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action:'login', user: user, pw: pw }) });
+    return JSON.parse(await r.text());
+  } finally { clearTimeout(t); }
+}
+/* What the sign-in screen says about entries still waiting on this device. */
+function authQueueNote(){
+  const n = (typeof outbox !== 'undefined' && Array.isArray(outbox)) ? outbox.length : 0;
+  return n ? (n === 1 ? '1 entry is' : n + ' entries are') + ' saved on this device and will be sent after you sign in — never twice.' : '';
+}
+
 /* ══ INSTANT SAVE — an outbox, the way WhatsApp, Gmail and Sheets offline work ══
    Google's Apps Script servers sometimes take 20–50 s just to START a request
    (measured 1 Oct 2026: a 'ping' that does nothing took 4 s, then 38 s, while
@@ -2771,6 +2801,8 @@ let outbox = (() => { try{ const a = JSON.parse(localStorage.getItem(OB_KEY) || 
 let _obBusy = false, _obTimer = 0, _obWait = 0;
 const _obConfirmed = new Map();                         // id → {row, at}: landed rows a slower sync may not list yet
 const OB_RID_TTL = 5.5 * 3600e3;                        // the server remembers a request id for 6 h
+let _obSyncedAt = 0;                                    // last time the whole ledger was read from the Sheet
+function outboxSynced(){ _obSyncedAt = Date.now(); }   // called by loadAll() on every good read
 
 function _obSave(){ try{ localStorage.setItem(OB_KEY, JSON.stringify(outbox)); }catch(_){} }
 function _obRow(it){ return Object.assign({ id:'LOCAL-' + it.rid, _pending:true, _failed: !!it.failed }, it.fields); }
@@ -2834,15 +2866,23 @@ async function flushOutbox(){
   try{
     for(const it of outbox.slice()){
       if(it.failed) continue;
-      // Past the server's memory of this request id, check the Sheet before re-sending.
-      if(it.tries > 0 && Date.now() - it.at > OB_RID_TTL &&
-         entries.some(e => String(e.id).indexOf('LOCAL-') !== 0 && _obSame(e, it.fields))){
-        outbox = outbox.filter(x => x !== it); _obSave(); continue;
+      // Past the server's memory of this request id, check the Sheet before re-sending —
+      // against a read made AFTER the last attempt (a sign-in can come hours later).
+      if(it.tries > 0 && Date.now() - it.at > OB_RID_TTL){
+        if(_obSyncedAt < (it.last || it.at)){ later = true; setTimeout(() => { try{ loadAll(); }catch(_){} }, 0); break; }
+        if(entries.some(e => String(e.id).indexOf('LOCAL-') !== 0 && _obSame(e, it.fields))){
+          outbox = outbox.filter(x => x !== it); _obSave(); continue;
+        }
       }
-      it.tries++; _obSave();
+      it.tries++; it.last = Date.now(); _obSave();
       let res = null;
       try{ res = await gasCall(Object.assign({ action:'add', rid: it.rid }, it.fields), 1, 30000); }
-      catch(e){ later = true; break; }                  // offline or Google slow — keep the order, try again soon
+      catch(e){
+        // Refused for sign-in = nothing was written, so it is not an attempt. The
+        // entry waits for the sign-in and then goes with the SAME request id.
+        if(e && e.auth){ it.tries = Math.max(0, it.tries - 1); _obSave(); }
+        later = true; break;                            // offline, signed out or Google slow — keep the order, try again soon
+      }
       if(res && res.status === 'ok'){
         const row = Object.assign({}, it.fields, { id: res.id || ('TX' + Date.now()) });
         outbox = outbox.filter(x => x !== it); _obSave();
@@ -5963,7 +6003,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.7</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.8</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -6190,6 +6230,8 @@ function gateStep(step){
   const connect = step === 'connect';
   document.getElementById('stepConnect').classList.toggle('on',  connect);
   document.getElementById('stepSignIn' ).classList.toggle('on', !connect);
+  const q = connect ? '' : authQueueNote(), qe = document.getElementById('gateQueue');
+  if(qe){ qe.textContent = q; qe.style.display = q ? '' : 'none'; }
   const el = document.getElementById(connect ? 'gUrl' : 'gPass');
   if(connect) el.value = GAS_URL || '';
   // Focus only on a pointer device. Throwing the phone keyboard up the instant
@@ -6250,7 +6292,7 @@ async function gateSignIn(ev){
   if(!user || !pw){ gateMsg('signInMsg','err','Enter both the username and the password.'); return; }
   gateBusy('gSignInBtn', true, 'Signing in…');
   try{
-    const data = await rawCall(GAS_URL, {action:'login', user:user, pw:pw}, 1, 25000);
+    const data = await authLogin(GAS_URL, user, pw);          // v4.8: in a POST body — a password never sits in a URL
     if(!data || data.status !== 'ok'){
       gateMsg('signInMsg','err', esc((data && data.message) || 'Sign in failed.'));
       document.getElementById('gPass').value = '';
@@ -6437,14 +6479,14 @@ function clearPhoto(){ pfPhotoDraft = ''; paintProfilePreview(); }
    text/plain keeps it a "simple" request: no CORS preflight, and the Apps
    Script reply is still readable. */
 async function gasPost(params, timeoutMs = 45000){
-  if(AUTH_LOST) throw new Error('Signed out');
+  if(AUTH_LOST) throw authError();
   const body = Object.assign({}, params); if(AUTH_TOKEN) body.token = AUTH_TOKEN;
   const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), timeoutMs);
   try{
     const r = await fetch(GAS_URL, { method:'POST', redirect:'follow', signal: ctl.signal,
       headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
     const data = JSON.parse(await r.text());
-    if(data && data.status === 'auth'){ handleAuthLoss(data.message); throw new Error(data.message || 'Session expired'); }
+    if(authRefused(data)){ handleAuthLoss(data.message); throw authError(data.message || 'Session expired'); }
     return data;
   } finally { clearTimeout(t); }
 }

@@ -1,4 +1,6 @@
-# Mini Finance Tracker v4.7
+# Mini Finance Tracker v4.8
+
+**Sign-in shared with IBI / TSM (v4.8)** — the password now travels in a POST body, never in a URL; a sign-in refusal never counts as a send attempt, so a waiting entry goes after sign-in with the same request id. GAS.gs 4.8 is a number-only bump.
 
 **Instant save (v4.7)** — a new entry appears at once (list and totals) and goes into an on-device outbox that syncs to Google Drive in the background, in order, retrying with growing gaps; the NO REPEATS request id makes every retry safe. A small badge in the status bar shows "N syncing…" or, if the server refuses one, "N not saved — tap" (send again / remove). The outbox survives closing the app. Edits update the row in place instead of re-downloading the ledger. Measured before: Apps Script took 4–50 s just to start a request.
 
