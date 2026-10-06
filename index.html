@@ -884,7 +884,7 @@ tbody tr.tx-row{cursor:pointer}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.8</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.9</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1233,7 +1233,7 @@ tbody tr.tx-row{cursor:pointer}
   <div id="bankBalList" class="cm-list"></div>
 </div><!-- /viewBal -->
 
-  <div class="footer">Mini Finance Tracker v4.8 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Finance Tracker v4.9 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1290,7 +1290,7 @@ tbody tr.tx-row{cursor:pointer}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.8 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.9 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1355,7 +1355,7 @@ tbody tr.tx-row{cursor:pointer}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.8</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.9</div>
       </div>
     </div>
 
@@ -2344,9 +2344,13 @@ async function loadAll(){
   document.getElementById('emptyState').style.display   = 'none';
   if(!haveRows) document.getElementById('txBody').innerHTML = '';
   try{
-    const data = await gasCall({action:'getAll'});
+    // Google can take 30–60 s to wake a sleeping script: say so, and wait for it.
+    const wakeT = setTimeout(() => setStatus(false, 'Waking Google Drive — Google can take up to a minute…'), 6000);   // its own timer: two syncs can overlap
+    let data;
+    try{ data = await gasCall({action:'getAll'}, 1, WAKE_TIMEOUT_MS); } finally { clearTimeout(wakeT); }
     if(data.status==='ok'){
-      entries=(data.transactions||[]).map(normType); outboxSynced(); outboxMerge(); setTimeout(flushOutbox, 0);
+      _resyncWait = 0; clearTimeout(_resyncTimer); _lastContact = Date.now();
+      entries=(data.transactions||[]).map(normType); outboxSynced(); outboxMerge(); _obWait = 0; setTimeout(flushOutbox, 0);
       /* A v1.x deployment answers with transactions and nothing else. The
          absence of the key — not an empty array, which is a real answer — is
          what says the Plan and Commitments sheets do not exist there yet. */
@@ -2364,9 +2368,14 @@ async function loadAll(){
     else{ setStatus(false,'Error: '+data.message); showToast('Load failed','error'); }
   }catch(e){
     if(!AUTH_LOST){                                     // the gate is already up in that case
-      setStatus(false, haveRows ? 'Offline — showing saved copy' : 'Connection failed');
+      // Retry by itself — 15 s, 30 s, 60 s, then every 2 min — instead of waiting for a tap on Sync.
+      const first = !_resyncWait;
+      _resyncWait = Math.min(120000, (_resyncWait || 7500) * 2);
+      clearTimeout(_resyncTimer);
+      _resyncTimer = setTimeout(() => { if(document.visibilityState === 'visible') loadAll(); }, _resyncWait);
+      setStatus(false, (haveRows ? 'Offline — showing saved copy' : 'Connection failed') + ' · trying again in ' + Math.round(_resyncWait / 1000) + ' s');
       setOffline(haveRows);
-      showToast('Cannot reach Google Drive','error');
+      if(first) showToast('Cannot reach Google Drive — trying again by itself','error');
     }
     console.error(e);
   }
@@ -2758,7 +2767,7 @@ async function runBalMove(){
   await loadAll();
 }
 
-/* ══ AUTH CLIENT — shared by all three finance trackers (Mini v4.8 / IBI v5.18 / TSM v6.18) ══
+/* ══ AUTH CLIENT — shared by all three finance trackers (Mini v4.9 / IBI v5.18 / TSM v6.18) ══
    The Apps Script holds the password; this page only forwards what was typed
    once and then carries the token it is handed. Change this block in all
    three apps together.
@@ -2876,7 +2885,7 @@ async function flushOutbox(){
       }
       it.tries++; it.last = Date.now(); _obSave();
       let res = null;
-      try{ res = await gasCall(Object.assign({ action:'add', rid: it.rid }, it.fields), 1, 30000); }
+      try{ res = await gasCall(Object.assign({ action:'add', rid: it.rid }, it.fields), 1, WAKE_TIMEOUT_MS); _lastContact = Date.now(); }
       catch(e){
         // Refused for sign-in = nothing was written, so it is not an attempt. The
         // entry waits for the sign-in and then goes with the SAME request id.
@@ -2889,6 +2898,8 @@ async function flushOutbox(){
         _obConfirmed.set(row.id, { row, at: Date.now() });
         const i = entries.findIndex(e => e.id === 'LOCAL-' + it.rid);
         if(i >= 0) entries[i] = row; else entries.push(row);
+        // Google took this entry, so it is reachable again: refresh now instead of waiting out the retry timer.
+        if(_resyncWait){ _resyncWait = 0; clearTimeout(_resyncTimer); setTimeout(loadAll, 0); }
       } else if(res && /busy|try again/i.test(res.message || '')){ later = true; break; }
       else {
         it.failed = true; it.err = (res && res.message) || 'not saved'; _obSave();
@@ -2906,6 +2917,34 @@ async function flushOutbox(){
 }
 window.addEventListener('online', () => { _obWait = 0; flushOutbox(); });
 document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') flushOutbox(); });
+
+/* ══ WAKE & KEEP WARM — Google's sleeping script (shared by all three trackers) ══
+   Measured 6 Oct 2026: the first request after a quiet spell took 39.9 s, the
+   next 2.4 s — Google was waking the script, not down. The app used to give
+   up at 20 s, call it "Offline", and wait for a tap on Sync. Now:
+   • a read waits up to 75 s, and after 6 s the status says Google is waking;
+   • a failed read retries by itself (15 s → 30 s → 60 s → 2 min);
+   • while the app is OPEN AND ON SCREEN, a ping every 4 minutes keeps the
+     script awake. A ping does no work and stops the moment the app is hidden —
+     the watch-gate rule: nothing runs for an app nobody is looking at.
+   `var`, not `let`: loadAll() can run before this block is reached.
+   Change this block in all three apps together. */
+var _resyncTimer = 0, _resyncWait = 0, _lastContact = 0;
+var WAKE_TIMEOUT_MS = 75000;
+function keepWarm(force){
+  if(document.visibilityState !== 'visible' || !navigator.onLine) return;
+  if(typeof AUTH_LOST !== 'undefined' && AUTH_LOST) return;
+  if(!force && Date.now() - _lastContact < 4 * 60e3) return;
+  _lastContact = Date.now();
+  gasCall({ action:'ping' }, 1, WAKE_TIMEOUT_MS).catch(() => {});
+}
+setInterval(keepWarm, 60e3);
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState !== 'visible') return;
+  if(_resyncWait){ _resyncWait = 0; clearTimeout(_resyncTimer); loadAll(); }   // was offline: try now
+  else keepWarm();
+});
+window.addEventListener('online', () => { if(_resyncWait){ _resyncWait = 0; clearTimeout(_resyncTimer); loadAll(); } });
 
 /* ══ NO REPEATS — one entry, one row (shared by all three finance trackers) ══
    Two things put the same entry in the books twice, and nobody saw either:
@@ -6003,7 +6042,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.8</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.9</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
@@ -6292,7 +6331,7 @@ async function gateSignIn(ev){
   if(!user || !pw){ gateMsg('signInMsg','err','Enter both the username and the password.'); return; }
   gateBusy('gSignInBtn', true, 'Signing in…');
   try{
-    const data = await authLogin(GAS_URL, user, pw);          // v4.8: in a POST body — a password never sits in a URL
+    const data = await authLogin(GAS_URL, user, pw);          // v4.9: in a POST body — a password never sits in a URL
     if(!data || data.status !== 'ok'){
       gateMsg('signInMsg','err', esc((data && data.message) || 'Sign in failed.'));
       document.getElementById('gPass').value = '';
