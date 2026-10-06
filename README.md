@@ -1,4 +1,7 @@
-# Mini Finance Tracker v4.9
+# Mini Finance Tracker v4.10
+
+**Honest offline banner (v4.10)** — the yellow banner said "New entries need a connection, so they are not saved yet", which stopped being true with instant save. It now says the app is showing the copy saved on this device and that new entries are kept here and sent automatically when Google Drive answers. GAS is a number-only bump.
+
 
 **Wakes Google, retries by itself (v4.9)** — measured 6 Oct 2026: Google's first request after a quiet spell took 39.9 s (the next 2.4 s); the app gave up at 20 s, showed "Offline" and waited for a tap on Sync. Now a read waits up to 75 s and says "Waking Google Drive…" after 6 s; a failed read retries by itself (15 s → 30 s → 60 s → 2 min); while the app is open and ON SCREEN a no-work ping every 4 min keeps the script awake (stops when hidden — the watch-gate rule); queued entries go the moment a read succeeds, and an entry that gets through refreshes the status at once. GAS is a number-only bump.
 
