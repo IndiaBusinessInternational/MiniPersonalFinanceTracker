@@ -1,4 +1,6 @@
-# Mini Finance Tracker v4.10
+# Mini Finance Tracker v4.11
+
+**Phones edge to edge (v4.11, 11 Oct 2026)** — on a phone the cards, section headers, report and dialogs now run the full width of the screen with 10px inner side padding (top bar 8px), and the page can never be wider than the screen. Only spacing changed; text sizes are unchanged. The same CSS block is in TSM v6.22 and IBI Finance Tracker v5.21. GAS 4.11 is a number-only bump — pasting it is optional.
 
 **Honest offline banner (v4.10)** — the yellow banner said "New entries need a connection, so they are not saved yet", which stopped being true with instant save. It now says the app is showing the copy saved on this device and that new entries are kept here and sent automatically when Google Drive answers. GAS is a number-only bump.
 
