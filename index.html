@@ -889,7 +889,7 @@ html,body{overflow-x:clip}
   .section-hdr,.form-card,.table-wrap,.bal-section,.pending-section,.status-bar,.offline-note,.pane-card,.pane-empty,.month-bar,.needs-backend{border-radius:0!important;border-left:none;border-right:none;box-shadow:none}
   .section-hdr,.form-card,.bal-section,.pending-section,.status-bar,.offline-note,.pane-card,.filter-row,.filter-summary{padding-left:10px;padding-right:10px}
   .summary-grid,.tot-grid,.plan-group,.cm-list,.pane-head,.dash-period{padding-left:10px;padding-right:10px}
-  .form-card,.pane-card,.bal-section,.pending-section,.status-bar,.offline-note,.sheet-body,.dt-f{overflow-wrap:anywhere}
+  .form-card,.pane-card,.bal-section,.pending-section,.status-bar,.offline-note,.sheet-body,.dt-f{overflow-wrap:break-word}   /* not anywhere: it split button labels mid-word */
   .report-modal{width:100vw;max-width:100vw;border-radius:0;border-left:none;border-right:none}
   .report-hdr,.report-actions{padding-left:10px;padding-right:10px}
   .report-body{padding-left:10px;padding-right:10px}
@@ -909,7 +909,7 @@ html,body{overflow-x:clip}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.11</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.12</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1258,7 +1258,7 @@ html,body{overflow-x:clip}
   <div id="bankBalList" class="cm-list"></div>
 </div><!-- /viewBal -->
 
-  <div class="footer">Mini Finance Tracker v4.11 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Finance Tracker v4.12 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1315,7 +1315,7 @@ html,body{overflow-x:clip}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.11 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.12 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1380,7 +1380,7 @@ html,body{overflow-x:clip}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.11</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.12</div>
       </div>
     </div>
 
@@ -6067,7 +6067,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.11</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.12</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
