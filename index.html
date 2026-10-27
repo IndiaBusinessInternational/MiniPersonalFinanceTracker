@@ -876,22 +876,35 @@ tbody tr.tx-row{cursor:pointer}
 .ob-chip.bad{background:var(--danger-bg);color:var(--danger-text);border-color:var(--danger-border)}
 .ob-chip .spin{display:inline-block;animation:obspin 1s linear infinite}
 @keyframes obspin{to{transform:rotate(360deg)}}
-/* ══ PHONES EDGE TO EDGE (11 Oct 2026 — shared by all three finance trackers) ══
-   CEO: "edge to edge with no padding to make screen bigger". On a phone (≤640px): no outer
-   gutter, full-bleed cards and dialogs (no side border, radius or shadow), 10px inner side
-   padding (the least that keeps letters off a curved screen edge; top bar 8px), long words
-   break inside their box, and the page is never wider than the screen — clip, NOT hidden,
-   because hidden breaks the sticky top bar. Only spacing changes; type sizes stay where the
-   phone type scale put them. Byte-identical in Mini / TSM / IBI FT. */
+/* ══ EDGE TO EDGE ON EVERY SCREEN (11 Oct 2026 phones; 27 Oct 2026 laptops too — shared by all three finance trackers) ══
+   CEO: "edge to edge with no padding to make screen bigger", then 27 Oct 2026: "make all the apps
+   edge to edge on laptop too". At EVERY width: no centred 960px column and no outer gutter,
+   full-bleed cards (no side border, radius or shadow), 10px inner side padding (the least that
+   keeps letters off a curved screen edge; top bar 8px), long words break inside their box, and
+   the page is never wider than the screen — clip, NOT hidden, because hidden breaks the sticky
+   top bar. Wide screens use the width with more cards per row (balances, commitments), never one
+   stretched column. Dialogs stay centred dialogs on laptops and go full-screen only on phones.
+   Only spacing changes; type sizes stay where the type scale put them. Byte-identical in
+   Mini / TSM / IBI FT. */
 html,body{overflow-x:clip}
+.topbar-inner,.hero-inner,.main,.viewnav-inner{max-width:none}
+.main{padding-left:0;padding-right:0}
+.topbar{padding-left:8px;padding-right:8px}
+.hero{padding-left:10px;padding-right:10px}
+.viewnav-inner{padding-left:10px;padding-right:10px}
+.section-hdr,.form-card,.table-wrap,.bal-section,.pending-section,.status-bar,.offline-note,.pane-card,.pane-empty,.month-bar,.needs-backend,.bal-needs{border-radius:0!important;border-left:none;border-right:none;box-shadow:none}
+.section-hdr,.form-card,.bal-section,.pending-section,.status-bar,.offline-note,.pane-card,.pane-empty,.needs-backend,.bal-needs,.filter-row,.filter-summary{padding-left:10px;padding-right:10px}
+.summary-grid,.tot-grid,.plan-group,.cm-list,.pane-head,.pane-sub,.dash-period,.view>.chip-row,#balMove{padding-left:10px;padding-right:10px}
+.form-card,.pane-card,.bal-section,.pending-section,.status-bar,.offline-note,.pane-sub,.sheet-body,.dt-f{overflow-wrap:break-word}   /* not anywhere: it split button labels mid-word */
+.form-card.editing{box-shadow:inset 0 0 0 2px rgba(0,197,255,0.15)}
+.cm-list .plan-group{padding-left:0;padding-right:0}
+.footer{padding-left:10px;padding-right:10px}
+@media(min-width:900px){
+  .cm-list:has(>.cm-card),.cm-list .plan-group{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:9px;align-items:start}
+  .cm-list .plan-group>.plan-group-h{grid-column:1/-1}
+  .cm-list .cm-card{margin-bottom:0}
+}
 @media(max-width:640px){
-  .main{padding-left:0;padding-right:0}
-  .topbar{padding-left:8px;padding-right:8px}
-  .hero{padding-left:10px;padding-right:10px}
-  .section-hdr,.form-card,.table-wrap,.bal-section,.pending-section,.status-bar,.offline-note,.pane-card,.pane-empty,.month-bar,.needs-backend{border-radius:0!important;border-left:none;border-right:none;box-shadow:none}
-  .section-hdr,.form-card,.bal-section,.pending-section,.status-bar,.offline-note,.pane-card,.filter-row,.filter-summary{padding-left:10px;padding-right:10px}
-  .summary-grid,.tot-grid,.plan-group,.cm-list,.pane-head,.dash-period{padding-left:10px;padding-right:10px}
-  .form-card,.pane-card,.bal-section,.pending-section,.status-bar,.offline-note,.sheet-body,.dt-f{overflow-wrap:break-word}   /* not anywhere: it split button labels mid-word */
   .report-modal{width:100vw;max-width:100vw;border-radius:0;border-left:none;border-right:none}
   .report-hdr,.report-actions{padding-left:10px;padding-right:10px}
   .report-body{padding-left:10px;padding-right:10px}
@@ -900,7 +913,7 @@ html,body{overflow-x:clip}
   .sheet-body{padding-left:10px;padding-right:10px}
   .sheet-foot{padding-left:10px;padding-right:10px}
 }
-/* ══ end PHONES EDGE TO EDGE ══ */
+/* ══ end EDGE TO EDGE ══ */
 /* Share this app (27 Oct 2026): on phones the top-bar share icon would squeeze the app name into an ellipsis,
    so there it lives in the menu (drawer item "Share this app"); wider screens show both. */
 @media(max-width:600px){ .topbar-right ibi-share-button{display:none!important} }
@@ -915,7 +928,7 @@ html,body{overflow-x:clip}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.14</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.15</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1264,7 +1277,7 @@ html,body{overflow-x:clip}
   <div id="bankBalList" class="cm-list"></div>
 </div><!-- /viewBal -->
 
-  <div class="footer">Mini Finance Tracker v4.14 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Finance Tracker v4.15 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1322,7 +1335,7 @@ html,body{overflow-x:clip}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.14 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.15 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1387,7 +1400,7 @@ html,body{overflow-x:clip}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.14</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.15</div>
       </div>
     </div>
 
@@ -6074,7 +6087,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.14</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.15</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }

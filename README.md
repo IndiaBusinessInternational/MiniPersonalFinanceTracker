@@ -1,4 +1,6 @@
-# Mini Finance Tracker v4.14
+# Mini Finance Tracker v4.15
+
+**v4.15 (27 Oct 2026)** — edge to edge on laptops too (CEO, 27 Oct 2026): the centred 960px column is gone at every width; cards are full-bleed with 10px inner side padding, top bar 8px; balances and commitments sit several cards per row on wide screens; Commitments/Balances notes no longer touch the phone edge. Dialogs stay centred dialogs on laptops. Shared edge block, byte-identical with TSM v6.26 and IBI FT v5.24. GAS.gs unchanged.
 
 **v4.14 (27 Oct 2026)** — on phones (600px and narrower) the top-bar share icon squeezed "Mini Finance Tracker" down to its first letter, so there **Share this app** moves into the menu (drawer item, all screen sizes); wider screens keep the top-bar icon too. Front end only — `GAS.gs` unchanged.
 
