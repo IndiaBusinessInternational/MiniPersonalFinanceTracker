@@ -901,6 +901,9 @@ html,body{overflow-x:clip}
   .sheet-foot{padding-left:10px;padding-right:10px}
 }
 /* ══ end PHONES EDGE TO EDGE ══ */
+/* Share this app (27 Oct 2026): on phones the top-bar share icon would squeeze the app name into an ellipsis,
+   so there it lives in the menu (drawer item "Share this app"); wider screens show both. */
+@media(max-width:600px){ .topbar-right ibi-share-button{display:none!important} }
 </style>
 <script src="ibi-share.js" defer data-slot=".topbar-right"></script>
 </head>
@@ -912,7 +915,7 @@ html,body{overflow-x:clip}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.13</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.14</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1261,7 +1264,7 @@ html,body{overflow-x:clip}
   <div id="bankBalList" class="cm-list"></div>
 </div><!-- /viewBal -->
 
-  <div class="footer">Mini Finance Tracker v4.13 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Finance Tracker v4.14 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1275,6 +1278,7 @@ html,body{overflow-x:clip}
   <button class="drawer-item" onclick="closeDrawer();openReport()"><i class="ti ti-report-money"></i> Financial Analysis</button>
   <button class="drawer-item" onclick="closeDrawer();openVoice()"><i class="ti ti-microphone"></i> Add entry by voice</button>
   <button class="drawer-item" onclick="loadAll();closeDrawer()"><i class="ti ti-refresh"></i> Sync with Google Drive</button>
+  <button class="drawer-item" onclick="closeDrawer();if(window.IBIShare)IBIShare.open()"><i class="ti ti-share"></i> Share this app</button>
   <button class="drawer-item" onclick="exportCSV();closeDrawer()"><i class="ti ti-download"></i> Export CSV</button>
   <a class="drawer-item" id="sheetLinkDrawer" href="#" target="_blank" rel="noopener" style="display:none" onclick="closeDrawer()"><i class="ti ti-external-link"></i> Open Google Sheet</a>
   <div class="drawer-section-label">Settings</div>
@@ -1318,7 +1322,7 @@ html,body{overflow-x:clip}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.13 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.14 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1383,7 +1387,7 @@ html,body{overflow-x:clip}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.13</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.14</div>
       </div>
     </div>
 
@@ -6070,7 +6074,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.13</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.14</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }
