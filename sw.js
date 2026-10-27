@@ -1,11 +1,12 @@
-/* Mini Finance Tracker — service worker v4.12.0
+/* Mini Finance Tracker — service worker v4.13.0
    Bump CACHE on every release, in step with the version badge in index.html. */
-const CACHE  = 'mpft-v4.12.0';
+const CACHE  = 'mpft-v4.13.0';
 // The icons are precached too: an installed app that opens offline still has to
 // draw its own mark in the install dialog and the task switcher.
 const ASSETS = ['./', './index.html', './manifest.json',
                 './icon-192.png', './icon-512.png', './icon-maskable-512.png',
-                './apple-touch-icon.png', './favicon-32.png', './favicon.ico'];
+                './apple-touch-icon.png', './favicon-32.png', './favicon.ico',
+                './ibi-share.js'];
 
 /* addAll() fetches through the ordinary HTTP cache, so a browser holding a
    still-fresh copy of index.html will happily precache YESTERDAY's file under

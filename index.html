@@ -13,9 +13,11 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="India Business International">
 <meta property="og:title" content="Mini Finance Tracker">
+<meta property="og:image:secure_url" content="https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/og-banner.jpg">
+<meta property="og:image:type" content="image/jpeg">
 <meta property="og:description" content="A private personal ledger — fast entry, credit and settlement tracking, and a full financial analysis pack. Works offline on mobile.">
 <meta property="og:url" content="https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/">
-<meta property="og:image" content="https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/og-banner.png">
+<meta property="og:image" content="https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/og-banner.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Mini Finance Tracker — India Business International">
@@ -23,7 +25,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Mini Finance Tracker">
 <meta name="twitter:description" content="A private personal ledger — fast entry, credit and settlement tracking, and a full financial analysis pack. Works offline on mobile.">
-<meta name="twitter:image" content="https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/og-banner.png">
+<meta name="twitter:image" content="https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/og-banner.jpg">
 <link rel="canonical" href="https://indiabusinessinternational.github.io/MiniPersonalFinanceTracker/">
 <meta name="robots" content="noindex, nofollow">
 <link rel="manifest" href="manifest.json">
@@ -900,6 +902,7 @@ html,body{overflow-x:clip}
 }
 /* ══ end PHONES EDGE TO EDGE ══ */
 </style>
+<script src="ibi-share.js" defer data-slot=".topbar-right"></script>
 </head>
 <body>
 
@@ -909,7 +912,7 @@ html,body{overflow-x:clip}
     <div class="topbar-left">
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div class="topbar-title">
-        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.12</span></div>
+        <div class="app-name"><span class="app-name-text">Mini Finance Tracker</span><span class="ver-badge">v4.13</span></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1258,7 +1261,7 @@ html,body{overflow-x:clip}
   <div id="bankBalList" class="cm-list"></div>
 </div><!-- /viewBal -->
 
-  <div class="footer">Mini Finance Tracker v4.12 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
+  <div class="footer">Mini Finance Tracker v4.13 &mdash; <span id="footName">N. Sowdhamini Sasimurugan</span> &mdash; built by India Business International</div>
 </div>
 
 <!-- DRAWER MENU -->
@@ -1315,7 +1318,7 @@ html,body{overflow-x:clip}
   <!-- v3.2 — app and backend carry the SAME version number (CEO, 7 Sep 2026,
        "for easy noting"). Both are shown here; a bare number mismatch is only a
        note, a missing feature is what raises the amber prompts. -->
-  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.12 · Backend: not connected yet</span></div>
+  <div class="drawer-item" style="cursor:default;color:var(--text2);font-size:12px;align-items:flex-start"><i class="ti ti-info-circle"></i> <span id="aboutVer">App v4.13 · Backend: not connected yet</span></div>
 </div>
 
 <!-- REPORT MODAL -->
@@ -1380,7 +1383,7 @@ html,body{overflow-x:clip}
       <div class="mono-logo"><span class="js-mono">Mini</span></div>
       <div>
         <div class="gate-title" id="gateTitle">Mini Finance Tracker</div>
-        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.12</div>
+        <div class="gate-sub">Private ledger, plan &amp; commitments &middot; v4.13</div>
       </div>
     </div>
 
@@ -6067,7 +6070,7 @@ function printReport(){
     <div class="sec">${block(A.expenses,'Expenditure — full listing (paid on the spot + taken on credit)',RED)}</div>
     ${A.settles.length?`<div class="sec">${block(A.settles,'Settlements — full listing (clearing earlier credit; not counted as spend again)',CY)}</div>`:''}
     <div class="sec">${qTbl}</div>
-    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.12</span><span>${esc(PROFILE.name)}</span></div>
+    <div class="foot"><span>Generated ${esc(genAt)} IST — Mini Finance Tracker v4.13</span><span>${esc(PROFILE.name)}</span></div>
   </body></html>`;
   const win=window.open('','_blank');
   if(!win){ showToast('Allow pop-ups to print, or use Download CSV','error'); return; }

@@ -1,4 +1,6 @@
-# Mini Finance Tracker v4.12
+# Mini Finance Tracker v4.13
+
+**v4.13 (27 Oct 2026)** — WhatsApp link preview: `og-banner.jpg` (1200×630 JPEG under 300 KB) with `og:image:type image/jpeg`; the old `og-banner.png` stays deployed. A **Share this app** button (`ibi-share.js`, precached) sits in the top bar after the menu button. Front end only — `GAS.gs` is unchanged (still 4.12), nothing to paste.
 
 **v4.12 (11 Oct 2026)** — long words now break with `overflow-wrap: break-word` instead of `anywhere`, which could split a button label mid-word on a phone. Same block in all three finance trackers. GAS 4.12 is a number-only bump — pasting it is optional.
 
